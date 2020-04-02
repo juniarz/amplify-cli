@@ -17,14 +17,18 @@ def main():
   parser.add_argument('--rn', metavar='R', help='AWS region', required=True)
   parser.add_argument('--tn', metavar='T', help='table name', required=True)
   parser.add_argument('--lf', metavar='LF', help='lambda function that posts data to es', required=True)
-  parser.add_argument('--esarn', metavar='ESARN', help='event source ARN', required=True)
+  parser.add_argument('--esarn', metavar='ESARN', help='event source ARN')
+  parser.add_argument('--ap', metavar='AP', help='aws configuration profile')
   parser.add_argument('--ak', metavar='AK', help='aws access key')
   parser.add_argument('--sk', metavar='AS', help='aws secret key')
   args = parser.parse_args()
   scan_limit = 300
 
   if (args.ak is None or args.sk is None):
-    credentials = boto3.Session().get_credentials()
+    if (args.ap is not None):
+      credentials = boto3.Session(profile_name=args.ap).get_credentials()
+    else:
+      credentials = boto3.Session().get_credentials()
     args.sk = args.sk or credentials.secret_key
     args.ak = args.ak or credentials.access_key
 
@@ -47,6 +51,10 @@ def import_dynamodb_items_to_es(table_name, aws_secret, aws_access, aws_region, 
   ddb_keys_name = [a['AttributeName'] for a in table.attribute_definitions]
   logger.info('ddb_keys_name: %s', ddb_keys_name)
   response = None
+  
+  if (event_source_arn is None):
+    event_source_arn = table.latest_stream_arn
+    logger.info('latest source arn: %s', event_source_arn);
 
   while True:
       if not response:
