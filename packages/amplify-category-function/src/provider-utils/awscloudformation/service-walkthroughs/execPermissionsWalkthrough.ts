@@ -20,9 +20,10 @@ import { stateManager } from 'amplify-cli-core';
 export const askExecRolePermissionsQuestions = async (
   context,
   lambdaFunctionToUpdate: string,
-  currentPermissionMap?,
+  currentParameters?,
   currentEnvMap?,
 ): Promise<ExecRolePermissionsResponse> => {
+  const currentPermissionMap = currentParameters.permissions;
   const amplifyMeta = stateManager.getMeta();
 
   const categories = Object.keys(amplifyMeta).filter(category => category !== 'providers');
@@ -131,7 +132,7 @@ export const askExecRolePermissionsQuestions = async (
 
           const crudPermissionAnswer = await inquirer.prompt([crudPermissionQuestion]);
 
-          const resourcePolicy: any = crudPermissionAnswer.crudOptions;
+          let resourcePolicy: any = crudPermissionAnswer.crudOptions;
           // overload crudOptions when user selects graphql @model-backing DynamoDB table
           // as there is no actual storage category resource where getPermissionPolicies can derive service and provider
           if (resourceName.endsWith(appsyncTableSuffix)) {
@@ -150,7 +151,64 @@ export const askExecRolePermissionsQuestions = async (
             ];
           }
 
-          const { permissionPolicies, resourceAttributes } = await getPermissionPolicies(context, { [resourceName]: resourcePolicy });
+          // Check if 'CUSTOM' is the only selected CRUD option, load permissions with 'READ' and remove all actions later.
+          let hasRead = false;
+          let hasCustom = false;
+          let shouldClearActions = false;
+          if (Array.isArray(resourcePolicy)) {
+            if (resourcePolicy.includes(CRUDOperation.READ)) {
+              hasRead = true;
+            }
+            if (resourcePolicy.includes(CRUDOperation.CUSTOM) && resourcePolicy.length === 1) {
+              hasCustom = true;
+              resourcePolicy.unshift(CRUDOperation.READ);
+              shouldClearActions = true;
+            }
+
+            // Remove 'CUSTOM' operation.
+            resourcePolicy = resourcePolicy.filter(operation => operation !== CRUDOperation.CUSTOM);
+          }
+
+
+          let { permissionPolicies, resourceAttributes } = await getPermissionPolicies(context, { [resourceName]: resourcePolicy });
+
+          // Only process if 'CUSTOM' is selected
+          if (hasCustom) {
+            resourcePolicy.push(CRUDOperation.CUSTOM);
+            if (!hasRead) {
+              resourcePolicy = resourcePolicy.filter(operation => operation !== CRUDOperation.READ);
+            }
+            // If shouldClearActions, remove all actions.
+
+            if (shouldClearActions) {
+              permissionPolicies.forEach(policy => {
+                policy.Action = [];
+              });
+            }
+
+            const customMap = currentParameters.custom;
+            if (customMap[category] && customMap[category][resourceName]) {
+              const { actions, attributes } = customMap[category][resourceName];
+              // Add all custom actions
+              if (actions) {
+                permissionPolicies.forEach(policy => {
+                  policy.Action = policy.Action.concat(actions);
+                });
+              }
+
+              // Add all custom attributes
+              if (attributes) {
+                resourceAttributes = resourceAttributes.map(attribute => {
+                  if (attribute.category === category && attribute.resourceName === resourceName) {
+                    attribute.attributes.push(...attributes)
+                  }
+
+                  return attribute;
+                });
+              }
+            }
+          }
+
           categoryPolicies = categoryPolicies.concat(permissionPolicies);
 
           if (!permissions[category]) {

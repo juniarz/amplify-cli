@@ -11,4 +11,5 @@ export enum CRUDOperation {
   READ = 'read',
   UPDATE = 'update',
   DELETE = 'delete',
+  CUSTOM = 'custom'
 }

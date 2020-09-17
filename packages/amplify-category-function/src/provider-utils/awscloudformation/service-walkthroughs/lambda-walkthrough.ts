@@ -104,7 +104,7 @@ export async function updateWalkthrough(context, lambdaToUpdate?: string) {
   if (
     await context.amplify.confirmPrompt('Do you want to update the Lambda function permissions to access other resources in this project?')
   ) {
-    merge(functionParameters, await askExecRolePermissionsQuestions(context, lambdaToUpdate, currentParameters.permissions));
+    merge(functionParameters, await askExecRolePermissionsQuestions(context, lambdaToUpdate, currentParameters));
 
     const cfnFileName = `${functionParameters.resourceName}-cloudformation-template.json`;
     const cfnFilePath = path.join(resourceDirPath, cfnFileName);
