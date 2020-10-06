@@ -2,7 +2,7 @@ const fs = require('fs-extra');
 const path = require('path');
 const inquirer = require('inquirer');
 const sequential = require('promise-sequential');
-const S3 = require('./aws-utils/aws-s3');
+const { S3 } = require('./aws-utils/aws-s3');
 const { getConfiguredAmplifyClient } = require('./aws-utils/aws-amplify');
 const constants = require('./constants');
 const { checkAmplifyServiceIAMPermission } = require('./amplify-service-permission-check');
@@ -111,8 +111,10 @@ async function init(amplifyServiceParams) {
       environmentVariables: { _LIVE_PACKAGE_UPDATES: '[{"pkg":"@aws-amplify/cli","type":"npm","version":"latest"}]' },
     };
     try {
-      const createAppResponse = await amplifyClient.createApp(createAppParams).promise();
-      amplifyAppId = createAppResponse.app.appId;
+      if (amplifyAppCreationEnabled()) {
+        const createAppResponse = await amplifyClient.createApp(createAppParams).promise();
+        amplifyAppId = createAppResponse.app.appId;
+      }
     } catch (e) {
       if (e.code === 'LimitExceededException') {
         // Do nothing
@@ -259,8 +261,10 @@ async function postPushCheck(context) {
         };
 
         try {
-          const createAppResponse = await amplifyClient.createApp(createAppParams).promise();
-          amplifyAppId = createAppResponse.app.appId;
+          if (amplifyAppCreationEnabled()) {
+            const createAppResponse = await amplifyClient.createApp(createAppParams).promise();
+            amplifyAppId = createAppResponse.app.appId;
+          }
         } catch (e) {
           if (e.code === 'LimitExceededException') {
             // Do nothing
@@ -392,7 +396,7 @@ async function searchAmplifyService(amplifyClient, stackName) {
 }
 
 function storeArtifactsForAmplifyService(context) {
-  return new S3(context).then(async s3 => {
+  return S3.getInstance(context).then(async s3 => {
     const currentCloudBackendDir = context.amplify.pathManager.getCurrentCloudBackendDirPath();
     const amplifyMetaFilePath = path.join(currentCloudBackendDir, 'amplify-meta.json');
     const backendConfigFilePath = path.join(currentCloudBackendDir, 'backend-config.json');
@@ -414,6 +418,8 @@ async function uploadFile(s3, filePath, key) {
     await s3.uploadFile(s3Params);
   }
 }
+
+const amplifyAppCreationEnabled = () => !process.env || process.env.CLI_DEV_INTERNAL_DISABLE_AMPLIFY_APP_CREATION !== '1';
 
 module.exports = {
   init,
