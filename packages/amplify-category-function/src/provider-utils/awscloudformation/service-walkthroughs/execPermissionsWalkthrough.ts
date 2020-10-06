@@ -151,44 +151,25 @@ export const askExecRolePermissionsQuestions = async (
             ];
           }
 
-          // Check if 'CUSTOM' is the only selected CRUD option, load permissions with 'READ' and remove all actions later.
-          let hasRead = false;
+          // Check if 'CUSTOM' is the selected and remove 'CUSTOM' before generating policies from other categories.
           let hasCustom = false;
-          let shouldClearActions = false;
           if (Array.isArray(resourcePolicy)) {
-            if (resourcePolicy.includes(CRUDOperation.READ)) {
-              hasRead = true;
-            }
-            if (resourcePolicy.includes(CRUDOperation.CUSTOM) && resourcePolicy.length === 1) {
+            if (resourcePolicy.includes(CRUDOperation.CUSTOM)) {
               hasCustom = true;
-              resourcePolicy.unshift(CRUDOperation.READ);
-              shouldClearActions = true;
+              resourcePolicy = resourcePolicy.filter(operation => operation !== CRUDOperation.CUSTOM);
             }
-
-            // Remove 'CUSTOM' operation.
-            resourcePolicy = resourcePolicy.filter(operation => operation !== CRUDOperation.CUSTOM);
           }
-
 
           let { permissionPolicies, resourceAttributes } = await getPermissionPolicies(context, { [resourceName]: resourcePolicy });
 
           // Only process if 'CUSTOM' is selected
-          if (hasCustom) {
+          if (hasCustom && await context.amplify.confirmPrompt('Custom parameters is selected, this is an advanced feature and may cause errors if not configured properly. Load custom parameters?')) {
             resourcePolicy.push(CRUDOperation.CUSTOM);
-            if (!hasRead) {
-              resourcePolicy = resourcePolicy.filter(operation => operation !== CRUDOperation.READ);
-            }
-            // If shouldClearActions, remove all actions.
 
-            if (shouldClearActions) {
-              permissionPolicies.forEach(policy => {
-                policy.Action = [];
-              });
-            }
+            const customResourcePermissionsMap = currentParameters.customPermissions?.resourcePermissions || {};
+            if (customResourcePermissionsMap[category] && customResourcePermissionsMap[category][resourceName]) {
+              const { actions, attributes } = customResourcePermissionsMap[category][resourceName];
 
-            const customMap = currentParameters.custom;
-            if (customMap[category] && customMap[category][resourceName]) {
-              const { actions, attributes } = customMap[category][resourceName];
               // Add all custom actions
               if (actions) {
                 permissionPolicies.forEach(policy => {
@@ -200,7 +181,7 @@ export const askExecRolePermissionsQuestions = async (
               if (attributes) {
                 resourceAttributes = resourceAttributes.map(attribute => {
                   if (attribute.category === category && attribute.resourceName === resourceName) {
-                    attribute.attributes.push(...attributes)
+                    attribute.attributes.push(...attributes);
                   }
 
                   return attribute;
