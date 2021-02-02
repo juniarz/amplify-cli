@@ -1,6 +1,7 @@
 const constants = require('./constants');
 const path = require('path');
 const fs = require('fs-extra');
+const _ = require('lodash');
 const graphQLConfig = require('graphql-config');
 const amplifyConfigHelper = require('./amplify-config-helper');
 
@@ -53,7 +54,7 @@ function getSrcDir(context) {
   };
 }
 
-function createAmplifyConfig(context) {
+function createAmplifyConfig(context, amplifyResources, cloudAmplifyResources) {
   const { amplify } = context;
   const projectPath = context.exeInfo ? context.exeInfo.localEnvInfo.projectPath : amplify.getEnvInfo().projectPath;
   const projectConfig = context.exeInfo ? context.exeInfo.projectConfig[constants.Label] : amplify.getProjectConfig()[constants.Label];
@@ -63,18 +64,16 @@ function createAmplifyConfig(context) {
   fs.ensureDirSync(srcDirPath);
 
   const targetFilePath = path.join(srcDirPath, constants.amplifyConfigFilename);
-  let amplifyConfig;
-  if (fs.existsSync(targetFilePath)) {
-    amplifyConfig = context.amplify.readJsonFile(targetFilePath);
-  }
 
-  amplifyConfig = amplifyConfigHelper.generateConfig(context, amplifyConfig);
+  // Native GA release requires entire awsconfiguration inside amplifyconfiguration auth plugin
+  const newAWSConfig = getNewAWSConfigObject(context, amplifyResources, cloudAmplifyResources);
+  const amplifyConfig = amplifyConfigHelper.generateConfig(context, newAWSConfig);
 
   const jsonString = JSON.stringify(amplifyConfig, null, 4);
   fs.writeFileSync(targetFilePath, jsonString, 'utf8');
 }
 
-function createAWSConfig(context, amplifyResources, cloudAmplifyResources) {
+function getNewAWSConfigObject(context, amplifyResources, cloudAmplifyResources) {
   const newAWSConfig = getAWSConfigObject(amplifyResources);
   const cloudAWSConfig = getAWSConfigObject(cloudAmplifyResources);
   const currentAWSConfig = getCurrentAWSConfig(context);
@@ -82,7 +81,11 @@ function createAWSConfig(context, amplifyResources, cloudAmplifyResources) {
   const customConfigs = getCustomConfigs(cloudAWSConfig, currentAWSConfig);
 
   Object.assign(newAWSConfig, customConfigs);
+  return newAWSConfig;
+}
 
+function createAWSConfig(context, amplifyResources, cloudAmplifyResources) {
+  const newAWSConfig = getNewAWSConfigObject(context, amplifyResources, cloudAmplifyResources);
   generateAWSConfigFile(context, newAWSConfig);
   return context;
 }
@@ -191,14 +194,17 @@ function getCognitoConfig(cognitoResources, projectRegion) {
   }
 
   if (cognitoResource.output.UserPoolId) {
+    const defaultPool = {
+      PoolId: cognitoResource.output.UserPoolId,
+      AppClientId: cognitoResource.output.AppClientID,
+      Region: projectRegion,
+    };
+    if (cognitoResource.output.AppClientSecret) {
+      _.set(defaultPool, 'AppClientSecret', cognitoResource.output.AppClientSecret);
+    }
     Object.assign(cognitoConfig, {
       CognitoUserPool: {
-        Default: {
-          PoolId: cognitoResource.output.UserPoolId,
-          AppClientId: cognitoResource.output.AppClientID,
-          AppClientSecret: cognitoResource.output.AppClientSecret,
-          Region: projectRegion,
-        },
+        Default: defaultPool,
       },
     });
   }

@@ -1,10 +1,11 @@
+import execa from 'execa';
 import path from 'path';
-import { InvocationRequest} from 'amplify-function-plugin-interface';
-import {constants} from './constants'
-import childProcess from 'child_process';
-import {buildResource} from './build'
-export async function invokeResource(request: InvocationRequest , context : any){
+import { InvocationRequest } from 'amplify-function-plugin-interface';
+import { packageName, relativeShimJarPath } from './constants';
+import { buildResource } from './build';
+import { pathManager } from 'amplify-cli-core';
 
+export const invokeResource = async (request: InvocationRequest, context: any) => {
   await buildResource({
     env: request.env,
     runtime: request.runtime,
@@ -12,14 +13,34 @@ export async function invokeResource(request: InvocationRequest , context : any)
     lastBuildTimestamp: request.lastBuildTimestamp,
   });
 
-  const cp = childProcess.spawnSync('java', [ '-jar', 'localinvoke-all.jar' ,request.handler , request.event], { cwd: constants.shimBinPath , stdio : 'pipe' , encoding: 'utf-8' });
+  const [handlerClassName, handlerMethodName] = request.handler.split('::');
 
-  let result  = JSON.stringify(cp.stdout);
+  const childProcess = execa(
+    'java',
+    [
+      '-jar',
+      path.join(pathManager.getAmplifyPackageLibDirPath(packageName), relativeShimJarPath),
+      path.join(request.srcRoot, 'build', 'libs', 'latest_build.jar'),
+      handlerClassName,
+      handlerMethodName,
+    ],
+    {
+      input: request.event,
+    },
+  );
+  childProcess.stdout.pipe(process.stdout);
+
+  const { stdout, exitCode } = await childProcess;
+  if (exitCode !== 0) {
+    throw new Error(`java failed, exit code was ${exitCode}`);
+  }
+  const lines = stdout.split('\n');
+  const lastLine = lines[lines.length - 1];
+  let result = lastLine;
   try {
-    result = JSON.parse(result);
+    result = JSON.parse(lastLine);
   } catch (err) {
     context.print.warning('Could not parse function output as JSON. Using raw output.');
   }
-  return Promise.resolve(result);
+  return result;
 };
-

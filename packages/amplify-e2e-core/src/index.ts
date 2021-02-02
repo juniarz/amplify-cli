@@ -1,8 +1,15 @@
-import path from 'path';
+import * as os from 'os';
+import * as path from 'path';
 import * as fs from 'fs-extra';
 import { spawnSync, execSync } from 'child_process';
+import { v4 as uuid } from 'uuid';
 
-export * from './utils/nexpect';
+export * from './configure/';
+export * from './init/';
+export * from './utils/';
+export * from './categories';
+export * from './utils/sdk-calls';
+export { addFeatureFlag } from './utils/feature-flags';
 
 declare global {
   namespace NodeJS {
@@ -12,22 +19,35 @@ declare global {
   }
 }
 
-export function getCLIPath() {
-  if (isCI()) {
-    return 'amplify';
+const amplifyTestsDir = 'amplify-e2e-tests';
+
+export function getCLIPath(testingWithLatestCodebase = false) {
+  if (isCI() && !testingWithLatestCodebase) {
+    return process.env.AMPLIFY_PATH || 'amplify';
   }
   return path.join(__dirname, '..', '..', 'amplify-cli', 'bin', 'amplify');
 }
 
 export function isCI(): boolean {
-  return process.env.CI ? true : false;
+  return process.env.CI && process.env.CIRCLECI ? true : false;
 }
 
 export function npmInstall(cwd: string) {
   spawnSync('npm', ['install'], { cwd });
 }
 
-export async function createNewProjectDir(projectName: string, prefix = path.join('/tmp', 'amplify-e2e-tests')): Promise<string> {
+export async function installAmplifyCLI(version: string = 'latest') {
+  spawnSync('npm', ['install', '-g', `@aws-amplify/cli@${version}`], {
+    cwd: process.cwd(),
+    env: process.env,
+    stdio: 'inherit',
+  });
+}
+
+export async function createNewProjectDir(
+  projectName: string,
+  prefix = path.join(fs.realpathSync(os.tmpdir()), amplifyTestsDir),
+): Promise<string> {
   const currentHash = execSync('git rev-parse --short HEAD', { cwd: __dirname })
     .toString()
     .trim();
@@ -40,3 +60,12 @@ export async function createNewProjectDir(projectName: string, prefix = path.joi
   fs.ensureDirSync(projectDir);
   return projectDir;
 }
+
+export const createTempDir = () => {
+  const osTempDir = fs.realpathSync(os.tmpdir());
+  const tempProjectDir = path.join(osTempDir, amplifyTestsDir, uuid());
+
+  fs.mkdirsSync(tempProjectDir);
+
+  return tempProjectDir;
+};

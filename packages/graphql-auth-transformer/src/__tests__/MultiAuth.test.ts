@@ -1,8 +1,9 @@
-import { ObjectTypeDefinitionNode, parse, DocumentNode, Kind } from 'graphql';
+import { ObjectTypeDefinitionNode, FieldDefinitionNode, parse, DocumentNode, Kind, InputValueDefinitionNode, NamedTypeNode } from 'graphql';
 import { GraphQLTransform } from 'graphql-transformer-core';
 import { DynamoDBModelTransformer } from 'graphql-dynamodb-transformer';
 import { ModelConnectionTransformer } from 'graphql-connection-transformer';
 import { ModelAuthTransformer, AppSyncAuthConfiguration, AppSyncAuthMode } from '../ModelAuthTransformer';
+import { KeyTransformer } from '../../../graphql-key-transformer/src/KeyTransformer';
 
 const noAuthModeDefaultConfig: AppSyncAuthConfiguration = {
   defaultAuthentication: {
@@ -66,6 +67,7 @@ const multiAuthDirective =
 const ownerAuthDirective = '@auth(rules: [{allow: owner}])';
 const ownerWithIAMAuthDirective = '@auth(rules: [{allow: owner, provider: iam }])';
 const ownerRestrictedPublicAuthDirective = '@auth(rules: [{allow: owner},{allow: public, operations: [read]}])';
+const ownerRestrictedIAMPrivateAuthDirective = '@auth(rules: [{allow: owner},{allow: private, operations: [read], provider: iam }])';
 const groupsAuthDirective = '@auth(rules: [{allow: groups}])';
 const groupsWithApiKeyAuthDirective = '@auth(rules: [{allow: groups}, {allow: public, operations: [read]}])';
 const groupsWithProviderAuthDirective = '@auth(rules: [{allow: groups, provider: iam }])';
@@ -124,6 +126,14 @@ const getSchemaWithNonModelField = (authDirective: string) => {
 
     type Location {
       name: String
+      address: Address
+    }
+
+    type Address {
+      street: String
+      city: String
+      state: String
+      zip: String
     }
 
     enum Status {
@@ -132,9 +142,29 @@ const getSchemaWithNonModelField = (authDirective: string) => {
     }`;
 };
 
+const getSchemaWithRecursiveNonModelField = (authDirective: string) => {
+  return `
+    type Post @model ${authDirective} {
+      id: ID!
+      title: String!
+      tags: [Tag]
+    }
+
+    type Tag {
+      id: ID
+      tags: [Tag]
+    }
+  `;
+};
+
 const getTransformer = (authConfig: AppSyncAuthConfiguration) =>
   new GraphQLTransform({
-    transformers: [new DynamoDBModelTransformer(), new ModelConnectionTransformer(), new ModelAuthTransformer({ authConfig })],
+    transformers: [
+      new DynamoDBModelTransformer(),
+      new KeyTransformer(),
+      new ModelConnectionTransformer(),
+      new ModelAuthTransformer({ authConfig }),
+    ],
   });
 
 const getObjectType = (doc: DocumentNode, type: string): ObjectTypeDefinitionNode | undefined => {
@@ -148,7 +178,7 @@ const expectNone = fieldOrType => {
 };
 
 const expectOne = (fieldOrType, directiveName) => {
-  expect(fieldOrType.directives.length === 1);
+  expect(fieldOrType.directives.length).toBe(1);
   expect(fieldOrType.directives.find(d => d.name.value === directiveName)).toBeDefined();
 };
 
@@ -158,6 +188,21 @@ const expectTwo = (fieldOrType, directiveNames) => {
   expect(fieldOrType.directives.length === 2);
   expect(fieldOrType.directives.find(d => d.name.value === directiveNames[0])).toBeDefined();
   expect(fieldOrType.directives.find(d => d.name.value === directiveNames[1])).toBeDefined();
+};
+
+const expectMultiple = (fieldOrType: ObjectTypeDefinitionNode | FieldDefinitionNode, directiveNames: string[]) => {
+  expect(directiveNames).toBeDefined();
+  expect(directiveNames).toHaveLength(directiveNames.length);
+  expect(fieldOrType.directives.length).toEqual(directiveNames.length);
+  directiveNames.forEach(directiveName => {
+    expect(fieldOrType.directives).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          name: expect.objectContaining({ value: directiveName }),
+        }),
+      ]),
+    );
+  });
 };
 
 const getField = (type, name) => type.fields.find(f => f.name.value === name);
@@ -302,12 +347,21 @@ describe('Type directive transformation tests', () => {
     const schemaDoc = parse(out.schema);
     const queryType = getObjectType(schemaDoc, 'Query');
     const mutationType = getObjectType(schemaDoc, 'Mutation');
+    const subscriptionType = getObjectType(schemaDoc, 'Subscription');
 
     const fields = [...queryType.fields, ...mutationType.fields];
 
     for (const field of fields) {
       expect(field.directives.length === 1);
       expect(field.directives.find(d => d.name.value === userPoolsDirectiveName)).toBeDefined();
+    }
+
+    // Check that owner is required when only using owner auth rules
+    for (const field of subscriptionType.fields) {
+      expect(field.arguments).toHaveLength(1);
+      let arg: InputValueDefinitionNode = field.arguments[0];
+      expect(arg.name.value).toEqual('owner');
+      expect(arg.type.kind).toEqual(Kind.NON_NULL_TYPE);
     }
 
     // Check that resolvers containing the authMode check block
@@ -328,6 +382,7 @@ describe('Type directive transformation tests', () => {
     const schemaDoc = parse(out.schema);
     const queryType = getObjectType(schemaDoc, 'Query');
     const mutationType = getObjectType(schemaDoc, 'Mutation');
+    const subscriptionType = getObjectType(schemaDoc, 'Subscription');
 
     expectTwo(getField(queryType, 'getPost'), ['aws_cognito_user_pools', 'aws_api_key']);
     expectTwo(getField(queryType, 'listPosts'), ['aws_cognito_user_pools', 'aws_api_key']);
@@ -335,6 +390,19 @@ describe('Type directive transformation tests', () => {
     expectOne(getField(mutationType, 'createPost'), 'aws_cognito_user_pools');
     expectOne(getField(mutationType, 'updatePost'), 'aws_cognito_user_pools');
     expectOne(getField(mutationType, 'deletePost'), 'aws_cognito_user_pools');
+
+    const onCreate = getField(subscriptionType, 'onCreatePost');
+    expectMultiple(onCreate, ['aws_subscribe', 'aws_api_key', 'aws_cognito_user_pools']);
+    expectMultiple(getField(subscriptionType, 'onUpdatePost'), ['aws_subscribe', 'aws_api_key', 'aws_cognito_user_pools']);
+    expectMultiple(getField(subscriptionType, 'onDeletePost'), ['aws_subscribe', 'aws_api_key', 'aws_cognito_user_pools']);
+    expect(onCreate.arguments).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          name: expect.objectContaining({ value: 'owner' }),
+          type: expect.objectContaining({ kind: 'NamedType' }),
+        }),
+      ]),
+    );
   });
 
   test(`'public' with IAM provider adds policy for Unauth role`, () => {
@@ -429,6 +497,7 @@ describe('Type directive transformation tests', () => {
     const schemaDoc = parse(out.schema);
 
     const locationType = getObjectType(schemaDoc, 'Location');
+    const addressType = getObjectType(schemaDoc, 'Address');
     const expectedDirectiveNames = [userPoolsDirectiveName, apiKeyDirectiveName];
 
     if (expectedDirectiveNames && expectedDirectiveNames.length > 0) {
@@ -440,7 +509,29 @@ describe('Type directive transformation tests', () => {
       }
 
       expect(expectedDireciveNameCount).toEqual(locationType.directives.length);
+
+      expectedDireciveNameCount = 0;
+
+      for (const expectedDirectiveName of expectedDirectiveNames) {
+        expect(addressType.directives.find(d => d.name.value === expectedDirectiveName)).toBeDefined();
+        expectedDireciveNameCount++;
+      }
+
+      expect(expectedDireciveNameCount).toEqual(addressType.directives.length);
     }
+  });
+
+  test(`Recursive types without @model`, () => {
+    const schema = getSchemaWithRecursiveNonModelField(ownerRestrictedIAMPrivateAuthDirective);
+    const transformer = getTransformer(withAuthModes(userPoolsDefaultConfig, ['AWS_IAM']));
+
+    const out = transformer.transform(schema);
+    const schemaDoc = parse(out.schema);
+
+    const tagType = getObjectType(schemaDoc, 'Tag');
+    const expectedDirectiveNames = [userPoolsDirectiveName, iamDirectiveName];
+
+    expectMultiple(tagType, expectedDirectiveNames);
   });
 
   test(`Nested types without @model getting directives applied (cognito default, iam additional)`, () => {
@@ -451,6 +542,7 @@ describe('Type directive transformation tests', () => {
     const schemaDoc = parse(out.schema);
 
     const locationType = getObjectType(schemaDoc, 'Location');
+    const addressType = getObjectType(schemaDoc, 'Address');
     const expectedDirectiveNames = [userPoolsDirectiveName, iamDirectiveName];
 
     if (expectedDirectiveNames && expectedDirectiveNames.length > 0) {
@@ -463,6 +555,15 @@ describe('Type directive transformation tests', () => {
 
       expect(expectedDireciveNameCount).toEqual(locationType.directives.length);
 
+      expectedDireciveNameCount = 0;
+
+      for (const expectedDirectiveName of expectedDirectiveNames) {
+        expect(addressType.directives.find(d => d.name.value === expectedDirectiveName)).toBeDefined();
+        expectedDireciveNameCount++;
+      }
+
+      expect(expectedDireciveNameCount).toEqual(addressType.directives.length);
+
       expect(out.rootStack.Resources.AuthRolePolicy01).toBeDefined();
 
       const locationPolicy = out.rootStack.Resources.AuthRolePolicy01.Properties.PolicyDocument.Statement[0].Resource.filter(
@@ -474,6 +575,16 @@ describe('Type directive transformation tests', () => {
           r['Fn::Sub'][1].typeName === 'Location',
       );
       expect(locationPolicy).toBeDefined();
+
+      const addressPolicy = out.rootStack.Resources.AuthRolePolicy01.Properties.PolicyDocument.Statement[0].Resource.filter(
+        r =>
+          r['Fn::Sub'] &&
+          r['Fn::Sub'].length &&
+          r['Fn::Sub'].length === 2 &&
+          r['Fn::Sub'][1].typeName &&
+          r['Fn::Sub'][1].typeName === 'Address',
+      );
+      expect(addressPolicy).toBeDefined();
     }
   });
 
@@ -485,8 +596,10 @@ describe('Type directive transformation tests', () => {
     const schemaDoc = parse(out.schema);
 
     const locationType = getObjectType(schemaDoc, 'Location');
+    const addressType = getObjectType(schemaDoc, 'Address');
 
     expect(locationType.directives.length).toBe(0);
+    expect(addressType.directives.length).toBe(0);
 
     expect(out.rootStack.Resources.AuthRolePolicy01).toBeUndefined();
   });
@@ -499,8 +612,10 @@ describe('Type directive transformation tests', () => {
     const schemaDoc = parse(out.schema);
 
     const locationType = getObjectType(schemaDoc, 'Location');
+    const addressType = getObjectType(schemaDoc, 'Address');
 
     expect(locationType.directives.length).toBe(0);
+    expect(addressType.directives.length).toBe(0);
 
     expect(out.rootStack.Resources.AuthRolePolicy01).toBeDefined();
 
@@ -513,6 +628,16 @@ describe('Type directive transformation tests', () => {
         r['Fn::Sub'][1].typeName === 'Location',
     );
     expect(locationPolicy).toBeDefined();
+
+    const addressPolicy = out.rootStack.Resources.AuthRolePolicy01.Properties.PolicyDocument.Statement[0].Resource.filter(
+      r =>
+        r['Fn::Sub'] &&
+        r['Fn::Sub'].length &&
+        r['Fn::Sub'].length === 2 &&
+        r['Fn::Sub'][1].typeName &&
+        r['Fn::Sub'][1].typeName === 'Address',
+    );
+    expect(addressPolicy).toBeDefined();
   });
 
   // Disabling until troubleshooting the changes
@@ -554,6 +679,91 @@ describe('Type directive transformation tests', () => {
   //     const modelPostConnectionType = getObjectType(schemaDoc, 'ModelPostConnection');
   //     expect (expectOne(modelPostConnectionType, 'aws_cognito_user_pools'));
   // });
+
+  test(`ModelXConnection type is getting the directives added, when a field has @connection but one of the types has no queries defined`, () => {
+    const schema = `
+    type User @model
+     @auth(rules: [
+       { allow: private, provider: iam, operations: [read] }
+       { allow: groups, groups: ["Group"], operations: [read, update, delete] },
+     ]) {
+     id: ID!
+     posts: [Post!] @connection(keyName:"byUser", fields: ["id"])
+   }
+
+   type Post @model(
+    queries: null)
+    @auth(rules: [
+      { allow: private, provider: iam, operations: [read] },
+      { allow: groups, groups: ["Group"], operations: [read, update, delete] }
+    ]) 
+    @key(name: "byUser", fields: ["postUserId"])
+    {
+    id: ID!
+    postUserId: ID!
+    message: String
+  }
+    `;
+
+    const transformer = getTransformer(withAuthModes(iamDefaultConfig, ['AMAZON_COGNITO_USER_POOLS']));
+    const out = transformer.transform(schema);
+    const schemaDoc = parse(out.schema);
+    const queryType = getObjectType(schemaDoc, 'Query');
+    const mutationType = getObjectType(schemaDoc, 'Mutation');
+
+    expectTwo(getField(queryType, 'getUser'), ['aws_iam', 'aws_cognito_user_pools']);
+    expectTwo(getField(queryType, 'listUsers'), ['aws_iam', 'aws_cognito_user_pools']);
+
+    expectNone(getField(mutationType, 'createUser'));
+    expectOne(getField(mutationType, 'updateUser'), 'aws_cognito_user_pools');
+    expectOne(getField(mutationType, 'deleteUser'), 'aws_cognito_user_pools');
+
+    const userType = getObjectType(schemaDoc, 'User');
+    expectTwo(userType, ['aws_iam', 'aws_cognito_user_pools']);
+    expectNone(getField(userType, 'posts'));
+
+    const modelPostConnectionType = getObjectType(schemaDoc, 'ModelPostConnection');
+    expect(modelPostConnectionType).toBeDefined();
+    expectTwo(modelPostConnectionType, ['aws_iam', 'aws_cognito_user_pools']);
+  });
+
+  test(`ModelXConnection type is getting the directives added, when a field has @connection but one of the types has no queries defined. Many to Many`, () => {
+    const schema = `
+    type Post @model @auth(rules: [{ allow: owner }]) {
+      id: ID!
+      title: String!
+      editors: [PostEditor] @connection(keyName: "byPost", fields: ["id"])
+    }
+    
+    # Create a join model and disable queries as you don't need them
+    # and can query through Post.editors and User.posts
+    type PostEditor
+      @model(queries: null)
+      @auth(rules: [{ allow: owner }])
+      @key(name: "byPost", fields: ["postID", "editorID"])
+      @key(name: "byEditor", fields: ["editorID", "postID"]) {
+      id: ID!
+      postID: ID!
+      editorID: ID!
+      post: Post! @connection(fields: ["postID"])
+      editor: User! @connection(fields: ["editorID"])
+    }
+    
+    type User @model @auth(rules: [{ allow: owner }]) {
+      id: ID!
+      username: String!
+      posts: [PostEditor] @connection(keyName: "byEditor", fields: ["id"])
+    }
+    `;
+
+    const transformer = getTransformer(withAuthModes(apiKeyDefaultConfig, ['AMAZON_COGNITO_USER_POOLS']));
+    const out = transformer.transform(schema);
+    const schemaDoc = parse(out.schema);
+
+    const modelPostEditorConnectionType = getObjectType(schemaDoc, 'ModelPostEditorConnection');
+    expect(modelPostEditorConnectionType).toBeDefined();
+    expectOne(modelPostEditorConnectionType, 'aws_cognito_user_pools');
+  });
 });
 
 describe(`Policy slicing tests`, () => {

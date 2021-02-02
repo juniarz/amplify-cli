@@ -1,8 +1,8 @@
 import { existsSync } from 'fs-extra';
-import _ = require('lodash');
-const path = require('path');
+import * as _ from 'lodash';
+import * as path from 'path';
 
-function loadFunction(fileName) {
+function loadFunction(fileName: string) {
   return require(path.resolve(fileName));
 }
 
@@ -76,10 +76,15 @@ function invokeFunction(options: InvokeOptions) {
         );
         return;
       }
-      const result = await lambda[options.handler](event, context, callback);
-      if (result !== undefined) {
-        context.done(null, result);
-      } else {
+      const response = lambda[options.handler](event, context, callback);
+      if (typeof response === 'object' && typeof response.then === 'function') {
+        const result = await response;
+        if (result !== undefined) {
+          context.done(null, result);
+        } else {
+          context.done(null, null);
+        }
+      } else if (response !== undefined) {
         context.done(null, null);
       }
     } catch (e) {
@@ -94,6 +99,7 @@ process.on('message', async options => {
     process.send(JSON.stringify({ result, error: null }));
   } catch (error) {
     process.send(JSON.stringify({ result: null, error }));
+    process.exit(1);
   }
-  process.exit(1);
+  process.exit(0);
 });

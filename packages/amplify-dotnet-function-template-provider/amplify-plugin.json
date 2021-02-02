@@ -6,7 +6,7 @@
   "functionTemplate": {
     "conditions": {
       "provider": "awscloudformation",
-      "service": "Lambda",
+      "services": ["Lambda"],
       "runtime": ["dotnetcore3.1"]
     },
     "templates": [
@@ -21,6 +21,10 @@
       {
         "name": "Trigger (DynamoDb, Kinesis)",
         "value": "trigger"
+      },
+      {
+        "name": "CRUD function for DynamoDB (Integration with API Gateway)",
+        "value": "crud"
       }
     ]
   }

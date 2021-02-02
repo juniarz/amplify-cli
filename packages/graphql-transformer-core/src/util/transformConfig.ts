@@ -15,22 +15,22 @@ export interface TransformMigrationConfig {
 }
 
 // Sync Config
-export declare enum ConflictHandlerType {
+export const enum ConflictHandlerType {
   OPTIMISTIC = 'OPTIMISTIC_CONCURRENCY',
   AUTOMERGE = 'AUTOMERGE',
   LAMBDA = 'LAMBDA',
 }
-export type ConflictDectionType = 'VERSION' | 'NONE';
+export type ConflictDetectionType = 'VERSION' | 'NONE';
 export type SyncConfigOPTIMISTIC = {
-  ConflictDetection: ConflictDectionType;
+  ConflictDetection: ConflictDetectionType;
   ConflictHandler: ConflictHandlerType.OPTIMISTIC;
 };
 export type SyncConfigSERVER = {
-  ConflictDetection: ConflictDectionType;
+  ConflictDetection: ConflictDetectionType;
   ConflictHandler: ConflictHandlerType.AUTOMERGE;
 };
 export type SyncConfigLAMBDA = {
-  ConflictDetection: ConflictDectionType;
+  ConflictDetection: ConflictDetectionType;
   ConflictHandler: ConflictHandlerType.LAMBDA;
   LambdaConflictHandler: {
     name: string;
@@ -41,8 +41,8 @@ export type SyncConfigLAMBDA = {
 export type SyncConfig = SyncConfigOPTIMISTIC | SyncConfigSERVER | SyncConfigLAMBDA;
 
 export type ResolverConfig = {
-  project: SyncConfig;
-  models: {
+  project?: SyncConfig;
+  models?: {
     [key: string]: SyncConfig;
   };
 };
@@ -99,6 +99,12 @@ export interface TransformConfig {
    * Such as sync configuration for appsync local support
    */
   ResolverConfig?: ResolverConfig;
+
+  /**
+   * List of custom transformer plugins
+   */
+  transformers?: string[];
+  warningESMessage?: boolean;
 }
 /**
  * try to load transformer config from specified projectDir
@@ -129,6 +135,11 @@ export async function writeConfig(projectDir: string, config: TransformConfig): 
   return config;
 }
 
+export const isDataStoreEnabled = async (projectDir: string): Promise<boolean> => {
+  const transformerConfig = await loadConfig(projectDir);
+  return transformerConfig?.ResolverConfig?.project !== undefined || transformerConfig?.ResolverConfig?.models !== undefined;
+};
+
 /**
  * Given an absolute path to an amplify project directory, load the
  * user defined configuration.
@@ -136,6 +147,9 @@ export async function writeConfig(projectDir: string, config: TransformConfig): 
 interface ProjectConfiguration {
   schema: string;
   functions: {
+    [k: string]: string;
+  };
+  pipelineFunctions: {
     [k: string]: string;
   };
   resolvers: {
@@ -163,6 +177,23 @@ export async function loadProject(projectDirectory: string, opts?: ProjectOption
         }
         const functionFilePath = path.join(functionDirectory, functionFile);
         functions[functionFile] = functionFilePath;
+      }
+    }
+  }
+
+  // load pipeline functions
+  const pipelineFunctions = {};
+  if (!(opts && opts.disablePipelineFunctionOverrides === true)) {
+    const pipelineFunctionDirectory = path.join(projectDirectory, 'pipelineFunctions');
+    const pipelineFunctionDirectoryExists = await fs.exists(pipelineFunctionDirectory);
+    if (pipelineFunctionDirectoryExists) {
+      const pipelineFunctionFiles = await fs.readdir(pipelineFunctionDirectory);
+      for (const pipelineFunctionFile of pipelineFunctionFiles) {
+        if (pipelineFunctionFile.indexOf('.') === 0) {
+          continue;
+        }
+        const pipelineFunctionPath = path.join(pipelineFunctionDirectory, pipelineFunctionFile);
+        pipelineFunctions[pipelineFunctionFile] = await fs.readFile(pipelineFunctionPath);
       }
     }
   }
@@ -209,6 +240,7 @@ export async function loadProject(projectDirectory: string, opts?: ProjectOption
   const config = await loadConfig(projectDirectory);
   return {
     functions,
+    pipelineFunctions,
     stacks,
     resolvers,
     schema,

@@ -48,15 +48,15 @@ export interface RawAppSyncModelConfig extends RawConfig {
    *  plugins:
    *    - amplify-codegen-appsync-model-plugin
    * ```
-   * target: 'swift'| 'javascript'| 'typescript' | 'android' | 'metadata'
+   * target: 'swift'| 'javascript'| 'typescript' | 'java' | 'metadata' | 'dart'
    */
   target: string;
 
   /**
    * @name modelName
    * @type string
-   * @description optional, name of the model to which the code needs to be generated. Used only
-   * when target is set to swift
+   * @description optional, name of the model to which the code needs to be generated. Used
+   * when target is set to swift, java and dart
    * @default undefined, this will generate code for all the models
    *
    * generates:
@@ -120,6 +120,7 @@ export type TypeInfo = {
   type: string;
   isList: boolean;
   isNullable: boolean;
+  isListNullable?: boolean;
   baseType?: GraphQLNamedType | null;
 };
 export type CodeGenModel = {
@@ -450,7 +451,7 @@ export class AppSyncModelVisitor<
           if (connectionInfo.kind === CodeGenConnectionType.HAS_MANY || connectionInfo.kind === CodeGenConnectionType.HAS_ONE) {
             // Need to update the other side of the connection even if there is no connection directive
             addFieldToModel(connectionInfo.connectedModel, connectionInfo.associatedWith);
-          } else {
+          } else if (connectionInfo.targetName !== 'id') {
             // Need to remove the field that is targetName
             removeFieldFromModel(model, connectionInfo.targetName);
           }
@@ -475,10 +476,18 @@ export class AppSyncModelVisitor<
   }
 
   protected processAuthDirectives(): void {
+    //model @auth process
     Object.values(this.modelMap).forEach(model => {
       const filteredDirectives = model.directives.filter(d => d.name !== 'auth');
       const authDirectives = processAuthDirective(model.directives);
       model.directives = [...filteredDirectives, ...authDirectives];
+
+      //field @auth process
+      model.fields.forEach(field => {
+        const nonAuthDirectives = field.directives.filter(d => d.name != 'auth');
+        const authDirectives = processAuthDirective(field.directives);
+        field.directives = [...nonAuthDirectives, ...authDirectives];
+      });
     });
   }
 

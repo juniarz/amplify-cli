@@ -8,7 +8,7 @@ import {
   interfaceDeclarationForFragment,
   propertiesFromFields,
   updateTypeNameField,
-  propertyDeclarations,
+  pickedPropertyDeclarations,
   interfaceNameFromOperation,
 } from '../typescript/codeGeneration';
 import { typeNameFromGraphQLType } from '../typescript/types';
@@ -23,10 +23,9 @@ export function generateSource(context: LegacyCompilerContext) {
   generator.printOnNewline('//  This file was automatically generated and should not be edited.');
 
   generator.printOnNewline(`import { Injectable } from '@angular/core';`);
-  generator.printOnNewline(`import API, { graphqlOperation } from '@aws-amplify/api';`);
-  generator.printOnNewline(`import { GraphQLResult } from "@aws-amplify/api/lib/types";`);
+  generator.printOnNewline(`import API, { graphqlOperation, GraphQLResult } from '@aws-amplify/api-graphql';`);
 
-  generator.printOnNewline(`import * as Observable from 'zen-observable';`);
+  generator.printOnNewline(`import { Observable } from 'zen-observable-ts';`);
   generator.printNewline();
 
   generateTypes(generator, context);
@@ -37,6 +36,15 @@ export function generateSource(context: LegacyCompilerContext) {
 }
 
 function generateTypes(generator: CodeGenerator, context: LegacyCompilerContext) {
+  // if subscription operations exist create subscriptionResponse interface
+  // https://github.com/aws-amplify/amplify-cli/issues/5284
+  if (context.schema.getSubscriptionType()) {
+    generator.printOnNewline(`
+    export interface SubscriptionResponse<T> {
+      value: GraphQLResult<T>;
+    }`);
+    generator.printNewline();
+  }
   context.typesUsed.forEach(type => typeDeclarationForGraphQLType(generator, type));
 
   Object.values(context.operations).forEach(operation => {
@@ -75,14 +83,14 @@ function interfaceDeclarationForOperation(generator: CodeGenerator, { operationN
         interfaceName,
       },
       () => {
-        propertyDeclarations(generator, properties);
+        pickedPropertyDeclarations(generator, properties);
       },
     );
   }
 }
 
 function getOperationResultField(operation: LegacyOperation): LegacyField | void {
-  if (operation.fields.length && operation.fields[0].fields) {
+  if (operation.fields.length) {
     return operation.fields[0];
   }
 }
@@ -128,7 +136,7 @@ function generateSubscriptionOperation(generator: CodeGenerator, op: LegacyOpera
   generator.printNewline();
   const subscriptionName = `${operationName}Listener`;
   generator.print(
-    `${subscriptionName}: Observable<${returnType}> = API.graphql(graphqlOperation(\n\`${statement}\`)) as Observable<${returnType}>`,
+    `${subscriptionName}: Observable<SubscriptionResponse<${returnType}>> = API.graphql(graphqlOperation(\n\`${statement}\`)) as Observable<SubscriptionResponse<${returnType}>>`,
   );
   generator.printNewline();
 }

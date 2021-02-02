@@ -1,7 +1,8 @@
 import { existsSync } from 'fs-extra';
-import { InvokeOptions } from './invokeOptions';
+import { InvokeOptions } from './invokeUtils';
 import path from 'path';
 import _ from 'lodash';
+import exit from 'exit';
 
 //  copied from amplify-util-mock with slight modifications
 
@@ -16,7 +17,7 @@ async function loadHandler(root: string, handler: string): Promise<Function> {
   }
 }
 
-function invokeFunction(options: InvokeOptions) {
+export function invokeFunction(options: InvokeOptions) {
   return new Promise(async (resolve, reject) => {
     let returned = false;
 
@@ -37,7 +38,7 @@ function invokeFunction(options: InvokeOptions) {
       },
       fail(error: any) {
         returned = true;
-        reject(_.assign({}, error));
+        reject(error);
       },
       awsRequestId: 'LAMBDA_INVOKE',
       logStreamName: 'LAMBDA_INVOKE',
@@ -69,13 +70,17 @@ function invokeFunction(options: InvokeOptions) {
     };
 
     const lambdaHandler = await loadHandler(options.packageFolder, options.handler);
-
     const { event } = options;
     try {
-      const result = await lambdaHandler(event, context, callback);
-      if (result !== undefined) {
-        context.done(null, result);
-      } else {
+      const response = lambdaHandler(JSON.parse(event), context, callback);
+      if (typeof response === 'object' && typeof response.then === 'function') {
+        const result = await response;
+        if (result !== undefined) {
+          context.done(null, result);
+        } else {
+          context.done(null, null);
+        }
+      } else if (response !== undefined) {
         context.done(null, null);
       }
     } catch (e) {
@@ -87,9 +92,17 @@ function invokeFunction(options: InvokeOptions) {
 process.on('message', async options => {
   try {
     const result = await invokeFunction(JSON.parse(options));
-    process.send!(JSON.stringify({ result, error: null }));
+    process.stdout.write('\n');
+    process.stdout.write(JSON.stringify({ result, error: null }));
   } catch (error) {
-    process.send!(JSON.stringify({ result: null, error }));
+    let lambdaError = typeof error === 'string' ? { message: 'Unknown Error' } : { message: error.message, stack: error.stack };
+    process.stdout.write('\n');
+    process.stdout.write(
+      JSON.stringify({
+        result: null,
+        error: { type: 'Lambda:Unhandled', ...lambdaError },
+      }),
+    );
   }
-  process.exit(1);
+  exit(0);
 });

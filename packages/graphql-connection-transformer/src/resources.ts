@@ -18,10 +18,9 @@ import {
   equals,
   iff,
   raw,
-  comment,
-  qref,
   Expression,
-  block,
+  or,
+  list,
 } from 'graphql-mapping-template';
 import {
   ResourceConstants,
@@ -152,7 +151,7 @@ export class ResourceFactory {
         // Use Int minvalue as default
         keyObj.attributes.push([
           sortFieldInfo.primarySortFieldName,
-          ref(`util.dynamodb.toDynamoDBJson($util.defaultIfNull($ctx.source.${sortFieldInfo.sortFieldName}, "${NONE_INT_VALUE}"))`),
+          ref(`util.dynamodb.toDynamoDBJson($util.defaultIfNull($ctx.source.${sortFieldInfo.sortFieldName}, ${NONE_INT_VALUE}))`),
         ]);
       }
     }
@@ -163,11 +162,18 @@ export class ResourceFactory {
       FieldName: field,
       TypeName: type,
       RequestMappingTemplate: print(
-        DynamoDBMappingTemplate.getItem({
-          key: keyObj,
-        }),
+        ifElse(
+          or([
+            raw(`$util.isNull($ctx.source.${connectionAttribute})`),
+            ...(sortFieldInfo ? [raw(`$util.isNull($ctx.source.${connectionAttribute})`)] : []),
+          ]),
+          raw('#return'),
+          DynamoDBMappingTemplate.getItem({
+            key: keyObj,
+          }),
+        ),
       ),
-      ResponseMappingTemplate: print(ref('util.toJson($context.result)')),
+      ResponseMappingTemplate: print(DynamoDBMappingTemplate.dynamoDBResponse(false)),
     }).dependsOn(ResourceConstants.RESOURCES.GraphQLSchemaLogicalID);
   }
 
@@ -185,8 +191,7 @@ export class ResourceFactory {
     sortKeyInfo?: { fieldName: string; attributeType: 'S' | 'B' | 'N' },
     limit?: number,
   ) {
-    const defaultPageLimit = 10;
-    const pageLimit = limit || defaultPageLimit;
+    const pageLimit = limit || ResourceConstants.DEFAULT_PAGE_LIMIT;
     const setup: Expression[] = [
       set(ref('limit'), ref(`util.defaultIfNull($context.args.limit, ${pageLimit})`)),
       set(
@@ -213,24 +218,31 @@ export class ResourceFactory {
       FieldName: field,
       TypeName: type,
       RequestMappingTemplate: print(
-        compoundExpression([
-          ...setup,
-          DynamoDBMappingTemplate.query({
-            query: raw('$util.toJson($query)'),
-            scanIndexForward: ifElse(
-              ref('context.args.sortDirection'),
-              ifElse(equals(ref('context.args.sortDirection'), str('ASC')), bool(true), bool(false)),
-              bool(true),
-            ),
-            filter: ifElse(ref('context.args.filter'), ref('util.transform.toDynamoDBFilterExpression($ctx.args.filter)'), nul()),
-            limit: ref('limit'),
-            nextToken: ifElse(ref('context.args.nextToken'), ref('util.toJson($context.args.nextToken)'), nul()),
-            index: str(`gsi-${connectionName}`),
-          }),
-        ]),
+        ifElse(
+          raw(`$util.isNull($context.source.${idFieldName})`),
+          compoundExpression([set(ref('result'), obj({ items: list([]) })), raw('#return($result)')]),
+          compoundExpression([
+            ...setup,
+            DynamoDBMappingTemplate.query({
+              query: raw('$util.toJson($query)'),
+              scanIndexForward: ifElse(
+                ref('context.args.sortDirection'),
+                ifElse(equals(ref('context.args.sortDirection'), str('ASC')), bool(true), bool(false)),
+                bool(true),
+              ),
+              filter: ifElse(ref('context.args.filter'), ref('util.transform.toDynamoDBFilterExpression($ctx.args.filter)'), nul()),
+              limit: ref('limit'),
+              nextToken: ifElse(ref('context.args.nextToken'), ref('util.toJson($context.args.nextToken)'), nul()),
+              index: str(`gsi-${connectionName}`),
+            }),
+          ]),
+        ),
       ),
       ResponseMappingTemplate: print(
-        compoundExpression([iff(raw('!$result'), set(ref('result'), ref('ctx.result'))), raw('$util.toJson($result)')]),
+        DynamoDBMappingTemplate.dynamoDBResponse(
+          false,
+          compoundExpression([iff(raw('!$result'), set(ref('result'), ref('ctx.result'))), raw('$util.toJson($result)')]),
+        ),
       ),
     }).dependsOn(ResourceConstants.RESOURCES.GraphQLSchemaLogicalID);
   }
@@ -284,13 +296,17 @@ export class ResourceFactory {
       FieldName: field,
       TypeName: type,
       RequestMappingTemplate: print(
-        compoundExpression([
-          DynamoDBMappingTemplate.getItem({
-            key: keyObj,
-          }),
-        ]),
+        ifElse(
+          or(connectionAttributes.map(ca => raw(`$util.isNull($ctx.source.${ca})`))),
+          raw('#return'),
+          compoundExpression([
+            DynamoDBMappingTemplate.getItem({
+              key: keyObj,
+            }),
+          ]),
+        ),
       ),
-      ResponseMappingTemplate: print(ref('util.toJson($context.result)')),
+      ResponseMappingTemplate: print(DynamoDBMappingTemplate.dynamoDBResponse(false)),
     }).dependsOn(ResourceConstants.RESOURCES.GraphQLSchemaLogicalID);
   }
 
@@ -310,10 +326,11 @@ export class ResourceFactory {
     connectionAttributes: string[],
     keySchema: KeySchema[],
     indexName: string,
+    limit?: number,
   ) {
-    const defaultPageLimit = 10;
+    const pageLimit = limit || ResourceConstants.DEFAULT_PAGE_LIMIT;
     const setup: Expression[] = [
-      set(ref('limit'), ref(`util.defaultIfNull($context.args.limit, ${defaultPageLimit})`)),
+      set(ref('limit'), ref(`util.defaultIfNull($context.args.limit, ${pageLimit})`)),
       set(ref('query'), this.makeExpression(keySchema, connectionAttributes)),
     ];
 
@@ -361,9 +378,18 @@ export class ResourceFactory {
       DataSourceName: Fn.GetAtt(ModelResourceIDs.ModelTableDataSourceID(relatedType.name.value), 'Name'),
       FieldName: field,
       TypeName: type,
-      RequestMappingTemplate: print(compoundExpression([...setup, queryObj])),
+      RequestMappingTemplate: print(
+        ifElse(
+          raw(`$util.isNull($ctx.source.${connectionAttributes[0]})`),
+          compoundExpression([set(ref('result'), obj({ items: list([]) })), raw('#return($result)')]),
+          compoundExpression([...setup, queryObj]),
+        ),
+      ),
       ResponseMappingTemplate: print(
-        compoundExpression([iff(raw('!$result'), set(ref('result'), ref('ctx.result'))), raw('$util.toJson($result)')]),
+        DynamoDBMappingTemplate.dynamoDBResponse(
+          false,
+          compoundExpression([iff(raw('!$result'), set(ref('result'), ref('ctx.result'))), raw('$util.toJson($result)')]),
+        ),
       ),
     }).dependsOn(ResourceConstants.RESOURCES.GraphQLSchemaLogicalID);
   }

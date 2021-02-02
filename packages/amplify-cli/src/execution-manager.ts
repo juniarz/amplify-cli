@@ -1,11 +1,12 @@
-import fs from 'fs-extra';
-import path from 'path';
+import * as fs from 'fs-extra';
+import * as path from 'path';
+import * as inquirer from 'inquirer';
+import { stateManager } from 'amplify-cli-core';
 import { twoStringSetsAreEqual, twoStringSetsAreDisjoint } from './utils/set-ops';
 import { Context } from './domain/context';
 import { constants } from './domain/constants';
 import { scan, getPluginsWithNameAndCommand, getPluginsWithEventHandler } from './plugin-manager';
 import { PluginInfo } from './domain/plugin-info';
-import inquirer from './domain/inquirer-helper';
 import {
   AmplifyEvent,
   AmplifyEventArgs,
@@ -15,7 +16,10 @@ import {
   AmplifyPostPushEventData,
   AmplifyPrePullEventData,
   AmplifyPostPullEventData,
+  AmplifyPreCodegenModelsEventData,
+  AmplifyPostCodegenModelsEventData,
 } from './domain/amplify-event';
+import { isHeadlessCommand, readHeadlessPayload } from './utils/headless-input-utils';
 
 export async function executeCommand(context: Context) {
   const pluginCandidates = getPluginsWithNameAndCommand(context.pluginPlatform, context.input.plugin!, context.input.command!);
@@ -26,6 +30,17 @@ export async function executeCommand(context: Context) {
     const selectedPluginInfo = await selectPluginForExecution(context, pluginCandidates);
     await executePluginModuleCommand(context, selectedPluginInfo);
   }
+}
+
+function isContainersEnabled(context) {
+  const { frontend } = context.amplify.getProjectConfig();
+  if (frontend) {
+    const { config: { ServerlessContainers = false } = {} } = context.amplify.getProjectConfig()[frontend];
+
+    return ServerlessContainers;
+  }
+
+  return false;
 }
 
 async function selectPluginForExecution(context: Context, pluginCandidates: PluginInfo[]): Promise<PluginInfo> {
@@ -47,9 +62,8 @@ async function selectPluginForExecution(context: Context, pluginCandidates: Plug
     });
 
     if (candidatesAreAllCategoryPlugins && candidatesAllHaveTheSameName) {
-      const amplifyMetaFilePath = context.amplify.pathManager.getAmplifyMetaFilePath();
-      if (fs.existsSync(amplifyMetaFilePath)) {
-        const amplifyMeta = context.amplify.readJsonFile(amplifyMetaFilePath);
+      if (stateManager.metaFileExists()) {
+        const amplifyMeta = stateManager.getMeta();
 
         const servicesSetInMeta = new Set<string>(Object.keys(amplifyMeta[pluginName] || {}));
         const pluginWithMatchingServices: PluginInfo[] = [];
@@ -117,6 +131,13 @@ async function selectPluginForExecution(context: Context, pluginCandidates: Plug
       pluginCandidates = consoleHostingPlugins.concat(otherPlugins);
     }
 
+    const amplifyMeta = context.amplify.getProjectMeta();
+    const { Region } = amplifyMeta.providers['awscloudformation'];
+
+    if (!isContainersEnabled(context) || Region !== 'us-east-1') {
+      pluginCandidates = pluginCandidates.filter(plugin => !plugin.manifest.services?.includes('ElasticContainer'));
+    }
+
     const answer = await inquirer.prompt({
       type: 'list',
       name: 'section',
@@ -140,78 +161,102 @@ async function selectPluginForExecution(context: Context, pluginCandidates: Plug
   return result;
 }
 
-async function executePluginModuleCommand(context: Context, plugin: PluginInfo) {
+async function executePluginModuleCommand(context: Context, plugin: PluginInfo): Promise<void> {
   const { commands, commandAliases } = plugin.manifest;
   if (!commands!.includes(context.input.command!)) {
     context.input.command = commandAliases![context.input.command!];
   }
 
-  if (fs.existsSync(plugin.packageLocation)) {
-    await raisePreEvent(context);
-
-    const pluginModule = require(plugin.packageLocation);
-    if (
-      pluginModule.hasOwnProperty(constants.ExecuteAmplifyCommand) &&
-      typeof pluginModule[constants.ExecuteAmplifyCommand] === 'function'
-    ) {
-      attachContextExtensions(context, plugin);
-      await pluginModule.executeAmplifyCommand(context);
-    } else {
-      // if the module does not have the executeAmplifyCommand method,
-      // fall back to the old approach by scanning the command folder and locate the command file
-      let commandFilepath = path.normalize(path.join(plugin.packageLocation, 'commands', plugin.manifest.name, context.input.command!));
-      if (context.input.subCommands && context.input.subCommands.length > 0) {
-        commandFilepath = path.join(commandFilepath, ...context.input.subCommands!);
-      }
-
-      let commandModule;
-
-      try {
-        commandModule = require(commandFilepath);
-      } catch (e) {
-        // do nothing
-      }
-
-      if (!commandModule) {
-        commandFilepath = path.normalize(path.join(plugin.packageLocation, 'commands', plugin.manifest.name));
-        try {
-          commandModule = require(commandFilepath);
-        } catch (e) {
-          // do nothing
-        }
-      }
-
-      if (commandModule) {
-        attachContextExtensions(context, plugin);
-        await commandModule.run(context);
-      } else {
-        const { showAllHelp } = require('./extensions/amplify-helpers/show-all-help');
-        showAllHelp(context);
-      }
-    }
-
-    await raisePostEvent(context);
-  } else {
+  if (!fs.existsSync(plugin.packageLocation)) {
     await scan();
     context.print.error('The Amplify CLI plugin platform detected an error.');
     context.print.info('It has performed a fresh scan.');
     context.print.info('Please execute your command again.');
+    return;
   }
+
+  const handler = await getHandler(plugin, context);
+  attachContextExtensions(context, plugin);
+  await raisePreEvent(context);
+  await handler();
+  await raisePostEvent(context);
 }
 
-async function raisePreEvent(context: Context) {
-  if (context.input.plugin === constants.CORE) {
-    switch (context.input.command) {
-      case 'init':
-        await raisePreInitEvent(context);
-        break;
-      case 'push':
-        await raisePrePushEvent(context);
-        break;
-      case 'pull':
-        await raisePrePullEvent(context);
-        break;
+const getHandler = async (pluginInfo: PluginInfo, context: any): Promise<() => Promise<void>> => {
+  const pluginModule = await import(pluginInfo.packageLocation);
+  let commandName = constants.ExecuteAmplifyCommand;
+  let fallbackFn = () => legacyCommandExecutor(context, pluginInfo);
+
+  if (isHeadlessCommand(context)) {
+    commandName = constants.ExecuteAmplifyHeadlessCommand;
+    fallbackFn = () => context.print.error(`Headless mode is not implemented for ${pluginInfo.packageName}`);
+  }
+
+  if (pluginModule.hasOwnProperty(commandName) && typeof pluginModule[commandName] === 'function') {
+    if (commandName === constants.ExecuteAmplifyHeadlessCommand) {
+      return async () => pluginModule[commandName](context, await readHeadlessPayload());
+    } else {
+      return () => pluginModule[commandName](context);
     }
+  } else {
+    return fallbackFn;
+  }
+};
+
+// old plugin execution approach of scanning the command folder and locating the command file
+// TODO check if this is used anywhere and remove if not
+const legacyCommandExecutor = async (context: Context, plugin: PluginInfo) => {
+  let commandFilepath = path.normalize(path.join(plugin.packageLocation, 'commands', plugin.manifest.name, context.input.command!));
+  if (context.input.subCommands && context.input.subCommands.length > 0) {
+    commandFilepath = path.join(commandFilepath, ...context.input.subCommands!);
+  }
+
+  let commandModule;
+
+  try {
+    commandModule = require(commandFilepath);
+  } catch (e) {
+    // do nothing
+  }
+
+  if (!commandModule) {
+    commandFilepath = path.normalize(path.join(plugin.packageLocation, 'commands', plugin.manifest.name));
+    try {
+      commandModule = require(commandFilepath);
+    } catch (e) {
+      // do nothing
+    }
+  }
+
+  if (commandModule) {
+    attachContextExtensions(context, plugin);
+    await commandModule.run(context);
+  } else {
+    const { showAllHelp } = require('./extensions/amplify-helpers/show-all-help');
+    showAllHelp(context);
+  }
+};
+
+const EVENT_EMITTING_PLUGINS = new Set([constants.CORE, constants.CODEGEN]);
+
+async function raisePreEvent(context: Context) {
+  const { command, plugin } = context.input;
+  if (!plugin || !EVENT_EMITTING_PLUGINS.has(plugin)) {
+    return;
+  }
+  switch (command) {
+    case 'init':
+      await raisePreInitEvent(context);
+      break;
+    case 'push':
+      await raisePrePushEvent(context);
+      break;
+    case 'pull':
+      await raisePrePullEvent(context);
+      break;
+    case 'models':
+      await raisePreCodegenModelsEvent(context);
+      break;
   }
 }
 
@@ -227,19 +272,28 @@ async function raisePrePullEvent(context: Context) {
   await raiseEvent(context, new AmplifyEventArgs(AmplifyEvent.PrePull, new AmplifyPrePullEventData()));
 }
 
+async function raisePreCodegenModelsEvent(context: Context) {
+  await raiseEvent(context, new AmplifyEventArgs(AmplifyEvent.PreCodegenModels, new AmplifyPreCodegenModelsEventData()));
+}
+
 async function raisePostEvent(context: Context) {
-  if (context.input.plugin === constants.CORE) {
-    switch (context.input.command) {
-      case 'init':
-        await raisePostInitEvent(context);
-        break;
-      case 'push':
-        await raisePostPushEvent(context);
-        break;
-      case 'pull':
-        await raisePostPullEvent(context);
-        break;
-    }
+  const { command, plugin } = context.input;
+  if (!plugin || !EVENT_EMITTING_PLUGINS.has(plugin)) {
+    return;
+  }
+  switch (command) {
+    case 'init':
+      await raisePostInitEvent(context);
+      break;
+    case 'push':
+      await raisePostPushEvent(context);
+      break;
+    case 'pull':
+      await raisePostPullEvent(context);
+      break;
+    case 'models':
+      await raisePostCodegenModelsEvent(context);
+      break;
   }
 }
 
@@ -253,6 +307,10 @@ async function raisePostPushEvent(context: Context) {
 
 async function raisePostPullEvent(context: Context) {
   await raiseEvent(context, new AmplifyEventArgs(AmplifyEvent.PostPull, new AmplifyPostPullEventData()));
+}
+
+async function raisePostCodegenModelsEvent(context: Context) {
+  await raiseEvent(context, new AmplifyEventArgs(AmplifyEvent.PostCodegenModels, new AmplifyPostCodegenModelsEventData()));
 }
 
 export async function raiseEvent(context: Context, args: AmplifyEventArgs) {

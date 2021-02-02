@@ -1,5 +1,5 @@
 import { ResourceConstants } from 'graphql-transformer-common';
-import { GraphQLTransform } from 'graphql-transformer-core';
+import { GraphQLTransform, DeploymentResources } from 'graphql-transformer-core';
 import { DynamoDBModelTransformer } from 'graphql-dynamodb-transformer';
 import { KeyTransformer } from 'graphql-key-transformer';
 import { ModelConnectionTransformer } from 'graphql-connection-transformer';
@@ -7,8 +7,7 @@ import { ModelAuthTransformer } from 'graphql-auth-transformer';
 import { CloudFormationClient } from '../CloudFormationClient';
 import { Output } from 'aws-sdk/clients/cloudformation';
 import { GraphQLClient } from '../GraphQLClient';
-import { deploy } from '../deployNestedStacks';
-import emptyBucket from '../emptyBucket';
+import { cleanupStackAfterTest, deploy } from '../deployNestedStacks';
 import { S3Client } from '../S3Client';
 import { default as S3 } from 'aws-sdk/clients/s3';
 import { default as moment } from 'moment';
@@ -25,7 +24,7 @@ const BUCKET_NAME = `appsync-new-connection-transformer-test-${BUILD_TIMESTAMP}`
 const LOCAL_FS_BUILD_DIR = '/tmp/new_connection_transform_tests/';
 const S3_ROOT_DIR_KEY = 'deployments';
 
-let GRAPHQL_CLIENT = undefined;
+let GRAPHQL_CLIENT: GraphQLClient = undefined;
 
 function outputValueSelector(key: string) {
   return (outputs: Output[]) => {
@@ -108,8 +107,7 @@ type Post @model {
 	id: ID!
 	authorID: ID!
 	postContents: [String]
-
-	authors: [User] @connection(fields: ["authorID"])
+	authors: [User] @connection(fields: ["authorID"], limit: 50)
 }
 
 type PostAuthor
@@ -123,23 +121,28 @@ type PostAuthor
     post: Post @connection(fields: ["postID"])
 }
 `;
-  const transformer = new GraphQLTransform({
-    transformers: [
-      new DynamoDBModelTransformer(),
-      new KeyTransformer(),
-      new ModelConnectionTransformer(),
-      new ModelAuthTransformer({
-        authConfig: {
-          defaultAuthentication: {
-            authenticationType: 'API_KEY',
+  let out: DeploymentResources = undefined;
+  try {
+    const transformer = new GraphQLTransform({
+      transformers: [
+        new DynamoDBModelTransformer(),
+        new KeyTransformer(),
+        new ModelConnectionTransformer(),
+        new ModelAuthTransformer({
+          authConfig: {
+            defaultAuthentication: {
+              authenticationType: 'API_KEY',
+            },
+            additionalAuthenticationProviders: [],
           },
-          additionalAuthenticationProviders: [],
-        },
-      }),
-    ],
-  });
-  const out = transformer.transform(validSchema);
-  // fs.writeFileSync('./out.json', JSON.stringify(out, null, 4));
+        }),
+      ],
+    });
+    out = transformer.transform(validSchema);
+  } catch (e) {
+    console.error(`Failed to transform schema: ${e}`);
+    expect(true).toEqual(false);
+  }
   try {
     await awsS3Client
       .createBucket({
@@ -148,9 +151,9 @@ type PostAuthor
       .promise();
   } catch (e) {
     console.error(`Failed to create S3 bucket: ${e}`);
+    expect(true).toEqual(false);
   }
   try {
-    console.log('Creating Stack ' + STACK_NAME);
     const finishedStack = await deploy(
       customS3Client,
       cf,
@@ -164,9 +167,7 @@ type PostAuthor
     );
     // Arbitrary wait to make sure everything is ready.
     await cf.wait(5, () => Promise.resolve());
-    console.log('Successfully created stack ' + STACK_NAME);
     expect(finishedStack).toBeDefined();
-    console.log(JSON.stringify(finishedStack, null, 4));
     const getApiEndpoint = outputValueSelector(ResourceConstants.OUTPUTS.GraphQLAPIEndpointOutput);
     const getApiKey = outputValueSelector(ResourceConstants.OUTPUTS.GraphQLAPIApiKeyOutput);
     const endpoint = getApiEndpoint(finishedStack.Outputs);
@@ -181,26 +182,7 @@ type PostAuthor
 });
 
 afterAll(async () => {
-  try {
-    console.log('Deleting stack ' + STACK_NAME);
-    await cf.deleteStack(STACK_NAME);
-    await cf.waitForStack(STACK_NAME);
-    console.log('Successfully deleted stack ' + STACK_NAME);
-  } catch (e) {
-    if (e.code === 'ValidationError' && e.message === `Stack with id ${STACK_NAME} does not exist`) {
-      // The stack was deleted. This is good.
-      expect(true).toEqual(true);
-      console.log('Successfully deleted stack ' + STACK_NAME);
-    } else {
-      console.error(e);
-      expect(true).toEqual(false);
-    }
-  }
-  try {
-    await emptyBucket(BUCKET_NAME);
-  } catch (e) {
-    console.error(`Failed to empty S3 bucket: ${e}`);
-  }
+  await cleanupStackAfterTest(BUCKET_NAME, STACK_NAME, cf);
 });
 
 /**
@@ -438,6 +420,42 @@ test('Test PostModel.authors query with composite sortkey', async () => {
   expect(items[1].name).toEqual(createUser2.data.createUserModel.name);
 });
 
+test(`Test the default limit.`, async () => {
+  for (let i = 0; i < 51; i++) {
+    await GRAPHQL_CLIENT.query(
+      `mutation {
+          createUser(input: { id: "11", name: "user${i}", surname: "sub${i}" }) {
+            id
+            name
+            surname
+          }
+        }`,
+      {},
+    );
+  }
+
+  const createResponse = await GRAPHQL_CLIENT.query(
+    `
+    mutation {
+      createPost(input: {authorID: "11", postContents: "helloWorld"}) {
+        authorID
+        id
+        authors {
+          items {
+            name
+            surname
+            id
+          }
+        }
+      }
+    }`,
+    {},
+  );
+  expect(createResponse).toBeDefined();
+  expect(createResponse.data.createPost.authorID).toEqual('11');
+  expect(createResponse.data.createPost.authors.items.length).toEqual(50);
+});
+
 test('Test PostModel.authors query with composite sortkey passed as arg.', async () => {
   const createUser = await GRAPHQL_CLIENT.query(
     `mutation {
@@ -488,13 +506,16 @@ test('Test PostModel.authors query with composite sortkey passed as arg.', async
 });
 
 test('Test User.authorPosts.posts query followed by getItem (intermediary model)', async () => {
-  const createPostAuthor = await GRAPHQL_CLIENT.query(`mutation {
+  const createPostAuthor = await GRAPHQL_CLIENT.query(
+    `mutation {
         createPostAuthor(input: { authorID: "123", postID: "321" }) {
             id
             authorID
             postID
         }
-    }`);
+    }`,
+    {},
+  );
   expect(createPostAuthor.data.createPostAuthor.id).toBeDefined();
   expect(createPostAuthor.data.createPostAuthor.authorID).toEqual('123');
   expect(createPostAuthor.data.createPostAuthor.postID).toEqual('321');

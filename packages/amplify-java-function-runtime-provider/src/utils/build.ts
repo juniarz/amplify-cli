@@ -1,46 +1,50 @@
-import path from 'path';
+import { join } from 'path';
+import * as execa from 'execa';
 import fs from 'fs-extra';
-import childProcess from 'child_process';
 import glob from 'glob';
-import _ from 'lodash';
-import {constants} from "./constants"
+import { packageName, relativeShimJarPath, relativeShimSrcPath } from './constants';
 import { BuildRequest, BuildResult } from 'amplify-function-plugin-interface';
+import { pathManager } from 'amplify-cli-core';
 
-export async function buildResource(request: BuildRequest): Promise<BuildResult> {
-  const resourceDir = path.join(request.srcRoot);
-  const projectPath = path.join(resourceDir);
+export const buildResource = async (request: BuildRequest): Promise<BuildResult> => {
+  const resourceDir = join(request.srcRoot);
+  const projectPath = join(resourceDir);
+
   if (!request.lastBuildTimestamp || isBuildStale(request.srcRoot, request.lastBuildTimestamp)) {
     installDependencies(projectPath);
-    return Promise.resolve({ rebuilt: true });
+
+    return { rebuilt: true };
   }
-  return Promise.resolve({ rebuilt: false });
-}
 
-function installDependencies(resourceDir: string) {
-  runPackageManager(resourceDir ,'build' );
-  //to build invocation jar file
-  //copy the jar file to lib folder for gradle build
-  const jarPathDir = path.join(constants.shimSrcPath,'lib');
-  fs.ensureDirSync(jarPathDir);
-  fs.copySync(path.join(resourceDir, 'build','libs',constants.shimBinaryName), path.join(jarPathDir,constants.shimBinaryName));
-  runPackageManager(constants.shimSrcPath,"fatJar");
-}
+  return { rebuilt: false };
+};
 
-function runPackageManager(cwd: string, buildArgs : string) {
+const installDependencies = (resourceDir: string) => {
+  runPackageManager(resourceDir, 'build');
+
+  // ensure invoker shim is built
+  const packageLibDir = pathManager.getAmplifyPackageLibDirPath(packageName);
+  if (!fs.existsSync(join(packageLibDir, relativeShimJarPath))) {
+    runPackageManager(join(packageLibDir, relativeShimSrcPath), 'jar');
+  }
+};
+
+const runPackageManager = (cwd: string, buildArgs: string) => {
   const packageManager = 'gradle';
   const args = [buildArgs];
-  const childProcessResult = childProcess.spawnSync(packageManager, args, {
-    cwd,
-    stdio: 'pipe',
-    encoding: 'utf-8',
-  });
-  if (childProcessResult.status !== 0) {
-    throw new Error(childProcessResult.output.join());
-  }
-}
 
-function isBuildStale(resourceDir: string, lastBuildTimestamp: Date) {
+  const result = execa.sync(packageManager, args, {
+    cwd,
+  });
+
+  if (result.exitCode !== 0) {
+    throw new Error(`${packageManager} failed, exit code was ${result.exitCode}`);
+  }
+};
+
+const isBuildStale = (resourceDir: string, lastBuildTimestamp: Date) => {
   const dirTime = new Date(fs.statSync(resourceDir).mtime);
+
   if (dirTime > lastBuildTimestamp) {
     return true;
   }
@@ -48,5 +52,6 @@ function isBuildStale(resourceDir: string, lastBuildTimestamp: Date) {
   const fileUpdatedAfterLastBuild = glob
     .sync(`${resourceDir}/*/!(build | dist)/**`)
     .find(file => new Date(fs.statSync(file).mtime) > lastBuildTimestamp);
+
   return !!fileUpdatedAfterLastBuild;
-}
+};

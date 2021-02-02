@@ -29,6 +29,7 @@ import {
   NewLineNode,
   ReturnNode,
   parens,
+  IsNullOrEmptyNode,
 } from './ast';
 
 const TAB = '  ';
@@ -114,7 +115,8 @@ function printReference(node: ReferenceNode): string {
 }
 
 function printQuietReference(node: QuietReferenceNode, indent: string = ''): string {
-  return `${indent}$util.qr(${node.value})`;
+  const val = typeof node.value === 'string' ? node.value : printExpr(node.value)
+  return `${indent}$util.qr(${val})`;
 }
 
 export function printObject(node: ObjectNode, indent: string = ''): string {
@@ -147,6 +149,10 @@ function printCompoundExpression(node: CompoundExpressionNode, indent: string = 
 
 function printToJson(node: ToJsonNode, indent: string = ''): string {
   return `${indent}$util.toJson(${printExpr(node.expr, '')})`;
+}
+
+function printIsNullOrEmpty(node: IsNullOrEmptyNode, indent: string = ''): string {
+  return `${indent}$util.isNullOrEmpty(${printExpr(node.expr, '')})`;
 }
 
 function printNot(node: NotNode, indent: string = ''): string {
@@ -216,6 +222,8 @@ function printExpr(expr: Expression, indent: string = ''): string {
       return printCompoundExpression(expr, indent);
     case 'Util.ToJson':
       return printToJson(expr, indent);
+    case 'Util.isNullOrEmpty':
+      return printIsNullOrEmpty(expr, indent);
     case 'Not':
       return printNot(expr, indent);
     case 'NewLine':

@@ -1,5 +1,5 @@
 import { ResourceConstants } from 'graphql-transformer-common';
-import { GraphQLTransform } from 'graphql-transformer-core';
+import { GraphQLTransform, ConflictHandlerType } from 'graphql-transformer-core';
 import { DynamoDBModelTransformer } from 'graphql-dynamodb-transformer';
 import { KeyTransformer } from 'graphql-key-transformer';
 import { SearchableModelTransformer } from 'graphql-elasticsearch-transformer';
@@ -8,10 +8,9 @@ import { CloudFormationClient } from '../CloudFormationClient';
 import { S3Client } from '../S3Client';
 import { Output } from 'aws-sdk/clients/cloudformation';
 import { GraphQLClient } from '../GraphQLClient';
-import { deploy } from '../deployNestedStacks';
+import { cleanupStackAfterTest, deploy } from '../deployNestedStacks';
 import { default as moment } from 'moment';
 import { default as S3 } from 'aws-sdk/clients/s3';
-import emptyBucket from '../emptyBucket';
 import addStringSets from '../stringSetMutations';
 
 // tslint:disable: no-magic-numbers
@@ -30,11 +29,10 @@ const S3_ROOT_DIR_KEY = 'deployments';
 
 const fragments = [`fragment FullPost on Post { id author title ups downs percentageUp isPublished createdAt }`];
 
-const runQuery = async (query: string, logContent: string) => {
+const runQuery = async (query: string) => {
   try {
     const q = [query, ...fragments].join('\n');
     const response = await GRAPHQL_CLIENT.query(q, {});
-    console.log(logContent + JSON.stringify(response, null, 4));
     return response;
   } catch (e) {
     console.error(e);
@@ -44,15 +42,14 @@ const runQuery = async (query: string, logContent: string) => {
 
 const createEntries = async () => {
   // create posts
-  const logContent = 'createPost response: ';
-  await runQuery(getCreatePostsMutation('snvishna', 'test', 157, 10, 97.4, true), logContent);
-  await runQuery(getCreatePostsMutation('snvishna', 'test title', 60, 30, 21.0, false), logContent);
-  await runQuery(getCreatePostsMutation('shankar', 'test title', 160, 30, 97.6, false), logContent);
-  await runQuery(getCreatePostsMutation('snvishna', 'test TITLE', 170, 30, 88.8, true), logContent);
-  await runQuery(getCreatePostsMutation('snvishna', 'test title', 200, 50, 11.9, false), logContent);
-  await runQuery(getCreatePostsMutation('snvishna', 'test title', 170, 30, 88.8, true), logContent);
-  await runQuery(getCreatePostsMutation('snvishna', 'test title', 160, 30, 97.6, false), logContent);
-  await runQuery(getCreatePostsMutation('snvishna', 'test title', 170, 30, 77.7, true), logContent);
+  await runQuery(getCreatePostsMutation('snvishna', 'test', 157, 10, 97.4, true));
+  await runQuery(getCreatePostsMutation('snvishna', 'test title', 60, 30, 21.0, false));
+  await runQuery(getCreatePostsMutation('shankar', 'test title', 160, 30, 97.6, false));
+  await runQuery(getCreatePostsMutation('snvishna', 'test TITLE', 170, 30, 88.8, true));
+  await runQuery(getCreatePostsMutation('snvishna', 'test title', 200, 50, 11.9, false));
+  await runQuery(getCreatePostsMutation('snvishna', 'test title', 170, 30, 88.8, true));
+  await runQuery(getCreatePostsMutation('snvishna', 'test title', 160, 30, 97.6, false));
+  await runQuery(getCreatePostsMutation('snvishna', 'test title', 170, 30, 77.7, true));
   // create users
   await GRAPHQL_CLIENT.query(getCreateUsersMutation(), {
     input: { name: 'user1', userItems: ['thing1', 'thing2'], createdAt: '2016-07-20' },
@@ -73,7 +70,6 @@ const createEntries = async () => {
   await GRAPHQL_CLIENT.query(createBookMutation(), { input: { author: 'Agatha Christie', name: 'Death on the Nile', genre: 'Mystery' } });
   await GRAPHQL_CLIENT.query(createBookMutation(), { input: { author: 'Ayn Rand', name: 'Anthem', genre: 'Science Fiction' } });
   // Waiting for the ES Cluster + Streaming Lambda infra to be setup
-  console.log('Waiting for the ES Cluster + Streaming Lambda infra to be setup');
   await cf.wait(120, () => Promise.resolve());
 };
 
@@ -114,6 +110,21 @@ beforeAll(async () => {
       name: String!
       genre: String!
     }
+
+    type Todo
+    @model
+    @searchable {
+      id: ID
+      name: String!
+      createdAt: AWSDateTime
+      description: String
+    }
+
+    type Comment @model @key(name: "commentByVersion", fields: ["version", "id"]) @searchable{
+      id: ID!
+      version: Int!
+      content: String!
+    }
     `;
   const transformer = new GraphQLTransform({
     transformers: [
@@ -129,6 +140,17 @@ beforeAll(async () => {
       }),
       new SearchableModelTransformer(),
     ],
+    // only enable datastore features on todo
+    transformConfig: {
+      ResolverConfig: {
+        models: {
+          Todo: {
+            ConflictHandler: ConflictHandlerType.AUTOMERGE,
+            ConflictDetection: 'VERSION',
+          },
+        },
+      },
+    },
   });
   try {
     await awsS3Client.createBucket({ Bucket: BUCKET_NAME }).promise();
@@ -139,7 +161,6 @@ beforeAll(async () => {
     // change create/update to create string sets
     const out = addStringSets(transformer.transform(validSchema));
     // fs.writeFileSync('./out.json', JSON.stringify(out, null, 4))
-    console.log('Creating Stack ' + STACK_NAME);
     const finishedStack = await deploy(
       customS3Client,
       cf,
@@ -153,7 +174,6 @@ beforeAll(async () => {
     );
     // Arbitrary wait to make sure everything is ready.
     await cf.wait(120, () => Promise.resolve());
-    console.log('Successfully created stack ' + STACK_NAME);
     expect(finishedStack).toBeDefined();
     const getApiEndpoint = outputValueSelector(ResourceConstants.OUTPUTS.GraphQLAPIEndpointOutput);
     const getApiKey = outputValueSelector(ResourceConstants.OUTPUTS.GraphQLAPIApiKeyOutput);
@@ -172,26 +192,7 @@ beforeAll(async () => {
 });
 
 afterAll(async () => {
-  try {
-    console.log('Deleting stack ' + STACK_NAME);
-    await cf.deleteStack(STACK_NAME);
-    await cf.waitForStack(STACK_NAME);
-    console.log('Successfully deleted stack ' + STACK_NAME);
-  } catch (e) {
-    if (e.code === 'ValidationError' && e.message === `Stack with id ${STACK_NAME} does not exist`) {
-      // The stack was deleted. This is good.
-      expect(true).toEqual(true);
-      console.log('Successfully deleted stack ' + STACK_NAME);
-    } else {
-      console.error(e);
-      expect(true).toEqual(false);
-    }
-  }
-  try {
-    await emptyBucket(BUCKET_NAME);
-  } catch (e) {
-    console.error(`Failed to empty S3 bucket: ${e}`);
-  }
+  await cleanupStackAfterTest(BUCKET_NAME, STACK_NAME, cf);
 });
 
 test('Test searchPosts with sort field on a string field', async () => {
@@ -207,7 +208,6 @@ test('Test searchPosts with sort field on a string field', async () => {
             nextToken
           }
     }`,
-    'Test searchPosts with filter ',
   );
   expect(firstQuery).toBeDefined();
   expect(firstQuery.data.searchPosts).toBeDefined();
@@ -224,7 +224,6 @@ test('Test searchPosts with sort field on a string field', async () => {
             nextToken
           }
     }`,
-    'Test searchPosts with limit ',
   );
   expect(secondQuery).toBeDefined();
   expect(secondQuery.data.searchPosts).toBeDefined();
@@ -242,12 +241,52 @@ test('Test searchPosts with sort field on a string field', async () => {
             nextToken
           }
     }`,
-    'Test searchPosts with sort limit and nextToken  ',
   );
   expect(thirdQuery).toBeDefined();
   expect(thirdQuery.data.searchPosts).toBeDefined();
   const firstItemOfThirdQuery = thirdQuery.data.searchPosts.items[0];
   expect(firstItemOfThirdQuery).toEqual(fourthItemOfFirstQuery);
+});
+
+test('Test searchPosts with offset pagination', async () => {
+  const firstQuery = await runQuery(
+    `query {
+        searchPosts(from: 0, limit: 999, sort: {
+            field: id
+            direction: desc
+        }){
+            items{
+              ...FullPost
+            }
+            nextToken
+            total
+          }
+    }`,
+  );
+  expect(firstQuery).toBeDefined();
+  expect(firstQuery.data.searchPosts).toBeDefined();
+  const firstLength = firstQuery.data.searchPosts.items.length;
+  const secondQuery = await runQuery(
+    `query {
+        searchPosts(from: 2, limit: 999, sort: {
+            field: id
+            direction: desc
+        }){
+            items{
+              ...FullPost
+            }
+            nextToken
+            total
+          }
+    }`,
+  );
+  expect(secondQuery).toBeDefined();
+  expect(secondQuery.data.searchPosts).toBeDefined();
+  const secondLength = secondQuery.data.searchPosts.items.length;
+  expect(secondLength).toEqual(firstLength - 2);
+  const firstItem = firstQuery.data.searchPosts.items[0];
+  const secondItems = secondQuery.data.searchPosts.items;
+  expect(secondItems.find(i => i.id === firstItem.id)).not.toBeDefined();
 });
 
 test('Test searchPosts with sort on date type', async () => {
@@ -263,7 +302,6 @@ test('Test searchPosts with sort on date type', async () => {
             }
         }
     }`,
-    'Test search posts with date type response: ',
   );
   expect(query).toBeDefined();
   expect(query.data.searchPosts).toBeDefined();
@@ -279,7 +317,6 @@ test('Test searchPosts query without filter', async () => {
             items { ...FullPost }
         }
     }`,
-    'Test searchPosts response without filter response: ',
   );
   expect(response).toBeDefined();
   expect(response.data.searchPosts.items).toBeDefined();
@@ -296,7 +333,6 @@ test('Test searchPosts query with basic filter', async () => {
             items { ...FullPost }
         }
     }`,
-    'Test searchPosts response with basic filter response: ',
   );
   expect(response).toBeDefined();
   expect(response.data.searchPosts.items).toBeDefined();
@@ -318,7 +354,6 @@ test('Test searchPosts query with non-recursive filter', async () => {
             items { ...FullPost }
         }
     }`,
-    'Test searchPosts response with non-recursive filter response: ',
   );
   expect(response).toBeDefined();
   expect(response.data.searchPosts.items).toBeDefined();
@@ -351,7 +386,6 @@ test('Test searchPosts query with recursive filter 1', async () => {
             items { ...FullPost }
         }
     }`,
-    'Test searchPosts response with recursive filter 1 response: ',
   );
   expect(response).toBeDefined();
   expect(response.data.searchPosts.items).toBeDefined();
@@ -384,7 +418,6 @@ test('Test searchPosts query with recursive filter 2', async () => {
             items { ...FullPost }
         }
     }`,
-    'Test searchPosts response with recursive filter 2 response: ',
   );
   expect(response).toBeDefined();
   expect(response.data.searchPosts.items).toBeDefined();
@@ -416,7 +449,6 @@ test('Test searchPosts query with recursive filter 3', async () => {
             items { ...FullPost }
         }
     }`,
-    'Test searchPosts query with recursive filter 3 response: ',
   );
   expect(response).toBeDefined();
   expect(response.data.searchPosts.items).toBeDefined();
@@ -458,7 +490,6 @@ test('Test searchPosts query with recursive filter 4', async () => {
             items { ...FullPost }
         }
     }`,
-    'Test searchPosts query with recursive filter 4 response: ',
   );
   expect(response).toBeDefined();
   expect(response.data.searchPosts.items).toBeDefined();
@@ -500,7 +531,6 @@ test('Test searchPosts query with recursive filter 5', async () => {
             items { ...FullPost }
         }
     }`,
-    'Test searchPosts query with recursive filter 5 response: ',
   );
   expect(response).toBeDefined();
   expect(response.data.searchPosts.items).toBeDefined();
@@ -541,7 +571,6 @@ test('Test searchPosts query with recursive filter 6', async () => {
             items { ...FullPost }
         }
     }`,
-    'Test searchPosts query with recursive filter 6 response: ',
   );
   expect(response).toBeDefined();
   expect(response.data.searchPosts.items).toBeDefined();
@@ -552,10 +581,7 @@ test('Test searchPosts query with recursive filter 6', async () => {
 test('Test deletePosts syncing with Elasticsearch', async () => {
   // Create Post
   const title = 'to be deleted';
-  const postToBeDeletedResponse = await runQuery(
-    getCreatePostsMutation('test author new', title, 1157, 1000, 22.2, true),
-    'createPost (to be deleted) response: ',
-  );
+  const postToBeDeletedResponse = await runQuery(getCreatePostsMutation('test author new', title, 1157, 1000, 22.2, true));
   expect(postToBeDeletedResponse).toBeDefined();
   expect(postToBeDeletedResponse.data.createPost).toBeDefined();
   expect(postToBeDeletedResponse.data.createPost.id).toBeDefined();
@@ -571,7 +597,6 @@ test('Test deletePosts syncing with Elasticsearch', async () => {
             items { ...FullPost }
         }
     }`,
-    'Test deletePosts syncing with Elasticsearch Search_Before response: ',
   );
   expect(searchResponse1).toBeDefined();
   expect(searchResponse1.data.searchPosts.items).toBeDefined();
@@ -593,7 +618,6 @@ test('Test deletePosts syncing with Elasticsearch', async () => {
             ...FullPost
         }
     }`,
-    'Test deletePosts syncing with Elasticsearch Perform_Delete response: ',
   );
   expect(deleteResponse).toBeDefined();
   expect(deleteResponse.data.deletePost).toBeDefined();
@@ -610,7 +634,6 @@ test('Test deletePosts syncing with Elasticsearch', async () => {
             items { ...FullPost }
         }
     }`,
-    'Test deletePosts syncing with Elasticsearch Search_After response: ',
   );
   expect(searchResponse2).toBeDefined();
   expect(searchResponse2.data.searchPosts.items).toBeDefined();
@@ -627,10 +650,7 @@ test('Test updatePost syncing with Elasticsearch', async () => {
   const percentageUp = 22.2;
   const isPublished = true;
 
-  const postToBeUpdatedResponse = await runQuery(
-    getCreatePostsMutation(author, title, ups, downs, percentageUp, isPublished),
-    'createPost (to be updated) response: ',
-  );
+  const postToBeUpdatedResponse = await runQuery(getCreatePostsMutation(author, title, ups, downs, percentageUp, isPublished));
   expect(postToBeUpdatedResponse).toBeDefined();
   expect(postToBeUpdatedResponse.data.createPost).toBeDefined();
 
@@ -648,7 +668,6 @@ test('Test updatePost syncing with Elasticsearch', async () => {
             items { ...FullPost }
         }
     }`,
-    'Test updatePost syncing with Elasticsearch Search_Before response: ',
   );
   expect(searchResponse1).toBeDefined();
   expect(searchResponse1.data.searchPosts.items).toBeDefined();
@@ -677,7 +696,6 @@ test('Test updatePost syncing with Elasticsearch', async () => {
             ...FullPost
         }
     }`,
-    'Test updatePost syncing with Elasticsearch Perform_Update response: ',
   );
   expect(updateResponse).toBeDefined();
   expect(updateResponse.data.updatePost).toBeDefined();
@@ -695,7 +713,6 @@ test('Test updatePost syncing with Elasticsearch', async () => {
             items { ...FullPost }
         }
     }`,
-    'Test updatePost syncing with Elasticsearch Search_After response: ',
   );
   expect(searchResponse2).toBeDefined();
   expect(searchResponse2.data.searchPosts.items).toBeDefined();
@@ -752,14 +769,13 @@ test('query using string range between names', async () => {
   );
   expect(searchResponse).toBeDefined();
   const items = searchResponse.data.searchUsers.items;
-  console.log(items);
   expect(items.length).toEqual(expectedLength);
   items.forEach((item: any) => {
     expect(expectedUsers).toContain(item.name);
   });
 });
 
-test('query using date range for createdAt', async () => {
+test('query using date range using lte and gte for createdAt', async () => {
   const expectedDates = ['2017-06-10', '2017-08-22'];
   const expectedLength = 2;
   const searchResponse = await GRAPHQL_CLIENT.query(
@@ -782,11 +798,32 @@ test('query using date range for createdAt', async () => {
   );
   expect(searchResponse).toBeDefined();
   const items = searchResponse.data.searchUsers.items;
-  console.log(items);
   expect(items.length).toEqual(expectedLength);
   items.forEach((item: any) => {
     expect(expectedDates).toContain(item.createdAt);
   });
+});
+
+test('query using date range for createdAt', async () => {
+  const expectLength = 3;
+  const searchResponse = await GRAPHQL_CLIENT.query(
+    `query {
+      searchUsers(filter: {createdAt: {range: ["2016", "2019"]}}) {
+        items {
+          id
+          name
+          createdAt
+          userItems
+        }
+      }
+    }
+    `,
+    {},
+  );
+  expect(searchResponse).toBeDefined();
+  const items = searchResponse.data.searchUsers.items;
+  expect(items.length).toEqual(expectLength);
+  expect(items.map(item => item.createdAt).sort()).toEqual(['2016-07-20', '2017-06-10', '2017-08-22']);
 });
 
 test('query for books by Agatha Christie with model using @key', async () => {
@@ -817,6 +854,140 @@ test('query for books by Agatha Christie with model using @key', async () => {
     expect(expectedBookNames).toContain(item.name);
   });
 });
+
+test('test searches with datastore enabled types', async () => {
+  const createTodoResponse = await createTodo({ id: '001', name: 'get milk' });
+  expect(createTodoResponse).toBeDefined();
+  let todoName = createTodoResponse.data.createTodo.name;
+  let todoVersion = createTodoResponse.data.createTodo._version;
+
+  // Wait for the Todo to sync to Elasticsearch
+  await cf.wait(10, () => Promise.resolve());
+
+  let searchTodoResponse = await searchTodos();
+  expect(searchTodoResponse).toBeDefined();
+  expect(searchTodoResponse.data.searchTodos.items.length).toEqual(1);
+  expect(searchTodoResponse.data.searchTodos.items[0].name).toEqual(todoName);
+  expect(searchTodoResponse.data.searchTodos.items[0]._version).toEqual(todoVersion);
+  todoName = 'get soy milk';
+
+  const updateTodoResponse = await updateTodo({ id: '001', name: todoName, _version: todoVersion });
+  expect(updateTodoResponse).toBeDefined();
+  todoVersion += 1;
+  expect(updateTodoResponse.data.updateTodo.name).toEqual(todoName);
+  expect(updateTodoResponse.data.updateTodo._version).toEqual(todoVersion);
+
+  // Wait for the Todo to sync to Elasticsearch
+  await cf.wait(10, () => Promise.resolve());
+
+  searchTodoResponse = await searchTodos();
+  expect(searchTodoResponse.data.searchTodos.items.length).toEqual(1);
+  expect(searchTodoResponse.data.searchTodos.items[0].name).toEqual(todoName);
+  expect(searchTodoResponse.data.searchTodos.items[0]._version).toEqual(todoVersion);
+});
+
+// Test for issue https://github.com/aws-amplify/amplify-cli/issues/5140
+test('test searches with @key with integer field', async () => {
+  const comment = await GRAPHQL_CLIENT.query(
+    `mutation createComment($createCommentInput: CreateCommentInput!){
+    createComment(input: $createCommentInput) {
+      id,
+      content,
+      version
+    }
+  }`,
+    {
+      createCommentInput: {
+        id: 1,
+        version: 1,
+        content: 'Content',
+      },
+    },
+  );
+  expect(comment.data).toBeDefined();
+  expect(comment.data.createComment).toEqual({
+    id: '1',
+    content: 'Content',
+    version: 1,
+  });
+
+  // Wait for the Comment to sync to Elasticsearch
+  await cf.wait(10, () => Promise.resolve());
+  let searchCommentResponse = await GRAPHQL_CLIENT.query(
+    `query searchComment {
+    searchComments {
+      items {
+        id,
+        version,
+        content
+      }
+    }
+  }`,
+    {},
+  );
+  expect(searchCommentResponse).toBeDefined();
+  expect(searchCommentResponse.data).toEqual({
+    searchComments: {
+      items: [
+        {
+          id: '1',
+          version: 1,
+          content: 'Content',
+        },
+      ],
+    },
+  });
+});
+
+type TodoInput = {
+  id?: string;
+  name: string;
+  createdAt?: string;
+  description?: string;
+  _version?: number;
+};
+
+async function createTodo(input: TodoInput) {
+  const createTodoMutation = `
+  mutation (
+    $input: CreateTodoInput!
+  ) {
+    createTodo(input: $input) {
+      id
+      name
+      _version
+    }
+  }`;
+  return await GRAPHQL_CLIENT.query(createTodoMutation, { input });
+}
+
+async function updateTodo(input: TodoInput) {
+  const updateTodoMutation = `
+    mutation (
+      $input: UpdateTodoInput!
+    ){
+      updateTodo(input: $input) {
+        id
+        name
+        _version
+      }
+    }`;
+  return await GRAPHQL_CLIENT.query(updateTodoMutation, { input });
+}
+
+async function searchTodos() {
+  const searchTodosQuery = `
+  query SearchTodos {
+    searchTodos {
+      items {
+        id
+        name
+        _version
+      }
+    }
+  }`;
+  return await GRAPHQL_CLIENT.query(searchTodosQuery, {});
+}
 
 function getCreatePostsMutation(
   author: string,

@@ -1,5 +1,5 @@
 {
-  "extends": "../../tsconfig.json",
+  "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "skipLibCheck": true,
     "strict": false, // TODO enable
@@ -20,5 +20,5 @@
     { "path": "../graphql-transformer-core" },
     { "path": "../graphql-versioned-transformer" }
   ],
-  "exclude": ["**/lib/**/*"]
+  "exclude": ["**/lib/**/*", "resources/**/*"]
 }

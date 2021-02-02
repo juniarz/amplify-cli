@@ -120,47 +120,96 @@ describe('AppSyncModelVisitor', () => {
   });
 
   describe(' 2 Way Connection', () => {
-    const schema = /* GraphQL */ `
-      type Post @model {
-        title: String!
-        content: String
-        comments: [Comment] @connection(name: "PostComment")
-      }
+    describe('with connection name', () => {
+      const schema = /* GraphQL */ `
+        type Post @model {
+          title: String!
+          content: String
+          comments: [Comment] @connection(name: "PostComment")
+        }
 
-      type Comment @model {
-        comment: String!
-        post: Post @connection(name: "PostComment")
-      }
-    `;
-    it('one to many connection', () => {
-      const ast = parse(schema);
-      const builtSchema = buildSchemaWithDirectives(schema);
-      const visitor = new AppSyncModelVisitor(builtSchema, { directives, target: 'android', generate: CodeGenGenerateEnum.code }, {});
-      visit(ast, { leave: visitor });
-      visitor.generate();
-      const commentsField = visitor.models.Post.fields.find(f => f.name === 'comments');
-      const postField = visitor.models.Comment.fields.find(f => f.name === 'post');
-      expect(commentsField).toBeDefined();
-      expect(commentsField!.connectionInfo).toBeDefined();
-      const connectionInfo = (commentsField!.connectionInfo as any) as CodeGenFieldConnectionHasMany;
-      expect(connectionInfo.kind).toEqual(CodeGenConnectionType.HAS_MANY);
-      expect(connectionInfo.associatedWith).toEqual(postField);
-      expect(connectionInfo.connectedModel).toEqual(visitor.models.Comment);
+        type Comment @model {
+          comment: String!
+          post: Post @connection(name: "PostComment")
+        }
+      `;
+      it('one to many connection', () => {
+        const ast = parse(schema);
+        const builtSchema = buildSchemaWithDirectives(schema);
+        const visitor = new AppSyncModelVisitor(builtSchema, { directives, target: 'android', generate: CodeGenGenerateEnum.code }, {});
+        visit(ast, { leave: visitor });
+        visitor.generate();
+        const commentsField = visitor.models.Post.fields.find(f => f.name === 'comments');
+        const postField = visitor.models.Comment.fields.find(f => f.name === 'post');
+        expect(commentsField).toBeDefined();
+        expect(commentsField!.connectionInfo).toBeDefined();
+        const connectionInfo = (commentsField!.connectionInfo as any) as CodeGenFieldConnectionHasMany;
+        expect(connectionInfo.kind).toEqual(CodeGenConnectionType.HAS_MANY);
+        expect(connectionInfo.associatedWith).toEqual(postField);
+        expect(connectionInfo.connectedModel).toEqual(visitor.models.Comment);
+      });
+
+      it('many to one connection', () => {
+        const ast = parse(schema);
+        const builtSchema = buildSchemaWithDirectives(schema);
+        const visitor = new AppSyncModelVisitor(builtSchema, { directives, target: 'android', generate: CodeGenGenerateEnum.code }, {});
+        visit(ast, { leave: visitor });
+        visitor.generate();
+        const commentsField = visitor.models.Post.fields.find(f => f.name === 'comments');
+        const postField = visitor.models.Comment.fields.find(f => f.name === 'post');
+        expect(postField).toBeDefined();
+        expect(postField!.connectionInfo).toBeDefined();
+        const connectionInfo = (postField!.connectionInfo as any) as CodeGenFieldConnectionBelongsTo;
+        expect(connectionInfo.kind).toEqual(CodeGenConnectionType.BELONGS_TO);
+        expect(connectionInfo.connectedModel).toEqual(visitor.models.Post);
+      });
     });
+    describe('connection with fields argument', () => {
+      const schema = /* GraphQL */ `
+        type Post @model {
+          title: String!
+          content: String
+          comments: [Comment] @connection(fields: ["id"])
+        }
 
-    it('many to one connection', () => {
-      const ast = parse(schema);
-      const builtSchema = buildSchemaWithDirectives(schema);
-      const visitor = new AppSyncModelVisitor(builtSchema, { directives, target: 'android', generate: CodeGenGenerateEnum.code }, {});
-      visit(ast, { leave: visitor });
-      visitor.generate();
-      const commentsField = visitor.models.Post.fields.find(f => f.name === 'comments');
-      const postField = visitor.models.Comment.fields.find(f => f.name === 'post');
-      expect(postField).toBeDefined();
-      expect(postField!.connectionInfo).toBeDefined();
-      const connectionInfo = (postField!.connectionInfo as any) as CodeGenFieldConnectionBelongsTo;
-      expect(connectionInfo.kind).toEqual(CodeGenConnectionType.BELONGS_TO);
-      expect(connectionInfo.connectedModel).toEqual(visitor.models.Post);
+        type Comment @model {
+          comment: String!
+          postId: ID!
+          post: Post @connection(fields: ["postId"])
+        }
+      `;
+
+      it('one to many connection', () => {
+        const ast = parse(schema);
+        const builtSchema = buildSchemaWithDirectives(schema);
+        const visitor = new AppSyncModelVisitor(builtSchema, { directives, target: 'android', generate: CodeGenGenerateEnum.code }, {});
+        visit(ast, { leave: visitor });
+        visitor.generate();
+        const commentsField = visitor.models.Post.fields.find(f => f.name === 'comments');
+        const commentIdField = visitor.models.Post.fields.find(f => f.name === 'id');
+        const postField = visitor.models.Comment.fields.find(f => f.name === 'post');
+        expect(commentsField).toBeDefined();
+        expect(commentsField!.connectionInfo).toBeDefined();
+        const connectionInfo = (commentsField!.connectionInfo as any) as CodeGenFieldConnectionHasMany;
+        expect(connectionInfo.kind).toEqual(CodeGenConnectionType.HAS_MANY);
+        expect(connectionInfo.associatedWith).toEqual(commentIdField);
+        expect(connectionInfo.connectedModel).toEqual(visitor.models.Comment);
+      });
+
+      it('many to one connection', () => {
+        const ast = parse(schema);
+        const builtSchema = buildSchemaWithDirectives(schema);
+        const visitor = new AppSyncModelVisitor(builtSchema, { directives, target: 'android', generate: CodeGenGenerateEnum.code }, {});
+        visit(ast, { leave: visitor });
+        visitor.generate();
+
+        const postField = visitor.models.Comment.fields.find(f => f.name === 'post');
+        expect(postField).toBeDefined();
+        expect(postField!.connectionInfo).toBeDefined();
+        const connectionInfo = (postField!.connectionInfo as any) as CodeGenFieldConnectionBelongsTo;
+        expect(connectionInfo.kind).toEqual(CodeGenConnectionType.BELONGS_TO);
+        expect(connectionInfo.connectedModel).toEqual(visitor.models.Post);
+      });
     });
   });
 
@@ -235,7 +284,7 @@ describe('AppSyncModelVisitor', () => {
       expect(ownerRule.provider).toEqual('userPools');
       expect(ownerRule.identityClaim).toEqual('cognito:username');
       expect(ownerRule.ownerField).toEqual('owner');
-      expect(ownerRule.operations).toEqual(['create', 'update', 'delete']);
+      expect(ownerRule.operations).toEqual(['create', 'update', 'delete', 'read']);
     });
 
     it('should process group with owner authorization', () => {
@@ -260,7 +309,41 @@ describe('AppSyncModelVisitor', () => {
       expect(groupRule).toBeDefined();
       expect(groupRule.provider).toEqual('userPools');
       expect(groupRule.groupClaim).toEqual('cognito:groups');
-      expect(groupRule.operations).toEqual(['create', 'update', 'delete']);
+      expect(groupRule.operations).toEqual(['create', 'update', 'delete', 'read']);
+    });
+
+    it('should process field level auth with default owner authorization', () => {
+      const schema = /* GraphQL*/ `
+        type Employee @model
+          @auth(rules: [
+              { allow: owner },
+              { allow: groups, groups: ["Admins"] }
+          ]) {
+            id: ID!
+            name: String!
+            address: String!
+            ssn: String @auth(rules: [{allow: owner}])
+        }
+      `;
+      const ast = parse(schema);
+      const builtSchema = buildSchemaWithDirectives(schema);
+      const visitor = new AppSyncModelVisitor(builtSchema, { directives, target: 'android', generate: CodeGenGenerateEnum.code }, {});
+      visit(ast, { leave: visitor });
+      visitor.generate();
+
+      const ssnField = visitor.models.Employee.fields.find(f => f.name === 'ssn');
+      const authDirective = ssnField.directives.find(d => d.name === 'auth');
+      expect(authDirective).toBeDefined();
+      const authRules = authDirective!.arguments.rules;
+      expect(authRules).toBeDefined();
+      expect(authRules).toHaveLength(1);
+      const ownerRule = authRules[0];
+      expect(ownerRule).toBeDefined();
+
+      expect(ownerRule.provider).toEqual('userPools');
+      expect(ownerRule.identityClaim).toEqual('cognito:username');
+      expect(ownerRule.ownerField).toEqual('owner');
+      expect(ownerRule.operations).toEqual(['create', 'update', 'delete', 'read']);
     });
   });
   describe('model less type', () => {

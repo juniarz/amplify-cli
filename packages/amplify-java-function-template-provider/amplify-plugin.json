@@ -6,13 +6,13 @@
   "functionTemplate": {
     "conditions": {
       "provider": "awscloudformation",
-      "service": "Lambda",
+      "services": ["Lambda"],
       "runtime": "java"
     },
     "templates": [
       {
         "name": "Hello World",
-        "value": "helloworld"
+        "value": "hello-world"
       }
     ]
   }

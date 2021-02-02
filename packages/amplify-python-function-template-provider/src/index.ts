@@ -23,7 +23,8 @@ export function helloWorld(): Promise<FunctionTemplateParameters> {
       sourceFiles: files,
       destMap: {
         'index.py': 'src/index.py',
-        'testEvent.json': 'tst/testEvent.json',
+        'event.json': 'src/event.json',
+        'setup.py': 'src/setup.py',
       },
       defaultEditorFile: 'src/index.py',
     },

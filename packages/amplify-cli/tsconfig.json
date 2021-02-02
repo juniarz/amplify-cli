@@ -1,14 +1,19 @@
 {
-  "extends": "../../tsconfig.json",
+  "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "composite": false,
-    "allowJs": true,
-    "declaration": false,
-    "declarationMap": false,
+    "strict": true,
+    "noImplicitAny": false,
     "rootDir": "src",
     "outDir": "lib"
   },
   "include": [
     "src/**/*"
+  ],
+  "references": [
+    { "path": "../amplify-category-function" },
+    { "path": "../amplify-cli-core" },
+    { "path": "../amplify-provider-awscloudformation" },
+    { "path": "../amplify-util-import" },
+    { "path": "../graphql-transformer-core"}
   ]
 }

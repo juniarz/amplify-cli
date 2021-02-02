@@ -1,5 +1,21 @@
-import { initJSProjectWithProfile, deleteProject, initProjectWithAccessKey, initNewEnvWithAccessKey, initNewEnvWithProfile } from '../init';
-import { createNewProjectDir, deleteProjectDir, getEnvVars, getProjectMeta } from '../utils';
+import * as fs from 'fs-extra';
+import * as path from 'path';
+import {
+  initJSProjectWithProfile,
+  deleteProject,
+  initProjectWithAccessKey,
+  initNewEnvWithAccessKey,
+  initNewEnvWithProfile,
+  amplifyStatus,
+  getAdminApp,
+  amplifyPullSandbox,
+  amplifyInitSandbox,
+  getProjectSchema,
+  amplifyPush,
+} from 'amplify-e2e-core';
+import { createNewProjectDir, deleteProjectDir, getEnvVars, getProjectMeta } from 'amplify-e2e-core';
+import { JSONUtilities } from 'amplify-cli-core';
+import { SandboxApp } from '../types/SandboxApp';
 
 describe('amplify init', () => {
   let projRoot: string;
@@ -10,6 +26,27 @@ describe('amplify init', () => {
   afterEach(async () => {
     await deleteProject(projRoot);
     deleteProjectDir(projRoot);
+  });
+
+  it('should pull sandbox and download schema', async () => {
+    const schemaBody = {
+      schema:
+        '    type Todo @model @auth(rules: [{allow: public}]) {        id: ID!        name: String!        description: String    }    ',
+      shareable: 'true',
+    };
+    const sandBoxAppString = await getAdminApp(schemaBody);
+    expect(sandBoxAppString).toBeDefined();
+    const sandboxApp = JSONUtilities.parse<SandboxApp>(sandBoxAppString);
+    expect(sandboxApp.schema).toEqual(schemaBody.schema);
+    await amplifyPullSandbox(projRoot, {
+      appType: 'javascript',
+      framework: 'angular',
+      sandboxId: sandboxApp.backendManagerAppId,
+    });
+    await amplifyInitSandbox(projRoot, {});
+    const projectSchema = getProjectSchema(projRoot, 'amplifyDatasource');
+    expect(projectSchema).toEqual(schemaBody.schema);
+    await amplifyPush(projRoot);
   });
 
   it('should init the project and create new env', async () => {
@@ -88,5 +125,30 @@ describe('amplify init', () => {
     expect(newEnvUnAuthRoleName).toBeIAMRoleWithArn(newEnvUnauthRoleArn);
     expect(newEnvAuthRoleName).toBeIAMRoleWithArn(newEnvAuthRoleArn);
     expect(newEnvDeploymentBucketName).toBeAS3Bucket(DeploymentBucketName);
+  });
+
+  it('init the project simulate checked in local-env-info with wrong path', async () => {
+    await initJSProjectWithProfile(projRoot, {});
+
+    // update <projRoot>/amplify/.config/local-env-info.json with nonexisting project path
+    const localEnvPath = path.join(projRoot, 'amplify', '.config', 'local-env-info.json');
+    expect(fs.existsSync(localEnvPath)).toBe(true);
+
+    const localEnvData = fs.readJsonSync(localEnvPath);
+    const originalPath = localEnvData.projectPath;
+
+    expect(localEnvData.projectPath).toEqual(fs.realpathSync(projRoot));
+
+    localEnvData.projectPath = path.join('foo', 'bar');
+
+    fs.writeFileSync(localEnvPath, JSON.stringify(localEnvData, null, 2));
+
+    // execute amplify status, which involves feature flags initialization, it must succeed
+    await amplifyStatus(projRoot, 'Current Environment');
+
+    // write back original path to make delete succeed in cleanup
+    localEnvData.projectPath = originalPath;
+
+    fs.writeFileSync(localEnvPath, JSON.stringify(localEnvData, null, 2));
   });
 });

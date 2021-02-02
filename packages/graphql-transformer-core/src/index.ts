@@ -12,6 +12,8 @@ import {
   uploadDeployment as uploadAPIProject,
   migrateAPIProject,
   revertAPIMigration,
+  CLOUDFORMATION_FILE_NAME,
+  PARAMETERS_FILE_NAME,
 } from './util/amplifyUtils';
 import {
   readSchema as readProjectSchema,
@@ -22,6 +24,9 @@ import {
   TRANSFORM_BASE_VERSION,
   TRANSFORM_CURRENT_VERSION,
   TransformConfig,
+  ConflictHandlerType,
+  ConflictDetectionType,
+  ResolverConfig,
   SyncConfig,
 } from './util/transformConfig';
 import { EXTRA_DIRECTIVES_DOCUMENT } from './validation';
@@ -34,6 +39,7 @@ export * from './util';
 export function getAppSyncServiceExtraDirectives(): string {
   return print(EXTRA_DIRECTIVES_DOCUMENT);
 }
+export { FeatureFlagProvider } from './FeatureFlags';
 
 export {
   GraphQLTransform,
@@ -55,6 +61,11 @@ export {
   TRANSFORM_CONFIG_FILE_NAME,
   TRANSFORM_BASE_VERSION,
   TRANSFORM_CURRENT_VERSION,
+  ConflictHandlerType,
+  ConflictDetectionType,
+  ResolverConfig,
   SyncConfig,
   DeploymentResources,
+  CLOUDFORMATION_FILE_NAME,
+  PARAMETERS_FILE_NAME,
 };

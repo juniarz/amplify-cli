@@ -1,9 +1,10 @@
-import { nspawn as spawn } from 'amplify-e2e-core';
+import { addCircleCITags, nspawn as spawn } from 'amplify-e2e-core';
 import { getCLIPath } from '../util';
+import { HOSTING_NOT_ENABLED, HOSTING_ENABLED_IN_CONSOLE, ORIGINAL_ENV } from './constants';
 
 const defaultSettings = {
   name: '\r',
-  envName: 'integtest',
+  envName: ORIGINAL_ENV,
   editor: '\r',
   appType: '\r',
   framework: '\r',
@@ -17,6 +18,9 @@ const defaultSettings = {
 
 export function initJSProjectWithProfile(cwd: string, providersParam: any) {
   const s = { ...defaultSettings };
+
+  addCircleCITags(cwd);
+
   return new Promise((resolve, reject) => {
     spawn(getCLIPath(), ['init', '--providers', JSON.stringify(providersParam)], { cwd, stripColors: true })
       .wait('Enter a name for the project')
@@ -205,6 +209,38 @@ export function removeHosting(cwd: string) {
       .wait(/.*Are you sure you want to delete the resource*/)
       .sendLine('\r')
       .wait('Successfully removed resource')
+      .run((err: Error) => {
+        if (!err) {
+          resolve();
+        } else {
+          reject(err);
+        }
+      });
+  });
+}
+
+export function removeNonExistingHosting(cwd: string) {
+  return new Promise((resolve, reject) => {
+    spawn(getCLIPath(), ['remove', 'hosting'], { cwd, stripColors: true })
+      .wait(/.*Hosting with Amplify Console*/)
+      .sendCarriageReturn()
+      .wait(HOSTING_NOT_ENABLED)
+      .run((err: Error) => {
+        if (!err) {
+          resolve();
+        } else {
+          reject(err);
+        }
+      });
+  });
+}
+
+export function removeHostingEnabledInConsole(cwd: string) {
+  return new Promise((resolve, reject) => {
+    spawn(getCLIPath(), ['remove', 'hosting'], { cwd, stripColors: true })
+      .wait(/.*Hosting with Amplify Console*/)
+      .sendCarriageReturn()
+      .wait(HOSTING_ENABLED_IN_CONSOLE)
       .run((err: Error) => {
         if (!err) {
           resolve();

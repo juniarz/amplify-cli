@@ -1,15 +1,27 @@
-function generateConfig(context, amplifyConfig) {
+function generateConfig(context, newAWSConfig) {
   const metadata = context.amplify.getProjectMeta();
-  amplifyConfig = amplifyConfig || {
+  const amplifyConfig = {
     UserAgent: 'aws-amplify-cli/2.0',
     Version: '1.0',
   };
   constructAnalytics(metadata, amplifyConfig);
   constructApi(metadata, amplifyConfig);
+  // Auth plugin with entire awsconfiguration contained required for Native GA release
+  constructAuth(metadata, amplifyConfig, newAWSConfig);
   constructPredictions(metadata, amplifyConfig);
   constructStorage(metadata, amplifyConfig);
 
   return amplifyConfig;
+}
+
+function constructAuth(metadata, amplifyConfig, awsConfig) {
+  const categoryName = 'auth';
+  const pluginName = 'awsCognitoAuthPlugin';
+  if (metadata[categoryName]) {
+    amplifyConfig[categoryName] = {};
+    amplifyConfig[categoryName].plugins = {};
+    amplifyConfig[categoryName].plugins[pluginName] = awsConfig;
+  }
 }
 
 function constructAnalytics(metadata, amplifyConfig) {
@@ -38,7 +50,7 @@ function constructApi(metadata, amplifyConfig) {
   const categoryName = 'api';
   const pluginName = 'awsAPIPlugin';
   const region = metadata.providers.awscloudformation.Region;
-  if (metadata[categoryName]) {
+  if (metadata[categoryName] && Object.keys(metadata[categoryName]).length > 0) {
     Object.keys(metadata[categoryName]).forEach(r => {
       const resourceMeta = metadata[categoryName][r];
       if (resourceMeta.output) {
@@ -66,6 +78,13 @@ function constructApi(metadata, amplifyConfig) {
             endpoint: resourceMeta.output.RootUrl,
             region,
             authorizationType: 'AWS_IAM',
+          };
+        } else if (resourceMeta.service === 'ElasticContainer' && resourceMeta.apiType === 'REST') {
+          amplifyConfig[categoryName].plugins[pluginName][r] = {
+            endpointType: 'REST',
+            endpoint: resourceMeta.output.RootUrl,
+            region,
+            authorizationType: resourceMeta.restrictAccess ? 'AMAZON_COGNITO_USER_POOLS' : 'AWS_IAM',
           };
         }
       }

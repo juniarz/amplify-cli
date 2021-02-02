@@ -1,19 +1,9 @@
 const constants = require('./constants');
+const _ = require('lodash');
 const path = require('path');
 const fs = require('fs-extra');
 const graphQLConfig = require('graphql-config');
 const amplifyConfigHelper = require('./amplify-config-helper');
-
-const FILE_EXTENSION_MAP = {
-  javascript: 'js',
-  graphql: 'graphql',
-  flow: 'js',
-  typescript: 'ts',
-  angular: 'graphql',
-  swift: 'graphql',
-};
-
-const fileNames = ['queries', 'mutations', 'subscriptions'];
 
 function deleteAmplifyConfig(context) {
   const srcDirPath = getSrcDir(context);
@@ -31,12 +21,13 @@ function deleteAmplifyConfig(context) {
     const { projects } = gqlConfig.config;
     Object.keys(projects).forEach(project => {
       const { codeGenTarget, docsFilePath, generatedFileName } = projects[project].extensions.amplify;
-      fileNames.forEach(filename => {
-        const file = path.join(srcDirPath, docsFilePath, `${filename}.${FILE_EXTENSION_MAP[codeGenTarget]}`);
+      constants.fileNames.forEach(filename => {
+        const file = path.join(srcDirPath, docsFilePath, `${filename}.${constants.FILE_EXTENSION_MAP[codeGenTarget]}`);
         if (fs.existsSync(file)) fs.removeSync(file);
       });
-
-      fs.removeSync(path.join(srcDirPath, generatedFileName));
+      if (generatedFileName.trim() !== '') {
+        fs.removeSync(path.join(srcDirPath, generatedFileName));
+      }
     });
   }
 }
@@ -47,26 +38,24 @@ function getSrcDir(context) {
   return path.join(projectPath);
 }
 
-function createAmplifyConfig(context) {
+function createAmplifyConfig(context, amplifyResources, cloudAmplifyResources) {
   const { amplify } = context;
   const projectPath = context.exeInfo ? context.exeInfo.localEnvInfo.projectPath : amplify.getEnvInfo().projectPath;
   const srcDirPath = path.join(projectPath);
 
   if (fs.existsSync(srcDirPath)) {
     const targetFilePath = path.join(srcDirPath, constants.amplifyConfigFilename);
-    let amplifyConfig;
-    if (fs.existsSync(targetFilePath)) {
-      amplifyConfig = context.amplify.readJsonFile(targetFilePath);
-    }
 
-    amplifyConfig = amplifyConfigHelper.generateConfig(context, amplifyConfig);
+    // Native GA release requires entire awsconfiguration inside amplifyconfiguration auth plugin
+    const newAWSConfig = getNewAWSConfigObject(context, amplifyResources, cloudAmplifyResources);
+    const amplifyConfig = amplifyConfigHelper.generateConfig(context, newAWSConfig);
 
     const jsonString = JSON.stringify(amplifyConfig, null, 4);
     fs.writeFileSync(targetFilePath, jsonString, 'utf8');
   }
 }
 
-function createAWSConfig(context, amplifyResources, cloudAmplifyResources) {
+function getNewAWSConfigObject(context, amplifyResources, cloudAmplifyResources) {
   const newAWSConfig = getAWSConfigObject(amplifyResources);
   const cloudAWSConfig = getAWSConfigObject(cloudAmplifyResources);
   const currentAWSConfig = getCurrentAWSConfig(context);
@@ -74,7 +63,11 @@ function createAWSConfig(context, amplifyResources, cloudAmplifyResources) {
   const customConfigs = getCustomConfigs(cloudAWSConfig, currentAWSConfig);
 
   Object.assign(newAWSConfig, customConfigs);
+  return newAWSConfig;
+}
 
+function createAWSConfig(context, amplifyResources, cloudAmplifyResources) {
+  const newAWSConfig = getNewAWSConfigObject(context, amplifyResources, cloudAmplifyResources);
   generateAWSConfigFile(context, newAWSConfig);
   return context;
 }
@@ -178,14 +171,17 @@ function getCognitoConfig(cognitoResources, projectRegion) {
   }
 
   if (cognitoResource.output.UserPoolId) {
+    const defaultPool = {
+      PoolId: cognitoResource.output.UserPoolId,
+      AppClientId: cognitoResource.output.AppClientID,
+      Region: projectRegion,
+    };
+    if (cognitoResource.output.AppClientSecret) {
+      _.set(defaultPool, 'AppClientSecret', cognitoResource.output.AppClientSecret);
+    }
     Object.assign(cognitoConfig, {
       CognitoUserPool: {
-        Default: {
-          PoolId: cognitoResource.output.UserPoolId,
-          AppClientId: cognitoResource.output.AppClientID,
-          AppClientSecret: cognitoResource.output.AppClientSecret,
-          Region: projectRegion,
-        },
+        Default: defaultPool,
       },
     });
   }

@@ -1,3 +1,7 @@
+const path = require('path');
+const _ = require('lodash');
+const { AngularConfigNotFoundError, exitOnNextTick, JSONUtilities } = require('amplify-cli-core');
+
 const npm = /^win/.test(process.platform) ? 'npm.cmd' : 'npm';
 
 const reactConfig = {
@@ -8,7 +12,7 @@ const reactConfig = {
 };
 
 const reactNativeConfig = {
-  SourceDir: '/',
+  SourceDir: 'src',
   DistributionDir: '/',
   BuildCommand: `${npm} run-script build`,
   StartCommand: `${npm} run-script start`,
@@ -49,12 +53,56 @@ const defaultConfig = {
   StartCommand: `${npm} run-script start`,
 };
 
+function getAngularConfig(context) {
+  const projectRoot = context.exeInfo.localEnvInfo.projectPath;
+  const angularConfigFile = path.join(projectRoot, 'angular.json');
+  let angularProjectConfig;
+  try {
+    angularProjectConfig = JSONUtilities.readJson(angularConfigFile);
+  } catch (error) {
+    const errorMessage = `Failed to read ${angularConfigFile}: ${error.message || 'Unknown error occurred.'}`;
+    context.print.error(errorMessage);
+    context.print.info(
+      `Angular apps need to be set up by the Angular CLI first: https://docs.amplify.aws/start/getting-started/setup/q/integration/angular`,
+    );
+    context.usageData.emitError(new AngularConfigNotFoundError(errorMessage));
+    exitOnNextTick(1);
+  }
+  const dist = _.get(
+    angularProjectConfig,
+    ['projects', angularProjectConfig.defaultProject, 'architect', 'build', 'options', 'outputPath'],
+    'dist',
+  );
+  return {
+    ...angularConfig,
+    DistributionDir: dist,
+  };
+}
+
+function getProjectConfiguration(context, framework) {
+  switch (framework) {
+    case 'angular':
+      return getAngularConfig(context);
+    case 'ember':
+      return emberConfig;
+    case 'ionic':
+      return ionicConfig;
+    case 'react':
+      return reactConfig;
+    case 'react-native':
+      return reactNativeConfig;
+    case 'vue':
+      return vueConfig;
+    default:
+      return defaultConfig;
+  }
+}
+
+function getSupportedFrameworks() {
+  return ['angular', 'ember', 'ionic', 'react', 'react-native', 'vue', 'none'];
+}
+
 module.exports = {
-  angular: angularConfig,
-  ember: emberConfig,
-  ionic: ionicConfig,
-  react: reactConfig,
-  'react-native': reactNativeConfig,
-  vue: vueConfig,
-  none: defaultConfig,
+  getSupportedFrameworks,
+  getProjectConfiguration,
 };

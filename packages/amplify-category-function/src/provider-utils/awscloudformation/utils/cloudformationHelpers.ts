@@ -1,9 +1,10 @@
-import { categoryName } from './constants';
+import { categoryName, appsyncTableSuffix } from './constants';
+import { getAppSyncResourceName } from './appSyncHelper';
 
 export function getNewCFNEnvVariables(oldCFNEnvVariables, currentDefaults, newCFNEnvVariables, newDefaults) {
   const currentResources = [];
   const newResources = [];
-  const deletedResources = [];
+  let deletedResources = [];
 
   if (currentDefaults.permissions) {
     Object.keys(currentDefaults.permissions).forEach(category => {
@@ -27,8 +28,21 @@ export function getNewCFNEnvVariables(oldCFNEnvVariables, currentDefaults, newCF
     }
   });
 
-  const toBeDeletedEnvVariables = [];
+  const deleteAppSyncTableResources = deletedResources.filter(resource => resource.includes(appsyncTableSuffix.toUpperCase()));
+  deletedResources = deletedResources.filter(resource => !resource.includes(appsyncTableSuffix.toUpperCase()));
+  deleteAppSyncTableResources.forEach(table => {
+    const appsyncResourceName = getAppSyncResourceName();
+    const replacementTableSuffix = `:${appsyncTableSuffix.toUpperCase()}_`;
+    const modelEnvPrefix = `API_${appsyncResourceName.toUpperCase()}_${table
+      .replace(replacementTableSuffix, 'TABLE')
+      .replace('STORAGE_', '')}`;
+    const modelEnvNameKey = `${modelEnvPrefix}_NAME`;
+    const modelEnvArnKey = `${modelEnvPrefix}_ARN`;
+    deletedResources.push(modelEnvNameKey);
+    deletedResources.push(modelEnvArnKey);
+  });
 
+  const toBeDeletedEnvVariables = [];
   Object.keys(oldCFNEnvVariables).forEach(envVar => {
     for (let i = 0; i < deletedResources.length; i += 1) {
       if (envVar.includes(deletedResources[i])) {
@@ -166,7 +180,7 @@ export function constructCFModelTableNameComponent(appsyncResourceName, resource
   };
 }
 
-export function constructCloudWatchEventComponent(cfnFilePath : string,cfnContent){
+export function constructCloudWatchEventComponent(cfnFilePath: string, cfnContent) {
   cfnContent.Resources.CloudWatchEvent = {
     Type: 'AWS::Events::Rule',
     Properties: {
@@ -203,4 +217,13 @@ export function constructCloudWatchEventComponent(cfnFilePath : string,cfnConten
       Ref: 'CloudWatchEvent',
     },
   };
+
+  // apend the cloudwatch parameters if not present
+  if (cfnContent.Parameters.CloudWatchRule === undefined) {
+    cfnContent.Parameters.CloudWatchRule = {
+      Type: 'String',
+      Default: 'NONE',
+      Description: ' Schedule Expression',
+    };
+  }
 }

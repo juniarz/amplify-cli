@@ -1,9 +1,19 @@
 import path from 'path';
 import { category } from './constants';
-import { categoryName } from './provider-utils/awscloudformation/utils/constants';
+export { category } from './constants';
 import { FunctionBreadcrumbs, FunctionRuntimeLifecycleManager } from 'amplify-function-plugin-interface';
+import { stateManager } from 'amplify-cli-core';
 import sequential from 'promise-sequential';
 import { updateConfigOnEnvInit } from './provider-utils/awscloudformation';
+import { supportedServices } from './provider-utils/supported-services';
+import _ from 'lodash';
+export { packageLayer, hashLayerResource } from './provider-utils/awscloudformation/utils/packageLayer';
+import { ServiceName } from './provider-utils/awscloudformation/utils/constants';
+export { ServiceName } from './provider-utils/awscloudformation/utils/constants';
+import { isMultiEnvLayer } from './provider-utils/awscloudformation/utils/layerParams';
+export { isMultiEnvLayer } from './provider-utils/awscloudformation/utils/layerParams';
+
+export { askExecRolePermissionsQuestions } from './provider-utils/awscloudformation/service-walkthroughs/execPermissionsWalkthrough';
 
 export async function add(context, providerName, service, parameters) {
   const options = {
@@ -13,7 +23,7 @@ export async function add(context, providerName, service, parameters) {
   };
   const providerController = require(`./provider-utils/${providerName}/index`);
   if (!providerController) {
-    context.print.error('Provider not confgiured for this category');
+    context.print.error('Provider not configured for this category');
     return;
   }
   return providerController.addResource(context, category, service, options, parameters);
@@ -22,7 +32,7 @@ export async function add(context, providerName, service, parameters) {
 export async function update(context, providerName, service, parameters, resourceToUpdate) {
   const providerController = require(`./provider-utils/${providerName}/index`);
   if (!providerController) {
-    context.print.error('Provider not confgiured for this category');
+    context.print.error('Provider not configured for this category');
     return;
   }
   return providerController.updateResource(context, category, service, parameters, resourceToUpdate);
@@ -59,15 +69,15 @@ export async function migrate(context) {
 }
 
 export async function getPermissionPolicies(context, resourceOpsMapping) {
-  const amplifyMetaFilePath = context.amplify.pathManager.getAmplifyMetaFilePath();
-  const amplifyMeta = context.amplify.readJsonFile(amplifyMetaFilePath);
+  const amplifyMeta = context.amplify.getProjectMeta();
   const permissionPolicies = [];
   const resourceAttributes = [];
 
   Object.keys(resourceOpsMapping).forEach(resourceName => {
     try {
-      const providerController = require(`./provider-utils/${amplifyMeta[category][resourceName].providerPlugin}/index`);
-      if (providerController) {
+      const providerName = amplifyMeta[category][resourceName].providerPlugin;
+      if (providerName) {
+        const providerController = require(`./provider-utils/${providerName}/index`);
         const { policy, attributes } = providerController.getPermissionPolicies(
           context,
           amplifyMeta[category][resourceName].service,
@@ -89,29 +99,66 @@ export async function getPermissionPolicies(context, resourceOpsMapping) {
 
 export async function initEnv(context) {
   const { amplify } = context;
-  const { resourcesToBeCreated, resourcesToBeDeleted, resourcesToBeUpdated } = await amplify.getResourceStatus('function');
+  const { envName } = amplify.getEnvInfo();
+  const { allResources, resourcesToBeCreated, resourcesToBeDeleted, resourcesToBeUpdated } = await amplify.getResourceStatus(category);
 
-  resourcesToBeDeleted.forEach(authResource => {
-    amplify.removeResourceParameters(context, 'function', authResource.resourceName);
+  // getResourceStatus will add dependencies of other types even when filtering by category, so we need to filter them out here
+  const resourceCategoryFilter = resource => resource.category === category;
+
+  resourcesToBeDeleted.filter(resourceCategoryFilter).forEach(functionResource => {
+    amplify.removeResourceParameters(context, category, functionResource.resourceName);
   });
 
-  const tasks = resourcesToBeCreated.concat(resourcesToBeUpdated);
+  const tasks = resourcesToBeCreated.concat(resourcesToBeUpdated).filter(resourceCategoryFilter);
 
   const functionTasks = tasks.map(functionResource => {
-    const { resourceName } = functionResource;
+    const { resourceName, service } = functionResource;
     return async () => {
-      const config = await updateConfigOnEnvInit(context, 'function', resourceName);
-      context.amplify.saveEnvResourceParameters(context, 'function', resourceName, config);
+      const config = await updateConfigOnEnvInit(context, resourceName, service);
+      amplify.saveEnvResourceParameters(context, category, resourceName, config);
     };
   });
+
+  // Need to fetch metadata from #current-cloud-backend, since amplifyMeta
+  // gets regenerated in intialize-env.ts in the amplify-cli package
+  const teamProviderInfo = stateManager.getTeamProviderInfo();
+  const currentAmplifyMeta = stateManager.getCurrentMeta();
+  const amplifyMeta = stateManager.getMeta();
+  const changedResources = [...resourcesToBeCreated, ...resourcesToBeDeleted, ...resourcesToBeUpdated];
+  allResources
+    .filter(resourceCategoryFilter)
+    .filter(r => !changedResources.includes(r))
+    .forEach(r => {
+      const { resourceName, service }: { resourceName: string; service: string } = r;
+
+      const s3Bucket = _.get(currentAmplifyMeta, [category, resourceName, 's3Bucket'], undefined);
+      if (s3Bucket) {
+        const tpiResourceParams = _.get(teamProviderInfo, [envName, 'categories', category, resourceName], {});
+        _.assign(tpiResourceParams, s3Bucket);
+        _.set(teamProviderInfo, [envName, 'categories', category, resourceName], tpiResourceParams);
+        _.set(amplifyMeta, [category, resourceName, 's3Bucket'], s3Bucket);
+      }
+
+      if (service === ServiceName.LambdaLayer) {
+        const lvmPath = [category, resourceName, 'layerVersionMap'];
+        const currentVersionMap = _.get(currentAmplifyMeta, lvmPath);
+        if (isMultiEnvLayer(context, resourceName)) {
+          _.set(teamProviderInfo, [envName, 'nonCFNdata', ...lvmPath], currentVersionMap);
+        }
+        _.set(amplifyMeta, lvmPath, currentVersionMap);
+      }
+    });
+
+  stateManager.setMeta(undefined, amplifyMeta);
+  stateManager.setTeamProviderInfo(undefined, teamProviderInfo);
 
   await sequential(functionTasks);
 }
 
 // returns a function that can be used to invoke the lambda locally
 export async function getInvoker(context: any, params: InvokerParameters): Promise<({ event: any }) => Promise<any>> {
-  const resourcePath = path.join(context.amplify.pathManager.getBackendDirPath(), categoryName, params.resourceName);
-  const breadcrumbs: FunctionBreadcrumbs = context.amplify.readBreadcrumbs(context, categoryName, params.resourceName);
+  const resourcePath = path.join(context.amplify.pathManager.getBackendDirPath(), category, params.resourceName);
+  const breadcrumbs: FunctionBreadcrumbs = context.amplify.readBreadcrumbs(context, category, params.resourceName);
   const runtimeManager: FunctionRuntimeLifecycleManager = await context.amplify.loadRuntimePlugin(context, breadcrumbs.pluginId);
 
   const lastBuildTimestampStr = (await context.amplify.getResourceStatus(category, params.resourceName)).allResources.find(
@@ -128,6 +175,36 @@ export async function getInvoker(context: any, params: InvokerParameters): Promi
       envVars: params.envVars,
       lastBuildTimestamp: lastBuildTimestampStr ? new Date(lastBuildTimestampStr) : undefined,
     });
+}
+
+export function isMockable(context: any, resourceName: string): IsMockableResponse {
+  const resourceValue = _.get(context.amplify.getProjectMeta(), [category, resourceName]);
+  if (!resourceValue) {
+    return {
+      isMockable: false,
+      reason: `Could not find the specified ${category}: ${resourceName}`,
+    };
+  }
+  const { service, dependsOn } = resourceValue;
+
+  const dependsOnLayers = Array.isArray(dependsOn)
+    ? dependsOn
+        .filter(dependency => dependency.category === 'function')
+        .map(val => _.get(context.amplify.getProjectMeta(), [val.category, val.resourceName]))
+        .filter(val => val.service === ServiceName.LambdaLayer)
+    : [];
+
+  const hasLayer = service === ServiceName.LambdaFunction && Array.isArray(dependsOnLayers) && dependsOnLayers.length !== 0;
+  if (hasLayer) {
+    return {
+      isMockable: false,
+      reason:
+        'Mocking a function with layers is not supported. ' +
+        'To test in the cloud: run "amplify push" to deploy your function to the cloud ' +
+        'and then run "amplify console function" to test your function in the Lambda console.',
+    };
+  }
+  return supportedServices[service].providerController.isMockable(service);
 }
 
 export async function executeAmplifyCommand(context) {
@@ -153,3 +230,8 @@ export type InvokerParameters = {
   handler: string;
   envVars?: { [key: string]: string };
 };
+
+export interface IsMockableResponse {
+  isMockable: boolean;
+  reason?: string;
+}

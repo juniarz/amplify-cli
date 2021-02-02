@@ -1,47 +1,63 @@
 import { constructCFModelTableNameComponent, constructCFModelTableArnComponent } from '../utils/cloudformationHelpers';
-import inquirer from 'inquirer';
+import inquirer, { CheckboxQuestion, DistinctChoice } from 'inquirer';
 import path from 'path';
 import * as TransformPackage from 'graphql-transformer-core';
+import _ from 'lodash';
+import { topLevelCommentPrefix, topLevelCommentSuffix, envVarPrintoutPrefix, CRUDOperation, GraphQLOperation } from '../../../constants';
+import { ServiceName } from '../utils/constants';
+import {
+  fetchPermissionCategories,
+  fetchPermissionResourcesForCategory,
+  fetchPermissionsForResourceInCategory,
+} from '../utils/permissionMapUtils';
+import { FunctionParameters, FunctionDependency } from 'amplify-function-plugin-interface/src';
+import { appsyncTableSuffix } from '../utils/constants';
+import { getAppSyncResourceName } from '../utils/appSyncHelper';
+import { stateManager, FeatureFlags } from 'amplify-cli-core';
 
-export async function askExecRolePermissionsQuestions(context, allDefaultValues, parameters, currentDefaults?) {
-  const amplifyMetaFilePath = context.amplify.pathManager.getAmplifyMetaFilePath();
-  const amplifyMeta = context.amplify.readJsonFile(amplifyMetaFilePath);
+/**
+ * This whole file desperately needs to be refactored
+ */
+export const askExecRolePermissionsQuestions = async (
+  context,
+  resourceNameToUpdate: string,
+  currentPermissionMap?,
+  currentEnvMap?,
+  category?: string,
+  serviceName?: string,
+): Promise<ExecRolePermissionsResponse> => {
+  // feature flag for graphQL permission bugfix as part of PR-5342
+  const generateGraphQLPermissions = FeatureFlags.getBoolean('appSync.generateGraphQLPermissions');
 
-  let categories = Object.keys(amplifyMeta);
-  categories = categories.filter(category => category !== 'providers');
+  const amplifyMeta = stateManager.getMeta();
 
-  // retrieve api's appsynch resource name for conditional logic
+  const categories = Object.keys(amplifyMeta).filter(category => category !== 'providers');
+
+  // retrieve api's AppSync resource name for conditional logic
   // in blending appsync @model-backed dynamoDB tables into storage category flow
-  const appsyncResourceName =
-    'api' in amplifyMeta ? Object.keys(amplifyMeta.api).find(key => amplifyMeta.api[key].service === 'AppSync') : undefined;
+  const appsyncResourceName = getAppSyncResourceName();
 
-  // if there is api category appsynch resource and no storage category, add it back to selection
+  // if there is api category AppSync resource and no storage category, add it back to selection
   // since storage category is responsible for managing appsync @model-backed dynamoDB table permissions
   if (!categories.includes('storage') && appsyncResourceName !== undefined) {
     categories.push('storage');
   }
 
-  const categoryPermissionQuestion = {
-    type: 'checkbox',
-    name: 'categories',
-    message: 'Select the category',
-    choices: categories,
-    default: currentDefaults ? currentDefaults.categories : undefined,
-  };
-  const capitalizeFirstLetter = str => str.charAt(0).toUpperCase() + str.slice(1);
-  const categoryPermissionAnswer = await inquirer.prompt([categoryPermissionQuestion]);
-  const selectedCategories = categoryPermissionAnswer.categories as any[];
+  const categoryPermissionQuestion = selectCategories(categories, currentPermissionMap);
+  const categoryPermissionAnswer = await inquirer.prompt(categoryPermissionQuestion);
+  const selectedCategories = categoryPermissionAnswer.categories as string[];
+
   let categoryPolicies = [];
   let resources = [];
-  const crudOptions = ['create', 'read', 'update', 'delete'];
-  parameters.permissions = {};
+  const crudOptions = _.values(CRUDOperation);
+  const graphqlOperations = _.values(GraphQLOperation);
+  const permissions = {};
 
   const backendDir = context.amplify.pathManager.getBackendDirPath();
-  const appsyncTableSuffix = '@model(appsync)';
 
-  for (let category of selectedCategories) {
-    const resourcesList = category in amplifyMeta ? Object.keys(amplifyMeta[category]) : [];
-    if (category === 'storage' && 'api' in amplifyMeta) {
+  for (const selectedCategory of selectedCategories) {
+    let resourcesList = selectedCategory in amplifyMeta ? Object.keys(amplifyMeta[selectedCategory]) : [];
+    if (selectedCategory === 'storage' && 'api' in amplifyMeta) {
       if (appsyncResourceName) {
         const resourceDirPath = path.join(backendDir, 'api', appsyncResourceName);
         const project = await TransformPackage.readProjectConfiguration(resourceDirPath);
@@ -51,92 +67,73 @@ export async function askExecRolePermissionsQuestions(context, allDefaultValues,
           .map(modelName => `${modelName}:${appsyncTableSuffix}`);
         resourcesList.push(...modelNames);
       }
+    } else if (selectedCategory === category) {
+      // A Lambda function cannot depend on itself
+      // Lambda layer dependencies are handled seperately
+      if (serviceName === ServiceName.LambdaFunction) {
+        resourcesList = resourcesList.filter(
+          resourceName => resourceName !== resourceNameToUpdate && amplifyMeta[selectedCategory][resourceName].service === serviceName,
+        );
+      } else {
+        resourcesList = resourcesList.filter(
+          resourceName => resourceName !== resourceNameToUpdate && !amplifyMeta[selectedCategory][resourceName].iamAccessUnavailable,
+        );
+      }
     }
 
-    if (resourcesList.length === 0) {
-      context.print.warning(`No resources found for ${category}`);
+    if (_.isEmpty(resourcesList)) {
+      context.print.warning(`No resources found for ${selectedCategory}`);
       continue;
     }
 
     try {
-      let selectedResources: any = [];
-
-      if (resourcesList.length === 1) {
-        context.print.info(`${capitalizeFirstLetter(category)} category has a resource called ${resourcesList[0]}`);
-        selectedResources = [resourcesList[0]];
-      } else {
-        const resourceQuestion = {
-          type: 'checkbox',
-          name: 'resources',
-          message: `${capitalizeFirstLetter(category)} has ${
-            resourcesList.length
-          } resources in this project. Select the one you would like your Lambda to access`,
-          choices: resourcesList,
-          validate: value => {
-            if (value.length === 0) {
-              return 'You must select at least resource';
-            }
-            return true;
-          },
-          default: () => {
-            if (currentDefaults && currentDefaults.categoryPermissionMap && currentDefaults.categoryPermissionMap[category]) {
-              return Object.keys(currentDefaults.categoryPermissionMap[category]);
-            }
-          },
-        };
-
+      let selectedResources = [];
+      if (resourcesList.length > 1) {
+        // There's a few resources in this category. Let's pick some.
+        const resourceQuestion = selectResourcesInCategory(resourcesList, currentPermissionMap, selectedCategory);
         const resourceAnswer = await inquirer.prompt([resourceQuestion]);
-        selectedResources = resourceAnswer.resources;
+        selectedResources = _.concat(resourceAnswer.resources);
+      } else {
+        // There's only one resource in the category. Let's use that.
+        selectedResources = _.concat(resourcesList);
       }
 
       for (let resourceName of selectedResources) {
-        const pluginInfo = context.amplify.getCategoryPluginInfo(context, category, resourceName);
+        // If the resource is AppSync, use GraphQL operations for permission policies.
+        // Otherwise, default to CRUD permissions.
+        const serviceType = _.get(amplifyMeta, [selectedCategory, resourceName, 'service']);
+        let options;
+        switch (serviceType) {
+          case 'AppSync':
+            options = generateGraphQLPermissions ? graphqlOperations : crudOptions;
+            break;
+          default:
+            options = crudOptions;
+            break;
+        }
 
-        const { getPermissionPolicies } = require(pluginInfo.packageLocation);
-
-        if (!getPermissionPolicies) {
-          context.print.warning(`Policies cannot be added for ${category}/${resourceName}`);
+        // In case of some resources they are not in the meta file so check for resource existence as well
+        const isMobileHubImportedResource = _.get(amplifyMeta, [selectedCategory, resourceName, 'mobileHubMigrated'], false);
+        if (isMobileHubImportedResource) {
+          context.print.warning(
+            `Policies cannot be added for ${selectedCategory}/${resourceName}, since it is a MobileHub imported resource.`,
+          );
           continue;
         } else {
-          const crudPermissionQuestion = {
-            type: 'checkbox',
-            name: 'crudOptions',
-            message: `Select the operations you want to permit for ${resourceName}`,
-            choices: crudOptions,
-            validate: value => {
-              if (value.length === 0) {
-                return 'You must select at least one operation';
-              }
+          const currentPermissions = fetchPermissionsForResourceInCategory(currentPermissionMap, selectedCategory, resourceName);
+          const permissionQuestion = selectPermissions(options, currentPermissions, resourceName);
+          const permissionAnswer = await inquirer.prompt([permissionQuestion]);
+          const resourcePolicy: any = permissionAnswer.options;
 
-              return true;
-            },
-            default: () => {
-              if (
-                currentDefaults &&
-                currentDefaults.categoryPermissionMap &&
-                currentDefaults.categoryPermissionMap[category] &&
-                currentDefaults.categoryPermissionMap[category][resourceName]
-              ) {
-                return currentDefaults.categoryPermissionMap[category][resourceName];
-              }
-            },
-          };
-
-          const crudPermissionAnswer = await inquirer.prompt([crudPermissionQuestion]);
-          if (!parameters.permissions[category]) {
-            parameters.permissions[category] = {};
-          }
-
-          parameters.permissions[category][resourceName] = crudPermissionAnswer.crudOptions;
-          // overload crudOptions when user selects graphql @model-backing DynamoDB table
+          // overload options when user selects graphql @model-backing DynamoDB table
           // as there is no actual storage category resource where getPermissionPolicies can derive service and provider
           if (resourceName.endsWith(appsyncTableSuffix)) {
-            parameters.permissions[category][resourceName].providerPlugin = 'awscloudformation';
-            parameters.permissions[category][resourceName].service = 'DynamoDB';
+            resourcePolicy.providerPlugin = 'awscloudformation';
+            resourcePolicy.service = 'DynamoDB';
             const dynamoDBTableARNComponents = constructCFModelTableArnComponent(appsyncResourceName, resourceName, appsyncTableSuffix);
 
             // have to override the policy resource as Fn::ImportValue is needed to extract DynamoDB table arn
-            parameters.permissions[category][resourceName].customPolicyResource = [
+            resourcePolicy.customPolicyResource = [
               {
                 'Fn::Join': ['', dynamoDBTableARNComponents],
               },
@@ -146,8 +143,20 @@ export async function askExecRolePermissionsQuestions(context, allDefaultValues,
             ];
           }
 
-          const { permissionPolicies, resourceAttributes } = await getPermissionPolicies(context, parameters.permissions[category]);
+          const { permissionPolicies, resourceAttributes } = await context.amplify.invokePluginMethod(
+            context,
+            selectedCategory,
+            resourceName,
+            'getPermissionPolicies',
+            [context, { [resourceName]: resourcePolicy }],
+          );
+
           categoryPolicies = categoryPolicies.concat(permissionPolicies);
+
+          if (!permissions[selectedCategory]) {
+            permissions[selectedCategory] = {};
+          }
+          permissions[selectedCategory][resourceName] = resourcePolicy;
 
           // replace resource attributes for @model-backed dynamoDB tables
           resources = resources.concat(
@@ -177,19 +186,20 @@ export async function askExecRolePermissionsQuestions(context, allDefaultValues,
         }
       }
     } catch (e) {
-      context.print.warning(`Policies cannot be added for ${category}`);
+      context.print.warning(`Policies cannot be added for ${selectedCategory}`);
       context.print.info(e.stack);
+      context.usageData.emitError(e);
+      process.exitCode = 1;
     }
   }
 
-  allDefaultValues.categoryPolicies = categoryPolicies;
-  const resourceProperties = [];
-  const resourcePropertiesJSON = {};
-  const categoryMapping = {};
+  const environmentMap = {};
+  const envVars = new Set<string>();
+  const dependsOn: FunctionDependency[] = [];
   resources.forEach(resource => {
     const { category, resourceName, attributes } = resource;
     /**
-     * while resourceProperties and resourcePropertiesJson
+     * while resourceProperties
      * (which are utilized to set Lambda environment variables on CF side)
      * are derived from dependencies on other category resources that in-turn are set as CF-template parameters
      * we need to inject extra when blending appsync @model-backed dynamoDB tables into storage category flow
@@ -197,49 +207,27 @@ export async function askExecRolePermissionsQuestions(context, allDefaultValues,
      */
     if (resource.needsAdditionalDynamoDBResourceProps) {
       const modelEnvPrefix = `${category.toUpperCase()}_${resourceName.toUpperCase()}_${resource._modelName.toUpperCase()}`;
-      let modelArnResourcePropValue = {
+      const modelEnvNameKey = `${modelEnvPrefix}_NAME`;
+      const modelEnvArnKey = `${modelEnvPrefix}_ARN`;
+
+      environmentMap[modelEnvNameKey] = resource._cfJoinComponentTableName;
+      environmentMap[modelEnvArnKey] = {
         'Fn::Join': ['', resource._cfJoinComponentTableArn],
       };
 
-      resourceProperties.push(`"${modelEnvPrefix}_NAME": ${JSON.stringify(resource._cfJoinComponentTableName)}`);
-      resourceProperties.push(`"${modelEnvPrefix}_ARN": ${JSON.stringify(modelArnResourcePropValue)}`);
-      resourcePropertiesJSON[`${modelEnvPrefix}_NAME`] = resource._cfJoinComponentTableName;
-      resourcePropertiesJSON[`${modelEnvPrefix}_ARN`] = modelArnResourcePropValue;
-
-      const categoryMappingPrefix = `${category}${capitalizeFirstLetter(resourceName)}${capitalizeFirstLetter(resource._modelName)}`;
-      if (!categoryMapping[category]) {
-        categoryMapping[category] = [];
-      }
-      categoryMapping[category].push({ envName: `${modelEnvPrefix}_NAME`, varName: `${categoryMappingPrefix}Name` });
-      categoryMapping[category].push({ envName: `${modelEnvPrefix}_ARN`, varName: `${categoryMappingPrefix}Arn` });
+      envVars.add(modelEnvNameKey);
+      envVars.add(modelEnvArnKey);
     }
 
     attributes.forEach(attribute => {
       const envName = `${category.toUpperCase()}_${resourceName.toUpperCase()}_${attribute.toUpperCase()}`;
-      const varName = `${category}${capitalizeFirstLetter(resourceName)}${capitalizeFirstLetter(attribute)}`;
       const refName = `${category}${resourceName}${attribute}`;
-
-      resourceProperties.push(`"${envName}": {"Ref": "${refName}"}`);
-      resourcePropertiesJSON[`${envName}`] = { Ref: `${category}${resourceName}${attribute}` };
-      if (!categoryMapping[category]) {
-        categoryMapping[category] = [];
-      }
-      categoryMapping[category].push({ envName, varName });
+      environmentMap[envName] = { Ref: refName };
+      envVars.add(envName);
     });
 
-    if (!allDefaultValues.dependsOn) {
-      allDefaultValues.dependsOn = [];
-    }
-
-    let resourceExists = false;
-    allDefaultValues.dependsOn.forEach(amplifyResource => {
-      if (amplifyResource.resourceName === resourceName) {
-        resourceExists = true;
-      }
-    });
-
-    if (!resourceExists) {
-      allDefaultValues.dependsOn.push({
+    if (!dependsOn.find(dep => dep.resourceName === resourceName)) {
+      dependsOn.push({
         category: resource.category,
         resourceName: resource.resourceName,
         attributes: resource.attributes,
@@ -247,25 +235,56 @@ export async function askExecRolePermissionsQuestions(context, allDefaultValues,
     }
   });
 
-  allDefaultValues.resourceProperties = resourceProperties.join(',\n');
-  allDefaultValues.resourcePropertiesJSON = resourcePropertiesJSON;
+  if (currentEnvMap) {
+    _.keys(currentEnvMap).forEach(key => {
+      envVars.add(key);
+    });
+  }
 
-  context.print.info('');
-  let topLevelComment = '/* Amplify Params - DO NOT EDIT\n';
-  let terminalOutput = 'You can access the following resource attributes as environment variables from your Lambda function\n';
-  terminalOutput += 'var environment = process.env.ENV\n';
-  terminalOutput += 'var region = process.env.REGION\n';
+  const envVarStringList = Array.from(envVars)
+    .sort()
+    .join('\n\t');
 
-  Object.keys(categoryMapping).forEach(category => {
-    if (categoryMapping[category].length > 0) {
-      categoryMapping[category].forEach(args => {
-        terminalOutput += `var ${args.varName} = process.env.${args.envName}\n`;
-      });
-    }
-  });
+  context.print.info(`${envVarPrintoutPrefix}${envVarStringList}`);
 
-  context.print.info(terminalOutput);
-  topLevelComment += `${terminalOutput}\nAmplify Params - DO NOT EDIT */`;
+  return {
+    dependsOn,
+    topLevelComment: `${topLevelCommentPrefix}${envVarStringList}${topLevelCommentSuffix}`,
+    environmentMap,
+    mutableParametersState: { permissions },
+    categoryPolicies,
+  };
+};
 
-  return { topLevelComment };
-}
+export type ExecRolePermissionsResponse = Required<
+  Pick<FunctionParameters, 'categoryPolicies' | 'environmentMap' | 'topLevelComment' | 'dependsOn' | 'mutableParametersState'>
+>;
+
+// Inquirer Questions
+
+const selectResourcesInCategory = (choices: DistinctChoice<any>[], currentPermissionMap: any, category: any): CheckboxQuestion => ({
+  type: 'checkbox',
+  name: 'resources',
+  message: `${_.capitalize(category)} has ${choices.length} resources in this project. Select the one you would like your Lambda to access`,
+  choices,
+  validate: answers => (_.isEmpty(answers) ? 'You must select at least one resource' : true),
+  default: fetchPermissionResourcesForCategory(currentPermissionMap, category),
+});
+
+const selectCategories = (choices: DistinctChoice<any>[], currentPermissionMap: object): CheckboxQuestion => ({
+  type: 'checkbox',
+  name: 'categories',
+  message: 'Select the categories you want this function to have access to.',
+  choices,
+  validate: answers => (_.isEmpty(answers) ? 'You must select at least one category' : true),
+  default: fetchPermissionCategories(currentPermissionMap),
+});
+
+const selectPermissions = (choices: DistinctChoice<any>[], currentPermissions: any, resourceName: any) => ({
+  type: 'checkbox',
+  name: 'options',
+  message: `Select the operations you want to permit on ${resourceName}`,
+  choices,
+  validate: answers => (_.isEmpty(answers) ? 'You must select at least one operation' : true),
+  default: currentPermissions,
+});
