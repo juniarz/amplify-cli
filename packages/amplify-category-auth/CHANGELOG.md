@@ -3,6 +3,283 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [2.34.0](https://github.com/aws-amplify/amplify-cli/compare/amplify-category-auth@2.33.1...amplify-category-auth@2.34.0) (2021-06-24)
+
+
+### Features
+
+* **import-auth:** add headless support ([#7266](https://github.com/aws-amplify/amplify-cli/issues/7266)) ([7fa478b](https://github.com/aws-amplify/amplify-cli/commit/7fa478bbfebbbe70e286eb19d436d772c32c4fd2))
+
+
+
+
+
+## [2.33.1](https://github.com/aws-amplify/amplify-cli/compare/amplify-category-auth@2.33.0...amplify-category-auth@2.33.1) (2021-06-15)
+
+**Note:** Version bump only for package amplify-category-auth
+
+
+
+
+
+# [2.33.0](https://github.com/aws-amplify/amplify-cli/compare/amplify-category-auth@2.32.1...amplify-category-auth@2.33.0) (2021-06-02)
+
+
+
+# 4.52.0 (2021-06-01)
+
+
+### Features
+
+* add support for SMS Sandbox ([#7436](https://github.com/aws-amplify/amplify-cli/issues/7436)) ([cdcb626](https://github.com/aws-amplify/amplify-cli/commit/cdcb6260c11bbedef5b056fdcd730612d8bb3230))
+
+
+
+
+
+## [2.32.1](https://github.com/aws-amplify/amplify-cli/compare/amplify-category-auth@2.32.0...amplify-category-auth@2.32.1) (2021-05-26)
+
+
+
+## 4.51.3 (2021-05-25)
+
+
+### Bug Fixes
+
+* add `sharedId` in `externalAuthEnable()` ([#7315](https://github.com/aws-amplify/amplify-cli/issues/7315)) ([fd552b4](https://github.com/aws-amplify/amplify-cli/commit/fd552b4c8d34d67c05330ae79804b00daa976f1d))
+* scope down usage of PassRole ([#7317](https://github.com/aws-amplify/amplify-cli/issues/7317)) ([d4d9394](https://github.com/aws-amplify/amplify-cli/commit/d4d9394f33995a6852d5b00e09d38802798ca6d7))
+* update auth sms workflow check ([#7396](https://github.com/aws-amplify/amplify-cli/issues/7396)) ([07a6fe4](https://github.com/aws-amplify/amplify-cli/commit/07a6fe47d1c39d952eef242400cdbb7e8a6a11eb))
+
+
+
+
+
+# [2.32.0](https://github.com/aws-amplify/amplify-cli/compare/amplify-category-auth@2.31.1...amplify-category-auth@2.32.0) (2021-05-22)
+
+
+
+## 4.51.2 (2021-05-20)
+
+
+### Bug Fixes
+
+* updated ejs template for empty object triggers ([#7351](https://github.com/aws-amplify/amplify-cli/issues/7351)) ([572ddbd](https://github.com/aws-amplify/amplify-cli/commit/572ddbda4f339d364a8a20bab0053140cf798f34))
+
+
+### Features
+
+* prep work for Cognito SMS Sandbox [#2](https://github.com/aws-amplify/amplify-cli/issues/2) ([#7338](https://github.com/aws-amplify/amplify-cli/issues/7338)) ([3dbb3bf](https://github.com/aws-amplify/amplify-cli/commit/3dbb3bfc199fdd7faac68cdee236d2625d6fb1ea))
+
+
+
+
+
+## [2.31.1](https://github.com/aws-amplify/amplify-cli/compare/amplify-category-auth@2.31.0...amplify-category-auth@2.31.1) (2021-05-18)
+
+
+
+## 4.51.1 (2021-05-18)
+
+**Note:** Version bump only for package amplify-category-auth
+
+
+
+
+
+# [2.31.0](https://github.com/aws-amplify/amplify-cli/compare/amplify-category-auth@2.30.6...amplify-category-auth@2.31.0) (2021-05-14)
+
+
+
+# 4.51.0 (2021-05-13)
+
+
+### Bug Fixes
+
+* [#4657](https://github.com/aws-amplify/amplify-cli/issues/4657) preserve previous authSelections in update flow ([#7255](https://github.com/aws-amplify/amplify-cli/issues/7255)) ([afbaa08](https://github.com/aws-amplify/amplify-cli/commit/afbaa08ac54bb001b640c808cf136c124089e5fc))
+* e2e failed tests for auth Triggers PR ([#7262](https://github.com/aws-amplify/amplify-cli/issues/7262)) ([fedb6c4](https://github.com/aws-amplify/amplify-cli/commit/fedb6c49cf0695e21f59929e7d0554b59290f2f1))
+* ejs template fix when no triggers added ([#7267](https://github.com/aws-amplify/amplify-cli/issues/7267)) ([81786a8](https://github.com/aws-amplify/amplify-cli/commit/81786a8d654f3ba2550e59986d85a654e5ed44dd))
+
+
+### Features
+
+* prep work for SMS Sandbox support ([#7302](https://github.com/aws-amplify/amplify-cli/issues/7302)) ([d1f85d2](https://github.com/aws-amplify/amplify-cli/commit/d1f85d2e0a9c367b71defefe6d9e00737f681ca4))
+* Support for Apple Sign In ([#7265](https://github.com/aws-amplify/amplify-cli/issues/7265)) ([9f5e659](https://github.com/aws-amplify/amplify-cli/commit/9f5e659d63362c7f47eaa147c68d40d5bcc36fcc))
+
+
+
+
+
+## [2.30.6](https://github.com/aws-amplify/amplify-cli/compare/amplify-category-auth@2.30.4...amplify-category-auth@2.30.6) (2021-05-03)
+
+
+
+## 4.50.1 (2021-05-03)
+
+
+### Bug Fixes
+
+* render the right auth mode for admin queries in config files ([#7118](https://github.com/aws-amplify/amplify-cli/issues/7118)) ([8f8deba](https://github.com/aws-amplify/amplify-cli/commit/8f8deba9171a30433aa6820af1f32f5498db5028)), closes [#6983](https://github.com/aws-amplify/amplify-cli/issues/6983)
+
+
+
+
+
+## [2.30.5](https://github.com/aws-amplify/amplify-cli/compare/amplify-category-auth@2.30.4...amplify-category-auth@2.30.5) (2021-05-03)
+
+
+### Bug Fixes
+
+* render the right auth mode for admin queries in config files ([#7118](https://github.com/aws-amplify/amplify-cli/issues/7118)) ([8f8deba](https://github.com/aws-amplify/amplify-cli/commit/8f8deba9171a30433aa6820af1f32f5498db5028)), closes [#6983](https://github.com/aws-amplify/amplify-cli/issues/6983)
+
+
+
+
+
+## [2.30.4](https://github.com/aws-amplify/amplify-cli/compare/amplify-category-auth@2.30.3...amplify-category-auth@2.30.4) (2021-04-27)
+
+**Note:** Version bump only for package amplify-category-auth
+
+
+
+
+
+## [2.30.3](https://github.com/aws-amplify/amplify-cli/compare/amplify-category-auth@2.30.2...amplify-category-auth@2.30.3) (2021-04-19)
+
+**Note:** Version bump only for package amplify-category-auth
+
+
+
+
+
+## [2.30.2](https://github.com/aws-amplify/amplify-cli/compare/amplify-category-auth@2.30.1...amplify-category-auth@2.30.2) (2021-04-14)
+
+**Note:** Version bump only for package amplify-category-auth
+
+
+
+
+
+## [2.30.1](https://github.com/aws-amplify/amplify-cli/compare/amplify-category-auth@2.29.3...amplify-category-auth@2.30.1) (2021-04-09)
+
+
+### Bug Fixes
+
+* **amplify-category-auth:** add lambda with AdminQueries API permissions ([#6935](https://github.com/aws-amplify/amplify-cli/issues/6935)) ([756b0f7](https://github.com/aws-amplify/amplify-cli/commit/756b0f70e3b060a4603290c0ab1ff7e3033d6021)), closes [#6576](https://github.com/aws-amplify/amplify-cli/issues/6576)
+* **cli:** use more inclusive language ([#6919](https://github.com/aws-amplify/amplify-cli/issues/6919)) ([bb70464](https://github.com/aws-amplify/amplify-cli/commit/bb70464d6c24fa931c0eb80d234a496d936913f5))
+
+
+
+
+
+## [2.29.3](https://github.com/aws-amplify/amplify-cli/compare/amplify-category-auth@2.29.2...amplify-category-auth@2.29.3) (2021-03-24)
+
+
+
+## 4.46.1 (2021-03-23)
+
+
+### Bug Fixes
+
+* exclude env add from check ([a7e0351](https://github.com/aws-amplify/amplify-cli/commit/a7e035126e264abf1c075b17cbd9a82fa3963481))
+
+
+
+
+
+## [2.29.2](https://github.com/aws-amplify/amplify-cli/compare/amplify-category-auth@2.29.1...amplify-category-auth@2.29.2) (2021-03-23)
+
+
+### Bug Fixes
+
+* add sms auth message to cfn template ([#6789](https://github.com/aws-amplify/amplify-cli/issues/6789)) ([7f9ea84](https://github.com/aws-amplify/amplify-cli/commit/7f9ea84f741ec9001dac9be55944d05c4534acb3))
+
+
+
+
+
+## [2.29.1](https://github.com/aws-amplify/amplify-cli/compare/amplify-category-auth@2.29.0...amplify-category-auth@2.29.1) (2021-03-11)
+
+**Note:** Version bump only for package amplify-category-auth
+
+
+
+
+
+# [2.29.0](https://github.com/aws-amplify/amplify-cli/compare/amplify-category-auth@2.28.3...amplify-category-auth@2.29.0) (2021-03-05)
+
+
+### Features
+
+* remove OAuth prompt from pull and new env ([#6739](https://github.com/aws-amplify/amplify-cli/issues/6739)) ([8ff15a6](https://github.com/aws-amplify/amplify-cli/commit/8ff15a6ea2c3c687f0344fb4e17547097cd575ea))
+
+
+
+
+
+## [2.28.3](https://github.com/aws-amplify/amplify-cli/compare/amplify-category-auth@2.28.2...amplify-category-auth@2.28.3) (2021-02-26)
+
+**Note:** Version bump only for package amplify-category-auth
+
+
+
+
+
+## [2.28.2](https://github.com/aws-amplify/amplify-cli/compare/amplify-category-auth@2.28.1...amplify-category-auth@2.28.2) (2021-02-24)
+
+
+### Bug Fixes
+
+* **auth:** update oauth prompt help text to mention that selecting "no" will remove existing configuration ([#6670](https://github.com/aws-amplify/amplify-cli/issues/6670)) ([83ec192](https://github.com/aws-amplify/amplify-cli/commit/83ec1923bdeffc328d0e97b658657894a79f4ca0))
+* insert hostedUIProviderCreds empty array on hostedUI ([#6485](https://github.com/aws-amplify/amplify-cli/issues/6485)) ([5ebee51](https://github.com/aws-amplify/amplify-cli/commit/5ebee516373c0544f1400f054eb382bb5b887253))
+
+
+### Reverts
+
+* Revert "fix: insert hostedUIProviderCreds empty array on hostedUI (#6485)" (#6682) ([4185595](https://github.com/aws-amplify/amplify-cli/commit/41855953b074fe4179a68a4acaf9796515e12688)), closes [#6485](https://github.com/aws-amplify/amplify-cli/issues/6485) [#6682](https://github.com/aws-amplify/amplify-cli/issues/6682)
+
+
+
+
+
+## [2.28.1](https://github.com/aws-amplify/amplify-cli/compare/amplify-category-auth@2.28.0...amplify-category-auth@2.28.1) (2021-02-17)
+
+**Note:** Version bump only for package amplify-category-auth
+
+
+
+
+
+# [2.28.0](https://github.com/aws-amplify/amplify-cli/compare/amplify-category-auth@2.27.0...amplify-category-auth@2.28.0) (2021-02-11)
+
+
+### Features
+
+* dont open urls when CLI is running in CI ([#6503](https://github.com/aws-amplify/amplify-cli/issues/6503)) ([27546a7](https://github.com/aws-amplify/amplify-cli/commit/27546a78159ea95c636dbbd094fe6a4f7fb8f8f4)), closes [#5973](https://github.com/aws-amplify/amplify-cli/issues/5973)
+
+
+
+
+
+# [2.27.0](https://github.com/aws-amplify/amplify-cli/compare/amplify-category-auth@2.26.4...amplify-category-auth@2.27.0) (2021-02-10)
+
+
+### Bug Fixes
+
+* [#6397](https://github.com/aws-amplify/amplify-cli/issues/6397) - auth update overwrite parameters ([#6403](https://github.com/aws-amplify/amplify-cli/issues/6403)) ([75f5ace](https://github.com/aws-amplify/amplify-cli/commit/75f5ace173a6b36b943e2110845e411a2cce5d6d))
+* appclient secret output default to false ([#6333](https://github.com/aws-amplify/amplify-cli/issues/6333)) ([3da53b7](https://github.com/aws-amplify/amplify-cli/commit/3da53b7c9aacf718ebd8ea63e59928425af20764))
+* apply empty arrays as default values but not undefined values ([#6445](https://github.com/aws-amplify/amplify-cli/issues/6445)) ([c2d2a6c](https://github.com/aws-amplify/amplify-cli/commit/c2d2a6cbffaed255a4cac7738d4691dda25e8710))
+* correct given_name fb attribute mapping ([#6510](https://github.com/aws-amplify/amplify-cli/issues/6510)) ([c26d958](https://github.com/aws-amplify/amplify-cli/commit/c26d95866a0496b26d4d7581eb2096b87390f50e))
+* generating condition for user pool ([#6426](https://github.com/aws-amplify/amplify-cli/issues/6426)) ([4f35e08](https://github.com/aws-amplify/amplify-cli/commit/4f35e08e38900f59e4b98da1417deb204f072f6a))
+
+
+### Features
+
+* add support for importing userpool with no appclient secret ([#6404](https://github.com/aws-amplify/amplify-cli/issues/6404)) ([4ce4138](https://github.com/aws-amplify/amplify-cli/commit/4ce413829f14aa90ca9ca27510249f1c6c39909f)), closes [#6333](https://github.com/aws-amplify/amplify-cli/issues/6333)
+
+
+
+
+
 ## [2.26.4](https://github.com/aws-amplify/amplify-cli/compare/amplify-category-auth@2.26.3...amplify-category-auth@2.26.4) (2021-01-08)
 
 **Note:** Version bump only for package amplify-category-auth

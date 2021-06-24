@@ -40,7 +40,7 @@ const vueConfig = {
 };
 
 const emberConfig = {
-  SourceDir: '/',
+  SourceDir: './',
   DistributionDir: 'dist',
   BuildCommand: `${npm} run-script build -- -e production`,
   StartCommand: `${npm} run-script start`,
@@ -53,8 +53,8 @@ const defaultConfig = {
   StartCommand: `${npm} run-script start`,
 };
 
-function getAngularConfig(context) {
-  const projectRoot = context.exeInfo.localEnvInfo.projectPath;
+function getAngularConfig(context, projectPath) {
+  const projectRoot = projectPath || context.exeInfo.localEnvInfo.projectPath;
   const angularConfigFile = path.join(projectRoot, 'angular.json');
   let angularProjectConfig;
   try {
@@ -79,23 +79,35 @@ function getAngularConfig(context) {
   };
 }
 
-function getProjectConfiguration(context, framework) {
+function getProjectConfiguration(context, framework, projectPath) {
+  let config;
+
   switch (framework) {
     case 'angular':
-      return getAngularConfig(context);
+      config = getAngularConfig(context, projectPath);
+      break;
     case 'ember':
-      return emberConfig;
+      config = emberConfig;
+      break;
     case 'ionic':
-      return ionicConfig;
+      config = ionicConfig;
+      break;
     case 'react':
-      return reactConfig;
+      config = reactConfig;
+      break;
     case 'react-native':
-      return reactNativeConfig;
+      config = reactNativeConfig;
+      break;
     case 'vue':
-      return vueConfig;
+      config = vueConfig;
+      break;
     default:
-      return defaultConfig;
+      config = defaultConfig;
   }
+
+  const headlessConfig = _.get(context, 'exeInfo.inputParams.javascript.config', {});
+  config = Object.assign({}, config, headlessConfig);
+  return config;
 }
 
 function getSupportedFrameworks() {

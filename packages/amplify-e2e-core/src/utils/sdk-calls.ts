@@ -11,12 +11,16 @@ import {
   CloudWatchEvents,
   Kinesis,
   CloudFormation,
+  AmplifyBackend,
+  IAM,
 } from 'aws-sdk';
 import _ from 'lodash';
 
 export const getDDBTable = async (tableName: string, region: string) => {
   const service = new DynamoDB({ region });
-  return await service.describeTable({ TableName: tableName }).promise();
+  if (tableName) {
+    return await service.describeTable({ TableName: tableName }).promise();
+  }
 };
 
 export const checkIfBucketExists = async (bucketName: string, region: string) => {
@@ -41,6 +45,19 @@ export const bucketNotExists = async (bucket: string) => {
   }
 };
 
+export const getBucketEncryption = async (bucket: string) => {
+  const s3 = new S3();
+  const params = {
+    Bucket: bucket,
+  };
+  try {
+    const result = await s3.getBucketEncryption(params).promise();
+    return result.ServerSideEncryptionConfiguration;
+  } catch (err) {
+    throw new Error(`Error fetching SSE info for bucket ${bucket}. Underlying error was [${err.message}]`);
+  }
+};
+
 export const deleteS3Bucket = async (bucket: string) => {
   const s3 = new S3();
   let continuationToken: Required<Pick<S3.ListObjectVersionsOutput, 'KeyMarker' | 'VersionIdMarker'>> = undefined;
@@ -53,7 +70,12 @@ export const deleteS3Bucket = async (bucket: string) => {
         ...continuationToken,
       })
       .promise();
+
     results.Versions?.forEach(({ Key, VersionId }) => {
+      objectKeyAndVersion.push({ Key, VersionId });
+    });
+
+    results.DeleteMarkers?.forEach(({ Key, VersionId }) => {
       objectKeyAndVersion.push({ Key, VersionId });
     });
 
@@ -193,7 +215,41 @@ export const getCloudWatchLogs = async (region: string, logGroupName: string, lo
 
 export const describeCloudFormationStack = async (stackName: string, region: string, profileConfig?: any) => {
   const service = profileConfig ? new CloudFormation(profileConfig) : new CloudFormation({ region });
-  return (await service.describeStacks({ StackName: stackName }).promise()).Stacks.find(stack => stack.StackName === stackName);
+  return (await service.describeStacks({ StackName: stackName }).promise()).Stacks.find(
+    stack => stack.StackName === stackName || stack.StackId === stackName,
+  );
+};
+
+export const getNestedStackID = async (stackName: string, region: string, logicalId: string): Promise<string> => {
+  const cfnClient = new CloudFormation({ region });
+  const resource = await cfnClient.describeStackResources({ StackName: stackName, LogicalResourceId: logicalId }).promise();
+  return resource?.StackResources?.[0].PhysicalResourceId ?? null;
+};
+
+/**
+ * Collects table resource id from parent stack
+ * @param region region the stack exists in
+ * @param table name of the table used in the appsync schema
+ * @param StackId id of the parent stack
+ * @returns
+ */
+
+export const getTableResourceId = async (region: string, table: string, StackId: string): Promise<string | null> => {
+  const cfnClient = new CloudFormation({ region });
+  const apiResources = await cfnClient
+    .describeStackResources({
+      StackName: StackId,
+    })
+    .promise();
+  const resource = apiResources.StackResources.find(stackResource => table === stackResource.LogicalResourceId);
+  if (resource) {
+    const tableStack = await cfnClient.describeStacks({ StackName: resource.PhysicalResourceId }).promise();
+    if (tableStack?.Stacks?.length > 0) {
+      const tableName = tableStack.Stacks[0].Outputs.find(out => out.OutputKey === `GetAtt${resource.LogicalResourceId}TableName`);
+      return tableName.OutputValue;
+    }
+  }
+  return null;
 };
 
 export const putKinesisRecords = async (data: string, partitionKey: string, streamName: string, region: string) => {
@@ -225,4 +281,37 @@ export const getCloudWatchEventRule = async (targetName: string, region: string)
     console.log(e);
   }
   return ruleName;
+};
+
+export const setupAmplifyAdminUI = async (appId: string, region: string) => {
+  const amplifyBackend = new AmplifyBackend({ region });
+
+  return await amplifyBackend.createBackendConfig({ AppId: appId }).promise();
+};
+
+export const getAmplifyBackendJobStatus = async (jobId: string, appId: string, envName: string, region: string) => {
+  const amplifyBackend = new AmplifyBackend({ region });
+
+  return await amplifyBackend
+    .getBackendJob({
+      JobId: jobId,
+      AppId: appId,
+      BackendEnvironmentName: envName,
+    })
+    .promise();
+};
+
+export const listRolePolicies = async (roleName: string, region: string) => {
+  const service = new IAM({ region });
+  return (await service.listRolePolicies({ RoleName: roleName }).promise()).PolicyNames;
+};
+
+export const listAttachedRolePolicies = async (roleName: string, region: string) => {
+  const service = new IAM({ region });
+  return (await service.listAttachedRolePolicies({ RoleName: roleName }).promise()).AttachedPolicies;
+};
+
+export const getPermissionsBoundary = async (roleName: string, region) => {
+  const iamClient = new IAM({ region });
+  return (await iamClient.getRole({ RoleName: roleName }).promise())?.Role?.PermissionsBoundary?.PermissionsBoundaryArn;
 };

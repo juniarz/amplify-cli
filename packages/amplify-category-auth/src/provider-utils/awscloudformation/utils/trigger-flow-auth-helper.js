@@ -1,4 +1,5 @@
 const path = require('path');
+const { FeatureFlags } = require('amplify-cli-core');
 
 const triggerAssetRoot = path.resolve(path.join(__dirname, '../../../../provider-utils/awscloudformation/triggers'));
 
@@ -35,10 +36,16 @@ async function handleTriggers(context, coreAnswers, previouslySaved) {
   // creating array of trigger values
   const values = Object.values(triggers);
 
+  // Auth lambda config for Triggers
+  let authTriggerConnections = [];
   if (triggers) {
     for (let t = 0; t < keys.length; t += 1) {
       const functionName = `${authResourceName}${keys[t]}`;
       const targetPath = `${targetDir}/function/${functionName}/src`;
+      let config = {};
+      config['triggerType'] = keys[t] === 'PreSignup' ? 'PreSignUp' : keys[t];
+      config['lambdaFunctionName'] = functionName;
+      authTriggerConnections.push(config);
 
       if (previouslySaved && previouslySaved[keys[t]]) {
         const currentEnvVariables = context.amplify.loadEnvResourceParameters(context, 'function', functionName);
@@ -101,12 +108,37 @@ async function handleTriggers(context, coreAnswers, previouslySaved) {
     coreAnswers.parentStack = { Ref: 'AWS::StackId' };
   }
 
-  return triggers;
+  return { triggers, authTriggerConnections };
 }
 
 // saving input-based trigger env variables to the team-provider
 const saveTriggerEnvParamsToTeamProviderInfo = async (context, key, value, functionName, currentEnvVars) => {
   const envs = await context.amplify.getTriggerEnvInputs(context, path.join(triggerAssetRoot, key), key, value, currentEnvVars);
+
+  if (!FeatureFlags.getBoolean('auth.useInclusiveTerminology') && key === 'PreSignup') {
+    // If the legacy language is being used, replace the deny and allow list
+    // environment variables and use the legacy lambda functions.
+    if (envs.DOMAINDENYLIST) {
+      envs.DOMAINBLACKLIST = envs.DOMAINDENYLIST;
+      delete envs.DOMAINDENYLIST;
+    }
+
+    if (envs.DOMAINALLOWLIST) {
+      envs.DOMAINWHITELIST = envs.DOMAINALLOWLIST;
+      delete envs.DOMAINALLOWLIST;
+    }
+
+    if (Array.isArray(value)) {
+      for (let i = 0; i < value.length; i++) {
+        const val = value[i];
+
+        if (val.endsWith('-denylist') || val.endsWith('-allowlist')) {
+          value[i] = `${val}-legacy`;
+        }
+      }
+    }
+  }
+
   context.amplify.saveEnvResourceParameters(context, 'function', functionName, envs);
 };
 

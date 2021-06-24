@@ -1,3 +1,13 @@
+jest.mock('amplify-cli-core', () => {
+  return {
+    FeatureFlags: {
+      getBoolean: jest.fn().mockImplementation((name, defaultValue) => {
+        return true;
+      }),
+    },
+  };
+});
+
 const { handleTriggers } = require('../../../../provider-utils/awscloudformation/utils/trigger-flow-auth-helper');
 
 const defaults = {
@@ -33,9 +43,22 @@ describe('When handling selected triggers...', () => {
     const mockAnswers = {
       triggers: {
         PostConfirmation: ['add-to-group'],
+        PostAuthentication: ['custom'],
       },
+      authTriggerConnections: [
+        {
+          lambdaFunctionName: 'demoFnPostConfirmation',
+          triggerType: 'PostConfirmation',
+        },
+        {
+          lambdaFunctionName: 'demoFnPostAuthentication',
+          triggerType: 'PostAuthentication',
+        },
+      ],
+      resourceName: 'demoFn',
     };
-    const triggers = await handleTriggers(context, mockAnswers);
+    const { triggers, authTriggerConnections } = await handleTriggers(context, mockAnswers);
     expect(triggers).toEqual(mockAnswers.triggers);
+    expect(authTriggerConnections).toEqual(mockAnswers.authTriggerConnections);
   });
 });

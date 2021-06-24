@@ -41,7 +41,7 @@ export async function initWithoutCredentialFileAndNoNewUserSetup(projRoot) {
   }
 }
 
-async function initWorkflow(cwd: string, settings: { accessKeyId: string; secretAccessKey: string; region: string }) {
+async function initWorkflow(cwd: string, settings: { accessKeyId: string; secretAccessKey: string; region: string }): Promise<void> {
   addCircleCITags(cwd);
 
   return new Promise((resolve, reject) => {
@@ -54,6 +54,8 @@ async function initWorkflow(cwd: string, settings: { accessKeyId: string; secret
     })
       .wait('Enter a name for the project')
       .sendCarriageReturn()
+      .wait('Initialize the project with the above configuration?')
+      .sendLine('n')
       .wait('Enter a name for the environment')
       .sendCarriageReturn()
       .wait('Choose your default editor:')

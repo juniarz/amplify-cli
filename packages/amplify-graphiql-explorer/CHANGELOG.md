@@ -3,6 +3,60 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.6.1](https://github.com/aws-amplify/amplify-cli/compare/amplify-graphiql-explorer@1.6.0...amplify-graphiql-explorer@1.6.1) (2021-05-18)
+
+
+
+## 4.51.1 (2021-05-18)
+
+**Note:** Version bump only for package amplify-graphiql-explorer
+
+
+
+
+
+# [1.6.0](https://github.com/aws-amplify/amplify-cli/compare/amplify-graphiql-explorer@1.4.3...amplify-graphiql-explorer@1.6.0) (2021-05-03)
+
+
+
+## 4.50.1 (2021-05-03)
+
+
+### Features
+
+* add mock support for custom fields in cognito jwt ([#7172](https://github.com/aws-amplify/amplify-cli/issues/7172)) ([e4210cc](https://github.com/aws-amplify/amplify-cli/commit/e4210cc25397a92ae0d6ce5a9d5f4ecc5da8ae6f)), closes [#6106](https://github.com/aws-amplify/amplify-cli/issues/6106)
+
+
+
+
+
+# [1.5.0](https://github.com/aws-amplify/amplify-cli/compare/amplify-graphiql-explorer@1.4.3...amplify-graphiql-explorer@1.5.0) (2021-05-03)
+
+
+### Features
+
+* add mock support for custom fields in cognito jwt ([#7172](https://github.com/aws-amplify/amplify-cli/issues/7172)) ([e4210cc](https://github.com/aws-amplify/amplify-cli/commit/e4210cc25397a92ae0d6ce5a9d5f4ecc5da8ae6f)), closes [#6106](https://github.com/aws-amplify/amplify-cli/issues/6106)
+
+
+
+
+
+## [1.4.3](https://github.com/aws-amplify/amplify-cli/compare/amplify-graphiql-explorer@1.4.2...amplify-graphiql-explorer@1.4.3) (2021-03-05)
+
+**Note:** Version bump only for package amplify-graphiql-explorer
+
+
+
+
+
+## [1.4.2](https://github.com/aws-amplify/amplify-cli/compare/amplify-graphiql-explorer@1.4.1...amplify-graphiql-explorer@1.4.2) (2021-02-11)
+
+**Note:** Version bump only for package amplify-graphiql-explorer
+
+
+
+
+
 ## [1.4.1](https://github.com/aws-amplify/amplify-cli/compare/amplify-graphiql-explorer@1.3.4...amplify-graphiql-explorer@1.4.1) (2020-11-22)
 
 **Note:** Version bump only for package amplify-graphiql-explorer

@@ -32,6 +32,10 @@ describe('test SIGINT with execute', () => {
       FeatureFlags: {
         initialize: jest.fn(),
       },
+      BannerMessage: {
+        initialize: jest.fn(),
+        getMessage: jest.fn(),
+      },
       PathConstants: {
         TeamProviderFileName: 'team-provider-info.json',
         DeploymentSecretsFileName: 'deployment-secrets.json',
@@ -70,7 +74,6 @@ describe('test SIGINT with execute', () => {
     mockContext.amplify = jest.genMockFromModule('../domain/amplify-toolkit');
     jest.setMock('../context-manager', {
       constructContext: jest.fn().mockReturnValue(mockContext),
-      persistContext: jest.fn(),
       attachUsageData: jest.fn(),
     });
 

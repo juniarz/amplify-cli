@@ -3,6 +3,265 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.21.0](https://github.com/aws-amplify/amplify-cli/compare/amplify-e2e-core@1.20.0...amplify-e2e-core@1.21.0) (2021-06-24)
+
+
+### Bug Fixes
+
+* support adding REST API paths in 'add api' ([#7229](https://github.com/aws-amplify/amplify-cli/issues/7229)) ([fa9404a](https://github.com/aws-amplify/amplify-cli/commit/fa9404afd1eedd342ea6ff2033fcbd143b33748a))
+
+
+### Features
+
+* **import-auth:** add headless support ([#7266](https://github.com/aws-amplify/amplify-cli/issues/7266)) ([7fa478b](https://github.com/aws-amplify/amplify-cli/commit/7fa478bbfebbbe70e286eb19d436d772c32c4fd2))
+
+
+
+
+
+# [1.20.0](https://github.com/aws-amplify/amplify-cli/compare/amplify-e2e-core@1.19.3...amplify-e2e-core@1.20.0) (2021-06-15)
+
+
+### Features
+
+* add support for defining IAM Permissions Boundary for Project ([#7144](https://github.com/aws-amplify/amplify-cli/issues/7144)) ([acf031b](https://github.com/aws-amplify/amplify-cli/commit/acf031b29d4e554d647da39ffb8293010cf1d8ad))
+* Define IAM Permissions Boundary for Project ([#7502](https://github.com/aws-amplify/amplify-cli/issues/7502)) (ref [#4618](https://github.com/aws-amplify/amplify-cli/issues/4618)) ([08f7a3c](https://github.com/aws-amplify/amplify-cli/commit/08f7a3c45b2e98535ef325eb0a97c5bc4d3008c6)), closes [#7053](https://github.com/aws-amplify/amplify-cli/issues/7053)
+* lambda layers rework ([#7375](https://github.com/aws-amplify/amplify-cli/issues/7375)) ([a3b7d3e](https://github.com/aws-amplify/amplify-cli/commit/a3b7d3e427e16bac2b2ea27699fe53b48cf47656))
+
+
+### Reverts
+
+* Revert "feat: add support for defining IAM Permissions Boundary for Project (#7144)" (#7453) ([08704f0](https://github.com/aws-amplify/amplify-cli/commit/08704f0271f6f5d0e0e98ad7002f4b35c3890924)), closes [#7144](https://github.com/aws-amplify/amplify-cli/issues/7144) [#7453](https://github.com/aws-amplify/amplify-cli/issues/7453)
+
+
+
+
+
+## [1.19.3](https://github.com/aws-amplify/amplify-cli/compare/amplify-e2e-core@1.19.2...amplify-e2e-core@1.19.3) (2021-05-26)
+
+**Note:** Version bump only for package amplify-e2e-core
+
+
+
+
+
+## [1.19.2](https://github.com/aws-amplify/amplify-cli/compare/amplify-e2e-core@1.19.1...amplify-e2e-core@1.19.2) (2021-05-22)
+
+
+### Bug Fixes
+
+* updated ejs template for empty object triggers ([#7351](https://github.com/aws-amplify/amplify-cli/issues/7351)) ([572ddbd](https://github.com/aws-amplify/amplify-cli/commit/572ddbda4f339d364a8a20bab0053140cf798f34))
+
+
+
+
+
+## [1.19.1](https://github.com/aws-amplify/amplify-cli/compare/amplify-e2e-core@1.19.0...amplify-e2e-core@1.19.1) (2021-05-18)
+
+
+
+## 4.51.1 (2021-05-18)
+
+
+### Bug Fixes
+
+* nexpect pathname parsing ([#7324](https://github.com/aws-amplify/amplify-cli/issues/7324)) ([#7325](https://github.com/aws-amplify/amplify-cli/issues/7325)) ([ed8dc22](https://github.com/aws-amplify/amplify-cli/commit/ed8dc221d92585a74e7e8214dcd721f5d27d5d11))
+
+
+
+
+
+# [1.19.0](https://github.com/aws-amplify/amplify-cli/compare/amplify-e2e-core@1.18.2...amplify-e2e-core@1.19.0) (2021-05-14)
+
+
+### Features
+
+* defer root stack creation to first `amplify push` ([#7174](https://github.com/aws-amplify/amplify-cli/issues/7174)) ([d28dd1c](https://github.com/aws-amplify/amplify-cli/commit/d28dd1caca86b19a858dab0e7aa907d1cc74c86a))
+* Support for Apple Sign In ([#7265](https://github.com/aws-amplify/amplify-cli/issues/7265)) ([9f5e659](https://github.com/aws-amplify/amplify-cli/commit/9f5e659d63362c7f47eaa147c68d40d5bcc36fcc))
+
+
+### Reverts
+
+* Revert "feat: defer root stack creation to first `amplify push` (#7174)" (#7306) ([78854eb](https://github.com/aws-amplify/amplify-cli/commit/78854ebd4a3d41d34d68736d6556045302101265)), closes [#7174](https://github.com/aws-amplify/amplify-cli/issues/7174) [#7306](https://github.com/aws-amplify/amplify-cli/issues/7306)
+
+
+
+
+
+## [1.18.2](https://github.com/aws-amplify/amplify-cli/compare/amplify-e2e-core@1.18.0...amplify-e2e-core@1.18.2) (2021-05-03)
+
+
+
+## 4.50.1 (2021-05-03)
+
+
+### Bug Fixes
+
+* ensure policy resource name when pushing REST APIs ([#7192](https://github.com/aws-amplify/amplify-cli/issues/7192)) ([fc77006](https://github.com/aws-amplify/amplify-cli/commit/fc77006d8f41301604fc4047edf794c23da6c552))
+
+
+
+
+
+## [1.18.1](https://github.com/aws-amplify/amplify-cli/compare/amplify-e2e-core@1.18.0...amplify-e2e-core@1.18.1) (2021-05-03)
+
+
+### Bug Fixes
+
+* ensure policy resource name when pushing REST APIs ([#7192](https://github.com/aws-amplify/amplify-cli/issues/7192)) ([fc77006](https://github.com/aws-amplify/amplify-cli/commit/fc77006d8f41301604fc4047edf794c23da6c552))
+
+
+
+
+
+# [1.18.0](https://github.com/aws-amplify/amplify-cli/compare/amplify-e2e-core@1.17.3...amplify-e2e-core@1.18.0) (2021-04-27)
+
+
+### Bug Fixes
+
+* consolidate REST API IAM policies ([#6904](https://github.com/aws-amplify/amplify-cli/issues/6904)) (ref [#2084](https://github.com/aws-amplify/amplify-cli/issues/2084)) ([5cfff17](https://github.com/aws-amplify/amplify-cli/commit/5cfff173d57ec9ab68984faf2d0f6474eccdcaae))
+
+
+### Features
+
+* S3 SSE by default ([#7039](https://github.com/aws-amplify/amplify-cli/issues/7039)) (ref [#5708](https://github.com/aws-amplify/amplify-cli/issues/5708)) ([c1369ed](https://github.com/aws-amplify/amplify-cli/commit/c1369ed6f9c204c89ee2d4c805314a40d6eeaf92))
+
+
+
+
+
+## [1.17.3](https://github.com/aws-amplify/amplify-cli/compare/amplify-e2e-core@1.17.2...amplify-e2e-core@1.17.3) (2021-04-19)
+
+
+### Bug Fixes
+
+* fix iterative delete for all objects and delete directory ([#7093](https://github.com/aws-amplify/amplify-cli/issues/7093)) ([189a826](https://github.com/aws-amplify/amplify-cli/commit/189a8260b25363caed3ab1f48b1fd9b7f4e4f829))
+* render spinner in stateChange update e2e to wait on spinner text ([#7116](https://github.com/aws-amplify/amplify-cli/issues/7116)) ([a46f2a3](https://github.com/aws-amplify/amplify-cli/commit/a46f2a32ec9bf9e75684bc93a2e7089ac3fb894d))
+
+
+
+
+
+## [1.17.2](https://github.com/aws-amplify/amplify-cli/compare/amplify-e2e-core@1.17.1...amplify-e2e-core@1.17.2) (2021-04-14)
+
+
+### Bug Fixes
+
+* **amplify-e2e-core:** update source of truth for supported regions ([#6988](https://github.com/aws-amplify/amplify-cli/issues/6988)) ([bb8f8e6](https://github.com/aws-amplify/amplify-cli/commit/bb8f8e6c03baa99748d1b594fea4d18a947cac5c))
+
+
+
+
+
+## [1.17.1](https://github.com/aws-amplify/amplify-cli/compare/amplify-e2e-core@1.16.2...amplify-e2e-core@1.17.1) (2021-04-09)
+
+
+### Bug Fixes
+
+* **cli:** use more inclusive language ([#6919](https://github.com/aws-amplify/amplify-cli/issues/6919)) ([bb70464](https://github.com/aws-amplify/amplify-cli/commit/bb70464d6c24fa931c0eb80d234a496d936913f5))
+
+
+### Reverts
+
+* Revert "Init and Configure DX changes (#6745)" ([9078b69](https://github.com/aws-amplify/amplify-cli/commit/9078b69b5842c99f0624797a5e897353bacb65d0)), closes [#6745](https://github.com/aws-amplify/amplify-cli/issues/6745)
+
+
+
+
+
+## [1.16.2](https://github.com/aws-amplify/amplify-cli/compare/amplify-e2e-core@1.16.1...amplify-e2e-core@1.16.2) (2021-03-23)
+
+
+### Bug Fixes
+
+* **amplify-category-api:** mantain ff in iam api policy ([#6723](https://github.com/aws-amplify/amplify-cli/issues/6723)) ([51e5e1b](https://github.com/aws-amplify/amplify-cli/commit/51e5e1b53514a05788dd824a48991c0db0b9705d)), closes [#6675](https://github.com/aws-amplify/amplify-cli/issues/6675)
+
+
+
+
+
+## [1.16.1](https://github.com/aws-amplify/amplify-cli/compare/amplify-e2e-core@1.16.0...amplify-e2e-core@1.16.1) (2021-03-11)
+
+**Note:** Version bump only for package amplify-e2e-core
+
+
+
+
+
+# [1.16.0](https://github.com/aws-amplify/amplify-cli/compare/amplify-e2e-core@1.15.2...amplify-e2e-core@1.16.0) (2021-03-05)
+
+
+### Bug Fixes
+
+* allow selecting all columns for GSIs ([#6689](https://github.com/aws-amplify/amplify-cli/issues/6689)) ([c33d29a](https://github.com/aws-amplify/amplify-cli/commit/c33d29a0398449379e49f023d068504c47872667))
+* pull issue with multi-env notifications [#6475](https://github.com/aws-amplify/amplify-cli/issues/6475) ([#6525](https://github.com/aws-amplify/amplify-cli/issues/6525)) ([b0803d1](https://github.com/aws-amplify/amplify-cli/commit/b0803d1a361c15db8ad6e32648f29402539aa2e4))
+* wording: Enable, instead of Configure, conflict detection ([#6708](https://github.com/aws-amplify/amplify-cli/issues/6708)) ([dac6ae9](https://github.com/aws-amplify/amplify-cli/commit/dac6ae94af47dd01da25ea4f61efd5442cb4c06b))
+
+
+### Features
+
+* generate datastore models for Admin CMS to consume post-deployment from CLI ([#6771](https://github.com/aws-amplify/amplify-cli/issues/6771)) ([0e74b65](https://github.com/aws-amplify/amplify-cli/commit/0e74b657491e53eb04376bb727eb442b59b2cf4c))
+
+
+
+
+
+## [1.15.2](https://github.com/aws-amplify/amplify-cli/compare/amplify-e2e-core@1.15.1...amplify-e2e-core@1.15.2) (2021-02-26)
+
+**Note:** Version bump only for package amplify-e2e-core
+
+
+
+
+
+## [1.15.1](https://github.com/aws-amplify/amplify-cli/compare/amplify-e2e-core@1.15.0...amplify-e2e-core@1.15.1) (2021-02-24)
+
+**Note:** Version bump only for package amplify-e2e-core
+
+
+
+
+
+# [1.15.0](https://github.com/aws-amplify/amplify-cli/compare/amplify-e2e-core@1.14.1...amplify-e2e-core@1.15.0) (2021-02-17)
+
+
+### Features
+
+* **amplify-cli-core:** add validations to tag Key and Value ([31eb8eb](https://github.com/aws-amplify/amplify-cli/commit/31eb8ebff2fcbd215975c8ac05287d023d544c42))
+
+
+
+
+
+## [1.14.1](https://github.com/aws-amplify/amplify-cli/compare/amplify-e2e-core@1.14.0...amplify-e2e-core@1.14.1) (2021-02-11)
+
+**Note:** Version bump only for package amplify-e2e-core
+
+
+
+
+
+# [1.14.0](https://github.com/aws-amplify/amplify-cli/compare/amplify-e2e-core@1.13.4...amplify-e2e-core@1.14.0) (2021-02-10)
+
+
+### Bug Fixes
+
+* appclient secret output default to false ([#6333](https://github.com/aws-amplify/amplify-cli/issues/6333)) ([3da53b7](https://github.com/aws-amplify/amplify-cli/commit/3da53b7c9aacf718ebd8ea63e59928425af20764))
+* fix appsync permission assignment from functions ([#5342](https://github.com/aws-amplify/amplify-cli/issues/5342)) ([b2e2dd0](https://github.com/aws-amplify/amplify-cli/commit/b2e2dd0071c1a451ba032cf7f8cfe7cf6381a96e))
+* **amplify-provider-awscloudformation:** fix hosting output ([#6041](https://github.com/aws-amplify/amplify-cli/issues/6041)) ([a2c1577](https://github.com/aws-amplify/amplify-cli/commit/a2c15774762c0f07b44ca9c91c57ef4eb3752f2b)), closes [#402](https://github.com/aws-amplify/amplify-cli/issues/402)
+* **amplify-provider-awscloudformation:** use prev deployment vars ([#6486](https://github.com/aws-amplify/amplify-cli/issues/6486)) ([39dfd27](https://github.com/aws-amplify/amplify-cli/commit/39dfd271bcf86b0ec424bb89c0bb38c0544d8d80))
+* persist s3bucket metadata on pull and env change ([#6502](https://github.com/aws-amplify/amplify-cli/issues/6502)) ([357f787](https://github.com/aws-amplify/amplify-cli/commit/357f787c2d816e1defa1d0909b06f82775c35255))
+* support choosing AWS authentication flow when admin UI is enabled ([#6433](https://github.com/aws-amplify/amplify-cli/issues/6433)) ([3bf56a8](https://github.com/aws-amplify/amplify-cli/commit/3bf56a8e2e5be67dd861a55807ecc94bd561b4a2))
+
+
+### Features
+
+* **graphql-key-transformer:** change default to add GSIs when using [@key](https://github.com/key) ([#5648](https://github.com/aws-amplify/amplify-cli/issues/5648)) ([4287c63](https://github.com/aws-amplify/amplify-cli/commit/4287c630295c304c7ff8343922926b4830b75cd4))
+
+
+
+
+
 ## [1.13.4](https://github.com/aws-amplify/amplify-cli/compare/amplify-e2e-core@1.13.3...amplify-e2e-core@1.13.4) (2021-01-08)
 
 

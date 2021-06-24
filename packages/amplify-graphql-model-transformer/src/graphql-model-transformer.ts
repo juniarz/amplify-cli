@@ -6,13 +6,13 @@ import {
   MutationFieldType,
   QueryFieldType,
   SubscriptionFieldType,
-  TranformerTransformSchemaStepContextProvider,
+  TransformerTransformSchemaStepContextProvider,
   TransformerContextProvider,
   TransformerModelProvider,
   TransformerPrepareStepContextProvider,
   TransformerResolverProvider,
 } from '@aws-amplify/graphql-transformer-interfaces';
-import { AttributeType, ITable, Table, TableEncryption } from '@aws-cdk/aws-dynamodb';
+import { AttributeType, ITable, StreamViewType, Table, TableEncryption } from '@aws-cdk/aws-dynamodb';
 import { RemovalPolicy } from '@aws-cdk/core';
 import { DirectiveNode, InputObjectTypeDefinitionNode, InputValueDefinitionNode, ObjectTypeDefinitionNode } from 'graphql';
 import {
@@ -170,7 +170,7 @@ export class ModelTransformer extends TransformerModelBase implements Transforme
     }
   };
 
-  transformSchema = (ctx: TranformerTransformSchemaStepContextProvider): void => {
+  transformSchema = (ctx: TransformerTransformSchemaStepContextProvider): void => {
     // Create Non Model input types
 
     // add the model input conditions
@@ -257,6 +257,7 @@ export class ModelTransformer extends TransformerModelBase implements Transforme
           name: 'id',
           type: AttributeType.STRING,
         },
+        stream: StreamViewType.NEW_AND_OLD_IMAGES,
         encryption: TableEncryption.DEFAULT,
         removalPolicy: RemovalPolicy.DESTROY,
       });
@@ -496,7 +497,7 @@ export class ModelTransformer extends TransformerModelBase implements Transforme
   };
 
   getQueryFieldNames = (
-    ctx: TranformerTransformSchemaStepContextProvider,
+    ctx: TransformerTransformSchemaStepContextProvider,
     type: ObjectTypeDefinitionNode,
   ): Set<{ fieldName: string; typeName: string; type: QueryFieldType }> => {
     const typeName = type.name.value;
@@ -527,7 +528,7 @@ export class ModelTransformer extends TransformerModelBase implements Transforme
   };
 
   getMutationFieldNames = (
-    ctx: TranformerTransformSchemaStepContextProvider,
+    ctx: TransformerTransformSchemaStepContextProvider,
     type: ObjectTypeDefinitionNode,
   ): Set<{ fieldName: string; typeName: string; type: MutationFieldType }> => {
     // Todo: get fields names from the directives
@@ -561,7 +562,7 @@ export class ModelTransformer extends TransformerModelBase implements Transforme
   };
 
   getSubscriptionFieldNames = (
-    ctx: TranformerTransformSchemaStepContextProvider,
+    ctx: TransformerTransformSchemaStepContextProvider,
     type: ObjectTypeDefinitionNode,
   ): Set<{
     fieldName: string;
@@ -640,7 +641,7 @@ export class ModelTransformer extends TransformerModelBase implements Transforme
   };
 
   getInputs = (
-    ctx: TranformerTransformSchemaStepContextProvider,
+    ctx: TransformerTransformSchemaStepContextProvider,
     type: ObjectTypeDefinitionNode,
     operation: {
       fieldName: string;
@@ -730,7 +731,7 @@ export class ModelTransformer extends TransformerModelBase implements Transforme
   };
 
   getOutputType = (
-    ctx: TranformerTransformSchemaStepContextProvider,
+    ctx: TransformerTransformSchemaStepContextProvider,
     type: ObjectTypeDefinitionNode,
     operation: {
       fieldName: string;
@@ -762,7 +763,7 @@ export class ModelTransformer extends TransformerModelBase implements Transforme
     return outputType;
   };
 
-  private createNonModelInputs = (ctx: TranformerTransformSchemaStepContextProvider, obj: ObjectTypeDefinitionNode): void => {
+  private createNonModelInputs = (ctx: TransformerTransformSchemaStepContextProvider, obj: ObjectTypeDefinitionNode): void => {
     for (let field of obj.fields || []) {
       if (!isScalar(field.type)) {
         const def = ctx.output.getType(getBaseType(field.type));
@@ -788,7 +789,7 @@ export class ModelTransformer extends TransformerModelBase implements Transforme
    * Model directive automatically adds id, created and updated time stamps to the filed, if they are configured
    * @param name Name of the type
    */
-  private addAutoGeneratableFields = (ctx: TranformerTransformSchemaStepContextProvider, name: string): void => {
+  private addAutoGeneratableFields = (ctx: TransformerTransformSchemaStepContextProvider, name: string): void => {
     const modelDirectiveConfig = this.modelDirectiveConfig.get(name);
     const typeObj = ctx.output.getObject(name);
     if (!typeObj) {

@@ -22,10 +22,9 @@ declare global {
 const amplifyTestsDir = 'amplify-e2e-tests';
 
 export function getCLIPath(testingWithLatestCodebase = false) {
-  if (isCI() && !testingWithLatestCodebase) {
-    return process.env.AMPLIFY_PATH || 'amplify';
-  }
-  return path.join(__dirname, '..', '..', 'amplify-cli', 'bin', 'amplify');
+  return testingWithLatestCodebase
+    ? path.join(__dirname, '..', '..', 'amplify-cli', 'bin', 'amplify')
+    : process.env.AMPLIFY_PATH || 'amplify';
 }
 
 export function isCI(): boolean {
@@ -48,9 +47,7 @@ export async function createNewProjectDir(
   projectName: string,
   prefix = path.join(fs.realpathSync(os.tmpdir()), amplifyTestsDir),
 ): Promise<string> {
-  const currentHash = execSync('git rev-parse --short HEAD', { cwd: __dirname })
-    .toString()
-    .trim();
+  const currentHash = execSync('git rev-parse --short HEAD', { cwd: __dirname }).toString().trim();
   let projectDir;
   do {
     const randomId = await global.getRandomId();
@@ -58,6 +55,7 @@ export async function createNewProjectDir(
   } while (fs.existsSync(projectDir));
 
   fs.ensureDirSync(projectDir);
+  console.log(projectDir);
   return projectDir;
 }
 

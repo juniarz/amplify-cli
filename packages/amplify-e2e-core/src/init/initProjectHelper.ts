@@ -1,5 +1,6 @@
 import { nspawn as spawn, getCLIPath, singleSelect, addCircleCITags } from '..';
 import { KEY_DOWN_ARROW } from '../utils';
+import { amplifyRegions } from '../configure';
 
 const defaultSettings = {
   name: '\r',
@@ -16,24 +17,12 @@ const defaultSettings = {
   region: process.env.CLI_REGION,
   local: false,
   disableAmplifyAppCreation: true,
+  disableCIDetection: false,
+  providerConfig: undefined,
+  permissionsBoundaryArn: undefined,
 };
 
-export const amplifyRegions = [
-  'us-east-1',
-  'us-east-2',
-  'us-west-2',
-  'eu-west-1',
-  'eu-west-2',
-  'eu-central-1',
-  'ap-northeast-1',
-  'ap-northeast-2',
-  'ap-southeast-1',
-  'ap-southeast-2',
-  'ap-south-1',
-  'ca-central-1',
-];
-
-export function initJSProjectWithProfile(cwd: string, settings: Object) {
+export function initJSProjectWithProfile(cwd: string, settings: Object): Promise<void> {
   const s = { ...defaultSettings, ...settings };
   let env;
 
@@ -45,10 +34,22 @@ export function initJSProjectWithProfile(cwd: string, settings: Object) {
 
   addCircleCITags(cwd);
 
+  const cliArgs = ['init'];
+  const providerConfigSpecified = !!s.providerConfig && typeof s.providerConfig === 'object';
+  if (providerConfigSpecified) {
+    cliArgs.push('--providers', JSON.stringify(s.providerConfig));
+  }
+
+  if (s.permissionsBoundaryArn) {
+    cliArgs.push('--permissions-boundary', s.permissionsBoundaryArn);
+  }
+
   return new Promise((resolve, reject) => {
-    spawn(getCLIPath(), ['init'], { cwd, stripColors: true, env })
+    const chain = spawn(getCLIPath(), cliArgs, { cwd, stripColors: true, env, disableCIDetection: s.disableCIDetection })
       .wait('Enter a name for the project')
       .sendLine(s.name)
+      .wait('Initialize the project with the above configuration?')
+      .sendLine('n')
       .wait('Enter a name for the environment')
       .sendLine(s.envName)
       .wait('Choose your default editor:')
@@ -64,24 +65,28 @@ export function initJSProjectWithProfile(cwd: string, settings: Object) {
       .wait('Build Command:')
       .sendLine(s.buildCmd)
       .wait('Start Command:')
-      .sendCarriageReturn()
-      .wait('Using default provider  awscloudformation')
-      .wait('Select the authentication method you want to use:')
-      .sendCarriageReturn()
-      .wait('Please choose the profile you want to use')
-      .sendLine(s.profileName)
-      .wait('Try "amplify add api" to create a backend API and then "amplify publish" to deploy everything')
-      .run((err: Error) => {
-        if (!err) {
-          resolve();
-        } else {
-          reject(err);
-        }
-      });
+      .sendCarriageReturn();
+
+    if (!providerConfigSpecified) {
+      chain
+        .wait('Using default provider  awscloudformation')
+        .wait('Select the authentication method you want to use:')
+        .sendCarriageReturn()
+        .wait('Please choose the profile you want to use')
+        .sendLine(s.profileName);
+    }
+
+    chain.wait('Try "amplify add api" to create a backend API and then "amplify publish" to deploy everything').run((err: Error) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve();
+      }
+    });
   });
 }
 
-export function initAndroidProjectWithProfile(cwd: string, settings: Object) {
+export function initAndroidProjectWithProfile(cwd: string, settings: Object): Promise<void> {
   const s = { ...defaultSettings, ...settings };
 
   addCircleCITags(cwd);
@@ -96,6 +101,8 @@ export function initAndroidProjectWithProfile(cwd: string, settings: Object) {
     })
       .wait('Enter a name for the project')
       .sendLine(s.name)
+      .wait('Initialize the project with the above configuration?')
+      .sendLine('n')
       .wait('Enter a name for the environment')
       .sendLine(s.envName)
       .wait('Choose your default editor:')
@@ -122,7 +129,7 @@ export function initAndroidProjectWithProfile(cwd: string, settings: Object) {
   });
 }
 
-export function initIosProjectWithProfile(cwd: string, settings: Object) {
+export function initIosProjectWithProfile(cwd: string, settings: Object): Promise<void> {
   const s = { ...defaultSettings, ...settings };
 
   addCircleCITags(cwd);
@@ -137,6 +144,8 @@ export function initIosProjectWithProfile(cwd: string, settings: Object) {
     })
       .wait('Enter a name for the project')
       .sendLine(s.name)
+      .wait('Initialize the project with the above configuration?')
+      .sendLine('n')
       .wait('Enter a name for the environment')
       .sendLine(s.envName)
       .wait('Choose your default editor:')
@@ -161,7 +170,7 @@ export function initIosProjectWithProfile(cwd: string, settings: Object) {
   });
 }
 
-export function initFlutterProjectWithProfile(cwd: string, settings: Object) {
+export function initFlutterProjectWithProfile(cwd: string, settings: Object): Promise<void> {
   const s = { ...defaultSettings, ...settings };
 
   addCircleCITags(cwd);
@@ -170,6 +179,8 @@ export function initFlutterProjectWithProfile(cwd: string, settings: Object) {
     let chain = spawn(getCLIPath(), ['init'], { cwd, stripColors: true })
       .wait('Enter a name for the project')
       .sendLine(s.name)
+      .wait('Initialize the project with the above configuration?')
+      .sendLine('n')
       .wait('Enter a name for the environment')
       .sendLine(s.envName)
       .wait('Choose your default editor:')
@@ -197,7 +208,10 @@ export function initFlutterProjectWithProfile(cwd: string, settings: Object) {
   });
 }
 
-export function initProjectWithAccessKey(cwd: string, settings: { accessKeyId: string; secretAccessKey: string; region?: string }) {
+export function initProjectWithAccessKey(
+  cwd: string,
+  settings: { accessKeyId: string; secretAccessKey: string; region?: string },
+): Promise<void> {
   const s = { ...defaultSettings, ...settings };
 
   addCircleCITags(cwd);
@@ -212,6 +226,8 @@ export function initProjectWithAccessKey(cwd: string, settings: { accessKeyId: s
     })
       .wait('Enter a name for the project')
       .sendLine(s.name)
+      .wait('Initialize the project with the above configuration?')
+      .sendLine('n')
       .wait('Enter a name for the environment')
       .sendLine(s.envName)
       .wait('Choose your default editor:')
@@ -252,7 +268,7 @@ export function initProjectWithAccessKey(cwd: string, settings: { accessKeyId: s
   });
 }
 
-export function initNewEnvWithAccessKey(cwd: string, s: { envName: string; accessKeyId: string; secretAccessKey: string }) {
+export function initNewEnvWithAccessKey(cwd: string, s: { envName: string; accessKeyId: string; secretAccessKey: string }): Promise<void> {
   addCircleCITags(cwd);
 
   return new Promise((resolve, reject) => {
@@ -291,7 +307,7 @@ export function initNewEnvWithAccessKey(cwd: string, s: { envName: string; acces
   });
 }
 
-export function initNewEnvWithProfile(cwd: string, s: { envName: string }) {
+export function initNewEnvWithProfile(cwd: string, s: { envName: string }): Promise<void> {
   addCircleCITags(cwd);
 
   return new Promise((resolve, reject) => {
@@ -322,7 +338,7 @@ export function initNewEnvWithProfile(cwd: string, s: { envName: string }) {
   });
 }
 
-export function amplifyInitSandbox(cwd: string, settings: {}) {
+export function amplifyInitSandbox(cwd: string, settings: {}): Promise<void> {
   const s = { ...defaultSettings, ...settings };
   let env;
 
@@ -356,7 +372,19 @@ export function amplifyInitSandbox(cwd: string, settings: {}) {
   });
 }
 
-export function amplifyVersion(cwd: string, expectedVersion: string, testingWithLatestCodebase = false) {
+export function amplifyInitYes(cwd: string): Promise<void> {
+  return new Promise((resolve, reject) => {
+    spawn(getCLIPath(), ['init', '--yes'], {
+      cwd,
+      stripColors: true,
+      env: {
+        CLI_DEV_INTERNAL_DISABLE_AMPLIFY_APP_CREATION: '1',
+      },
+    }).run((err: Error) => (err ? reject(err) : resolve()));
+  });
+}
+
+export function amplifyVersion(cwd: string, expectedVersion: string, testingWithLatestCodebase = false): Promise<void> {
   return new Promise((resolve, reject) => {
     spawn(getCLIPath(testingWithLatestCodebase), ['--version'], { cwd, stripColors: true })
       .wait(expectedVersion)
@@ -371,7 +399,7 @@ export function amplifyVersion(cwd: string, expectedVersion: string, testingWith
 }
 
 //Can be called only if detects teamprovider change
-export function amplifyStatusWithMigrate(cwd: string, expectedStatus: string, testingWithLatestCodebase) {
+export function amplifyStatusWithMigrate(cwd: string, expectedStatus: string, testingWithLatestCodebase): Promise<void> {
   return new Promise((resolve, reject) => {
     let regex = new RegExp(`.*${expectedStatus}*`);
     spawn(getCLIPath(testingWithLatestCodebase), ['status'], { cwd, stripColors: true })
@@ -389,7 +417,7 @@ export function amplifyStatusWithMigrate(cwd: string, expectedStatus: string, te
   });
 }
 
-export function amplifyStatus(cwd: string, expectedStatus: string, testingWithLatestCodebase = false) {
+export function amplifyStatus(cwd: string, expectedStatus: string, testingWithLatestCodebase = false): Promise<void> {
   return new Promise((resolve, reject) => {
     let regex = new RegExp(`.*${expectedStatus}*`);
     spawn(getCLIPath(testingWithLatestCodebase), ['status'], { cwd, stripColors: true })

@@ -4,7 +4,8 @@ import * as fs from 'fs-extra';
 import { getAmplifyMeta, getMockDataDirectory } from '../utils';
 import { ConfigOverrideManager } from '../utils/config-override';
 import { getInvoker } from 'amplify-category-function';
-import { loadMinimalLambdaConfig } from '../utils/lambda/loadMinimal';
+import { loadLambdaConfig } from '../utils/lambda/load-lambda-config';
+import { $TSAny, $TSContext, JSONUtilities } from 'amplify-cli-core';
 
 const port = 20005; // port for S3
 
@@ -37,7 +38,7 @@ export class StorageTest {
 
     try {
       context.amplify.addCleanUpTask(async context => {
-        await this.stop(context);
+        await this.stop();
       });
       this.configOverrideManager = ConfigOverrideManager.getInstance(context);
       this.storageName = await this.getStorage(context);
@@ -51,12 +52,12 @@ export class StorageTest {
     }
   }
 
-  async stop(context) {
+  async stop() {
     await this.storageSimulator.stop();
   }
 
   // to fire s3 triggers attached on the bucket
-  async trigger(context) {
+  async trigger(context: $TSContext) {
     let region = this.storageRegion;
     this.storageSimulator.getServer.on('event', async (eventObj: any) => {
       const meta = context.amplify.getProjectDetails().amplifyMeta;
@@ -64,7 +65,7 @@ export class StorageTest {
       let backendPath = context.amplify.pathManager.getBackendDirPath();
       const resourceName = Object.keys(existingStorage)[0];
       const CFNFilePath = path.join(backendPath, 'storage', resourceName, 's3-cloudformation-template.json');
-      const storageParams = context.amplify.readJsonFile(CFNFilePath);
+      const storageParams = JSONUtilities.readJson<$TSAny>(CFNFilePath);
       const lambdaConfig =
         storageParams.Resources.S3Bucket.Properties.NotificationConfiguration &&
         storageParams.Resources.S3Bucket.Properties.NotificationConfiguration.LambdaConfigurations;
@@ -81,9 +82,7 @@ export class StorageTest {
         if (prefix_arr === undefined) {
           let eventName = String(eventObj.Records[0].event.eventName).split(':')[0];
           if (eventName === 'ObjectRemoved' || eventName === 'ObjectCreated') {
-            triggerName = String(obj.Function.Ref)
-              .split('function')[1]
-              .split('Arn')[0];
+            triggerName = String(obj.Function.Ref).split('function')[1].split('Arn')[0];
             break;
           }
         } else {
@@ -100,9 +99,7 @@ export class StorageTest {
             }
             // check prefix given  is the prefix of keyname in the event object
             if (keyName.indexOf(node) === 0) {
-              triggerName = String(obj.Function.Ref)
-                .split('function')[1]
-                .split('Arn')[0];
+              triggerName = String(obj.Function.Ref).split('function')[1].split('Arn')[0];
               break;
             }
           }
@@ -112,9 +109,14 @@ export class StorageTest {
         }
       }
 
-      const config = loadMinimalLambdaConfig(context, triggerName);
-      const invoker = await getInvoker(context, { handler: config.handler, resourceName: triggerName });
-      await invoker({ event: eventObj });
+      const config = await loadLambdaConfig(context, triggerName);
+      const invoker = await getInvoker(context, { handler: config.handler, resourceName: triggerName, envVars: config.environment });
+      try {
+        await invoker({ event: eventObj });
+      } catch (err) {
+        context.print.error('Error executing lambda trigger');
+        context.print.error(err);
+      }
     });
   }
 

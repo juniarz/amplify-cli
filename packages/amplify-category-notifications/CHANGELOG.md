@@ -3,6 +3,55 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.19.3](https://github.com/aws-amplify/amplify-cli/compare/amplify-category-notifications@2.19.2...amplify-category-notifications@2.19.3) (2021-06-24)
+
+
+### Bug Fixes
+
+* added required parameters in Email notifications channel ([#7552](https://github.com/aws-amplify/amplify-cli/issues/7552)) ([e3e51f5](https://github.com/aws-amplify/amplify-cli/commit/e3e51f55e66ca32bcfaffbc950bad8de13af8170))
+
+
+
+
+
+## [2.19.2](https://github.com/aws-amplify/amplify-cli/compare/amplify-category-notifications@2.19.1...amplify-category-notifications@2.19.2) (2021-05-26)
+
+**Note:** Version bump only for package amplify-category-notifications
+
+
+
+
+
+## [2.19.1](https://github.com/aws-amplify/amplify-cli/compare/amplify-category-notifications@2.18.1...amplify-category-notifications@2.19.1) (2021-04-09)
+
+**Note:** Version bump only for package amplify-category-notifications
+
+
+
+
+
+## [2.18.1](https://github.com/aws-amplify/amplify-cli/compare/amplify-category-notifications@2.18.0...amplify-category-notifications@2.18.1) (2021-03-05)
+
+
+### Bug Fixes
+
+* pull issue with multi-env notifications [#6475](https://github.com/aws-amplify/amplify-cli/issues/6475) ([#6525](https://github.com/aws-amplify/amplify-cli/issues/6525)) ([b0803d1](https://github.com/aws-amplify/amplify-cli/commit/b0803d1a361c15db8ad6e32648f29402539aa2e4))
+
+
+
+
+
+# [2.18.0](https://github.com/aws-amplify/amplify-cli/compare/amplify-category-notifications@2.17.2...amplify-category-notifications@2.18.0) (2021-02-11)
+
+
+### Features
+
+* dont open urls when CLI is running in CI ([#6503](https://github.com/aws-amplify/amplify-cli/issues/6503)) ([27546a7](https://github.com/aws-amplify/amplify-cli/commit/27546a78159ea95c636dbbd094fe6a4f7fb8f8f4)), closes [#5973](https://github.com/aws-amplify/amplify-cli/issues/5973)
+
+
+
+
+
 ## [2.17.2](https://github.com/aws-amplify/amplify-cli/compare/amplify-category-notifications@2.17.1...amplify-category-notifications@2.17.2) (2021-01-08)
 
 

@@ -3,6 +3,149 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.8.11](https://github.com/aws-amplify/amplify-cli/compare/amplify-category-xr@2.8.10...amplify-category-xr@2.8.11) (2021-06-24)
+
+**Note:** Version bump only for package amplify-category-xr
+
+
+
+
+
+## [2.8.10](https://github.com/aws-amplify/amplify-cli/compare/amplify-category-xr@2.8.9...amplify-category-xr@2.8.10) (2021-06-15)
+
+**Note:** Version bump only for package amplify-category-xr
+
+
+
+
+
+## [2.8.9](https://github.com/aws-amplify/amplify-cli/compare/amplify-category-xr@2.8.8...amplify-category-xr@2.8.9) (2021-05-26)
+
+**Note:** Version bump only for package amplify-category-xr
+
+
+
+
+
+## [2.8.8](https://github.com/aws-amplify/amplify-cli/compare/amplify-category-xr@2.8.7...amplify-category-xr@2.8.8) (2021-05-18)
+
+**Note:** Version bump only for package amplify-category-xr
+
+
+
+
+
+## [2.8.7](https://github.com/aws-amplify/amplify-cli/compare/amplify-category-xr@2.8.6...amplify-category-xr@2.8.7) (2021-05-14)
+
+**Note:** Version bump only for package amplify-category-xr
+
+
+
+
+
+## [2.8.6](https://github.com/aws-amplify/amplify-cli/compare/amplify-category-xr@2.8.4...amplify-category-xr@2.8.6) (2021-05-03)
+
+
+
+## 4.50.1 (2021-05-03)
+
+**Note:** Version bump only for package amplify-category-xr
+
+
+
+
+
+## [2.8.5](https://github.com/aws-amplify/amplify-cli/compare/amplify-category-xr@2.8.4...amplify-category-xr@2.8.5) (2021-05-03)
+
+**Note:** Version bump only for package amplify-category-xr
+
+
+
+
+
+## [2.8.4](https://github.com/aws-amplify/amplify-cli/compare/amplify-category-xr@2.8.3...amplify-category-xr@2.8.4) (2021-04-27)
+
+**Note:** Version bump only for package amplify-category-xr
+
+
+
+
+
+## [2.8.3](https://github.com/aws-amplify/amplify-cli/compare/amplify-category-xr@2.8.2...amplify-category-xr@2.8.3) (2021-04-19)
+
+**Note:** Version bump only for package amplify-category-xr
+
+
+
+
+
+## [2.8.2](https://github.com/aws-amplify/amplify-cli/compare/amplify-category-xr@2.8.1...amplify-category-xr@2.8.2) (2021-04-14)
+
+**Note:** Version bump only for package amplify-category-xr
+
+
+
+
+
+## [2.8.1](https://github.com/aws-amplify/amplify-cli/compare/amplify-category-xr@2.7.5...amplify-category-xr@2.8.1) (2021-04-09)
+
+**Note:** Version bump only for package amplify-category-xr
+
+
+
+
+
+## [2.7.5](https://github.com/aws-amplify/amplify-cli/compare/amplify-category-xr@2.7.4...amplify-category-xr@2.7.5) (2021-03-11)
+
+**Note:** Version bump only for package amplify-category-xr
+
+
+
+
+
+## [2.7.4](https://github.com/aws-amplify/amplify-cli/compare/amplify-category-xr@2.7.3...amplify-category-xr@2.7.4) (2021-03-05)
+
+**Note:** Version bump only for package amplify-category-xr
+
+
+
+
+
+## [2.7.3](https://github.com/aws-amplify/amplify-cli/compare/amplify-category-xr@2.7.2...amplify-category-xr@2.7.3) (2021-02-26)
+
+**Note:** Version bump only for package amplify-category-xr
+
+
+
+
+
+## [2.7.2](https://github.com/aws-amplify/amplify-cli/compare/amplify-category-xr@2.7.1...amplify-category-xr@2.7.2) (2021-02-24)
+
+**Note:** Version bump only for package amplify-category-xr
+
+
+
+
+
+## [2.7.1](https://github.com/aws-amplify/amplify-cli/compare/amplify-category-xr@2.7.0...amplify-category-xr@2.7.1) (2021-02-17)
+
+**Note:** Version bump only for package amplify-category-xr
+
+
+
+
+
+# [2.7.0](https://github.com/aws-amplify/amplify-cli/compare/amplify-category-xr@2.6.1...amplify-category-xr@2.7.0) (2021-02-11)
+
+
+### Features
+
+* dont open urls when CLI is running in CI ([#6503](https://github.com/aws-amplify/amplify-cli/issues/6503)) ([27546a7](https://github.com/aws-amplify/amplify-cli/commit/27546a78159ea95c636dbbd094fe6a4f7fb8f8f4)), closes [#5973](https://github.com/aws-amplify/amplify-cli/issues/5973)
+
+
+
+
+
 ## [2.6.1](https://github.com/aws-amplify/amplify-cli/compare/amplify-category-xr@2.5.4...amplify-category-xr@2.6.1) (2020-11-22)
 
 **Note:** Version bump only for package amplify-category-xr

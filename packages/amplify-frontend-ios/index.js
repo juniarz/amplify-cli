@@ -1,11 +1,12 @@
 const path = require('path');
+const fs = require('fs');
+const { FeatureFlags, pathManager, JSONUtilities } = require('amplify-cli-core');
+const { importConfig, importModels } = require('./lib/amplify-xcode');
 const initializer = require('./lib/initializer');
 const projectScanner = require('./lib/project-scanner');
 const configManager = require('./lib/configuration-manager');
 const constants = require('./lib/constants');
 const { createAmplifyConfig, createAWSConfig, deleteAmplifyConfig } = require('./lib/frontend-config-creator');
-const onPostInit = require('./event-handlers/handle-PostInit');
-const onPostCodegenModels = require('./event-handlers/handle-PostCodegenModels');
 
 const pluginName = 'ios';
 
@@ -19,6 +20,14 @@ function init(context) {
 
 function onInitSuccessful(context) {
   return initializer.onInitSuccessful(context);
+}
+
+function displayFrontendDefaults(context, projectPath) {
+  return configManager.displayFrontendDefaults(context);
+}
+
+function setFrontendDefaults(context, projectPath) {
+  return configManager.setFrontendDefaults(context);
 }
 
 function createFrontendConfigs(context, amplifyResources, amplifyCloudResources) {
@@ -51,24 +60,64 @@ async function executeAmplifyCommand(context) {
   await commandModule.run(context);
 }
 
+const postInitQuickStart = projectPath => {
+  const awsConfigFilePath = path.join(projectPath, 'awsconfiguration.json');
+  const amplifyConfigFilePath = path.join(projectPath, 'amplifyconfiguration.json');
+  if (!fs.existsSync(awsConfigFilePath)) {
+    JSONUtilities.writeJson(awsConfigFilePath, {});
+  }
+
+  if (!fs.existsSync(amplifyConfigFilePath)) {
+    JSONUtilities.writeJson(amplifyConfigFilePath, {});
+  }
+};
+
 async function handleAmplifyEvent(context, args) {
+  const { frontend } = context.amplify.getProjectConfig();
+  const isXcodeIntegrationEnabled = FeatureFlags.getBoolean('frontend-ios.enableXcodeIntegration');
+  const isFrontendiOS = frontend === 'ios';
+  const isMacOs = process.platform === 'darwin';
+  const successMessage = 'Amplify setup completed successfully.';
+  if (!isFrontendiOS || !isXcodeIntegrationEnabled) {
+    return;
+  }
+  // Xcode integration is a MacOS-only binary, skip on other platforms
+  if (!isMacOs) {
+    context.print.info('Skipping Xcode project setup.');
+    context.print.info(successMessage);
+    return;
+  }
+  context.print.info('Updating Xcode project:');
+  const projectPath = pathManager.findProjectRoot();
   switch (args.event) {
     case 'PostInit':
-      await onPostInit.run(context, args);
+      if (context.input && context.input.options && context.input.options.quickstart) {
+        postInitQuickStart(projectPath);
+      }
+      await importConfig({ path: projectPath });
       break;
     case 'PostCodegenModels':
-      await onPostCodegenModels.run(context, args);
+      await importModels({ path: projectPath });
+      break;
+    case 'PostPull':
+      await importConfig({ path: projectPath });
+      await importModels({ path: projectPath });
       break;
     default:
       break;
   }
+  context.print.info(successMessage);
 }
+
+const getPackageAssetPaths = async () => ['resources'];
 
 module.exports = {
   constants,
   scanProject,
   init,
   onInitSuccessful,
+  displayFrontendDefaults,
+  setFrontendDefaults,
   configure,
   publish,
   run,
@@ -76,4 +125,5 @@ module.exports = {
   executeAmplifyCommand,
   handleAmplifyEvent,
   deleteConfig: deleteAmplifyConfig,
+  getPackageAssetPaths,
 };

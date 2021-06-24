@@ -11,6 +11,7 @@ export const run = async context => {
     /* eslint-enable */
   }
   shiftParams(context);
+  subcommand = mapSubcommandAlias(subcommand);
   if (subcommand === 'help') {
     displayHelp(context);
   } else {
@@ -19,6 +20,9 @@ export const run = async context => {
     try {
       commandModule = require(path.normalize(path.join(__dirname, 'env', subcommand)));
     } catch (e) {
+      if (subCommands) {
+        context.print.warning(`Cannot find command: 'amplify env ${subCommands.join(' ')}'`);
+      }
       displayHelp(context);
     }
 
@@ -79,6 +83,10 @@ function displayHelp(context) {
       description: 'Imports an already existing Amplify project environment stack to your local backend',
     },
     {
+      name: 'update [--permissions-boundary <IAM Policy ARN>]',
+      description: 'Update the environment configuration',
+    },
+    {
       name: 'remove <env-name>',
       description: 'Removes an environment from the Amplify project',
     },
@@ -86,4 +94,11 @@ function displayHelp(context) {
 
   context.amplify.showHelp(header, commands);
   context.print.info('');
+}
+
+function mapSubcommandAlias(subcommand: string): string {
+  if (subcommand === 'ls') {
+    return 'list';
+  }
+  return subcommand;
 }

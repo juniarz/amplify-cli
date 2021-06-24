@@ -1,3 +1,4 @@
+import { $TSContext } from 'amplify-cli-core';
 import { analyzeProject } from '../config-steps/c0-analyzeProject';
 import { configFrontendHandler } from '../config-steps/c1-configFrontend';
 import { configProviders } from '../config-steps/c2-configProviders';
@@ -27,7 +28,7 @@ export const run = async (context: Context) => {
       await providerPlugin.adminLoginFlow(context, appId, envName);
     } catch (e) {
       context.print.error(`Failed to authenticate: ${e.message || 'Unknown error occurred.'}`);
-      context.usageData.emitError(e);
+      await context.usageData.emitError(e);
       process.exit(1);
     }
     return;
@@ -55,5 +56,5 @@ export const run = async (context: Context) => {
 
 function constructExeInfo(context: Context) {
   context.exeInfo = context.amplify.getProjectDetails();
-  context.exeInfo.inputParams = normalizeInputParams(context);
+  context.exeInfo.inputParams = normalizeInputParams((context as unknown) as $TSContext);
 }

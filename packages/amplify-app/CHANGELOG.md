@@ -3,6 +3,192 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.0.1](https://github.com/aws-amplify/amplify-cli/compare/amplify-app@3.0.0...amplify-app@3.0.1) (2021-06-24)
+
+**Note:** Version bump only for package amplify-app
+
+
+
+
+
+# [3.0.0](https://github.com/aws-amplify/amplify-cli/compare/amplify-app@2.24.2...amplify-app@3.0.0) (2021-06-15)
+
+
+### Bug Fixes
+
+* bump amplify-cli to v5 and fix layers migration tests ([#7493](https://github.com/aws-amplify/amplify-cli/issues/7493)) ([cb196ab](https://github.com/aws-amplify/amplify-cli/commit/cb196ab4d1c9e25ef30b5276c55202a3ef347c75))
+
+
+### BREAKING CHANGES
+
+* bump amplify-cli to v5 for Lambda layers rework
+
+
+
+
+
+## [2.24.2](https://github.com/aws-amplify/amplify-cli/compare/amplify-app@2.24.1...amplify-app@2.24.2) (2021-05-26)
+
+**Note:** Version bump only for package amplify-app
+
+
+
+
+
+## [2.24.1](https://github.com/aws-amplify/amplify-cli/compare/amplify-app@2.24.0...amplify-app@2.24.1) (2021-05-18)
+
+**Note:** Version bump only for package amplify-app
+
+
+
+
+
+# [2.24.0](https://github.com/aws-amplify/amplify-cli/compare/amplify-app@2.23.5...amplify-app@2.24.0) (2021-05-14)
+
+
+
+# 4.51.0 (2021-05-13)
+
+
+### Features
+
+* prep work for SMS Sandbox support ([#7302](https://github.com/aws-amplify/amplify-cli/issues/7302)) ([d1f85d2](https://github.com/aws-amplify/amplify-cli/commit/d1f85d2e0a9c367b71defefe6d9e00737f681ca4))
+
+
+
+
+
+## [2.23.5](https://github.com/aws-amplify/amplify-cli/compare/amplify-app@2.23.3...amplify-app@2.23.5) (2021-05-03)
+
+
+
+## 4.50.1 (2021-05-03)
+
+**Note:** Version bump only for package amplify-app
+
+
+
+
+
+## [2.23.4](https://github.com/aws-amplify/amplify-cli/compare/amplify-app@2.23.3...amplify-app@2.23.4) (2021-05-03)
+
+**Note:** Version bump only for package amplify-app
+
+
+
+
+
+## [2.23.3](https://github.com/aws-amplify/amplify-cli/compare/amplify-app@2.23.2...amplify-app@2.23.3) (2021-04-27)
+
+**Note:** Version bump only for package amplify-app
+
+
+
+
+
+## [2.23.2](https://github.com/aws-amplify/amplify-cli/compare/amplify-app@2.23.1...amplify-app@2.23.2) (2021-04-19)
+
+**Note:** Version bump only for package amplify-app
+
+
+
+
+
+## [2.23.1](https://github.com/aws-amplify/amplify-cli/compare/amplify-app@2.23.0...amplify-app@2.23.1) (2021-04-14)
+
+**Note:** Version bump only for package amplify-app
+
+
+
+
+
+# [2.23.0](https://github.com/aws-amplify/amplify-cli/compare/amplify-app@2.21.6...amplify-app@2.23.0) (2021-04-09)
+
+
+### Bug Fixes
+
+* amplify-app import -> require ([#7022](https://github.com/aws-amplify/amplify-cli/issues/7022)) ([bc92eb8](https://github.com/aws-amplify/amplify-cli/commit/bc92eb8239e1cacf77b31530ab9cd78d9d2d507a))
+
+
+### Features
+
+* added more explicit messaging ([#6797](https://github.com/aws-amplify/amplify-cli/issues/6797)) ([eb9257e](https://github.com/aws-amplify/amplify-cli/commit/eb9257eaee117d0ed53ebc23aa28ecd7b7510fa1))
+
+
+
+
+
+## [2.21.6](https://github.com/aws-amplify/amplify-cli/compare/amplify-app@2.21.5...amplify-app@2.21.6) (2021-03-11)
+
+**Note:** Version bump only for package amplify-app
+
+
+
+
+
+## [2.21.5](https://github.com/aws-amplify/amplify-cli/compare/amplify-app@2.21.4...amplify-app@2.21.5) (2021-03-05)
+
+**Note:** Version bump only for package amplify-app
+
+
+
+
+
+## [2.21.4](https://github.com/aws-amplify/amplify-cli/compare/amplify-app@2.21.3...amplify-app@2.21.4) (2021-02-26)
+
+**Note:** Version bump only for package amplify-app
+
+
+
+
+
+## [2.21.3](https://github.com/aws-amplify/amplify-cli/compare/amplify-app@2.21.2...amplify-app@2.21.3) (2021-02-24)
+
+**Note:** Version bump only for package amplify-app
+
+
+
+
+
+## [2.21.2](https://github.com/aws-amplify/amplify-cli/compare/amplify-app@2.21.1...amplify-app@2.21.2) (2021-02-17)
+
+**Note:** Version bump only for package amplify-app
+
+
+
+
+
+## [2.21.1](https://github.com/aws-amplify/amplify-cli/compare/amplify-app@2.21.0...amplify-app@2.21.1) (2021-02-11)
+
+
+### Bug Fixes
+
+* **amplify-codegen:** set sourceDir path to correct graphql schema location ([#6512](https://github.com/aws-amplify/amplify-cli/issues/6512)) ([6edf229](https://github.com/aws-amplify/amplify-cli/commit/6edf2298ebbabda57230f9e0b9c6c4f504f8a275)), closes [aws-amplify/amplify-cli#5483](https://github.com/aws-amplify/amplify-cli/issues/5483) [aws-amplify/amplify-cli#5483](https://github.com/aws-amplify/amplify-cli/issues/5483)
+
+
+
+
+
+# [2.21.0](https://github.com/aws-amplify/amplify-cli/compare/amplify-app@2.20.8...amplify-app@2.21.0) (2021-02-10)
+
+
+
+# 4.42.0 (2021-02-09)
+
+
+### Bug Fixes
+
+* generate flutter amp config in lib ([#6571](https://github.com/aws-amplify/amplify-cli/issues/6571)) ([ecfb6d3](https://github.com/aws-amplify/amplify-cli/commit/ecfb6d3a1421787c2d48eb81c1625e30ca60216f))
+
+
+### Features
+
+* add Flutter  support for Admin UI ([#6516](https://github.com/aws-amplify/amplify-cli/issues/6516)) ([d9ee44b](https://github.com/aws-amplify/amplify-cli/commit/d9ee44be73f43b11da2a07d21fd60108f49b1608))
+
+
+
+
+
 ## [2.20.8](https://github.com/aws-amplify/amplify-cli/compare/amplify-app@2.20.7...amplify-app@2.20.8) (2021-01-13)
 
 **Note:** Version bump only for package amplify-app

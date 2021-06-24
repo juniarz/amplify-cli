@@ -3,38 +3,38 @@ import * as path from 'path';
 import chalk from 'chalk';
 import _ from 'lodash';
 import { print } from './print';
-import { hashElement } from 'folder-hash';
+import { hashElement, HashElementOptions } from 'folder-hash';
 import { getEnvInfo } from './get-env-info';
 import { CLOUD_INITIALIZED, CLOUD_NOT_INITIALIZED, getCloudInitStatus } from './get-cloud-init-status';
 import { ServiceName as FunctionServiceName, hashLayerResource } from 'amplify-category-function';
 import { removeGetUserEndpoints } from '../amplify-helpers/remove-pinpoint-policy';
-import { pathManager, stateManager, $TSMeta, $TSAny, Tag } from 'amplify-cli-core';
+import { pathManager, stateManager, $TSMeta, $TSAny, NotInitializedError } from 'amplify-cli-core';
 
-async function isBackendDirModifiedSinceLastPush(resourceName, category, lastPushTimeStamp, isLambdaLayer = false) {
+async function isBackendDirModifiedSinceLastPush(resourceName, category, lastPushTimeStamp, hashFunction) {
   // Pushing the resource for the first time hence no lastPushTimeStamp
   if (!lastPushTimeStamp) {
     return false;
   }
 
   const localBackendDir = path.normalize(path.join(pathManager.getBackendDirPath(), category, resourceName));
-
   const cloudBackendDir = path.normalize(path.join(pathManager.getCurrentCloudBackendDirPath(), category, resourceName));
 
   if (!fs.existsSync(localBackendDir)) {
     return false;
   }
 
-  const hashingFunc = isLambdaLayer ? hashLayerResource : getHashForResourceDir;
-
-  const localDirHash = await hashingFunc(localBackendDir);
-  const cloudDirHash = await hashingFunc(cloudBackendDir);
+  const localDirHash = await hashFunction(localBackendDir, resourceName);
+  const cloudDirHash = await hashFunction(cloudBackendDir, resourceName);
 
   return localDirHash !== cloudDirHash;
 }
 
-function getHashForResourceDir(dirPath) {
-  const options = {
+export function getHashForResourceDir(dirPath, files?: string[]) {
+  const options: HashElementOptions = {
     folders: { exclude: ['.*', 'node_modules', 'test_coverage', 'dist', 'build'] },
+    files: {
+      include: files,
+    },
   };
 
   return hashElement(dirPath, options).then(result => result.hash);
@@ -184,6 +184,7 @@ async function getResourcesToBeUpdated(amplifyMeta, currentAmplifyMeta, category
       if (categoryName === 'analytics') {
         removeGetUserEndpoints(resource);
       }
+
       if (
         currentAmplifyMeta[categoryName] &&
         currentAmplifyMeta[categoryName][resource] !== undefined &&
@@ -191,18 +192,60 @@ async function getResourcesToBeUpdated(amplifyMeta, currentAmplifyMeta, category
         amplifyMeta[categoryName][resource] !== undefined &&
         amplifyMeta[categoryName][resource].serviceType !== 'imported'
       ) {
-        const isLambdaLayer = amplifyMeta[categoryName][resource].service === FunctionServiceName.LambdaLayer;
-        const backendModified = await isBackendDirModifiedSinceLastPush(
-          resource,
-          categoryName,
-          currentAmplifyMeta[categoryName][resource].lastPushTimeStamp,
-          isLambdaLayer,
-        );
+        if (categoryName === 'function' && currentAmplifyMeta[categoryName][resource].service === FunctionServiceName.LambdaLayer) {
+          const backendModified = await isBackendDirModifiedSinceLastPush(
+            resource,
+            categoryName,
+            currentAmplifyMeta[categoryName][resource].lastPushTimeStamp,
+            hashLayerResource,
+          );
 
-        if (backendModified) {
-          amplifyMeta[categoryName][resource].resourceName = resource;
-          amplifyMeta[categoryName][resource].category = categoryName;
-          resources.push(amplifyMeta[categoryName][resource]);
+          if (backendModified) {
+            amplifyMeta[categoryName][resource].resourceName = resource;
+            amplifyMeta[categoryName][resource].category = categoryName;
+            resources.push(amplifyMeta[categoryName][resource]);
+          }
+        } else {
+          const backendModified = await isBackendDirModifiedSinceLastPush(
+            resource,
+            categoryName,
+            currentAmplifyMeta[categoryName][resource].lastPushTimeStamp,
+            getHashForResourceDir,
+          );
+
+          if (backendModified) {
+            amplifyMeta[categoryName][resource].resourceName = resource;
+            amplifyMeta[categoryName][resource].category = categoryName;
+            resources.push(amplifyMeta[categoryName][resource]);
+          }
+
+          if (categoryName === 'hosting' && currentAmplifyMeta[categoryName][resource].service === 'ElasticContainer') {
+            const {
+              frontend,
+              [frontend]: {
+                config: { SourceDir },
+              },
+            } = stateManager.getProjectConfig();
+            // build absolute path for Dockerfile and docker-compose.yaml
+            const projectRootPath = pathManager.findProjectRoot();
+            if (projectRootPath) {
+              const sourceAbsolutePath = path.join(projectRootPath, SourceDir);
+
+              // Generate the hash for this file, cfn files are autogenerated based on Dockerfile and resource settings
+              // Hash is generated by this files and not cfn files
+              const dockerfileHash = await getHashForResourceDir(sourceAbsolutePath, [
+                'Dockerfile',
+                'docker-compose.yaml',
+                'docker-compose.yml',
+              ]);
+
+              // Compare hash with value stored on meta
+              if (currentAmplifyMeta[categoryName][resource].lastPushDirHash !== dockerfileHash) {
+                resources.push(amplifyMeta[categoryName][resource]);
+                return;
+              }
+            }
+          }
         }
       }
     });
@@ -323,14 +366,7 @@ export async function getResourceStatus(category?, resourceName?, providerName?,
   } else if (amplifyProjectInitStatus === CLOUD_NOT_INITIALIZED) {
     amplifyMeta = stateManager.getBackendConfig();
   } else {
-    const error = new Error(
-      "You are not working inside a valid Amplify project.\nUse 'amplify init' in the root of your app directory to initialize your project, or 'amplify pull' to pull down an existing project.",
-    );
-
-    error.name = 'NotInitialized';
-    error.stack = undefined;
-
-    throw error;
+    throw new NotInitializedError();
   }
 
   let resourcesToBeCreated: any = getResourcesToBeCreated(amplifyMeta, currentAmplifyMeta, category, resourceName, filteredResources);

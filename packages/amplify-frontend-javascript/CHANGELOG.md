@@ -3,6 +3,181 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.22.4](https://github.com/aws-amplify/amplify-cli/compare/amplify-frontend-javascript@2.22.3...amplify-frontend-javascript@2.22.4) (2021-06-24)
+
+**Note:** Version bump only for package amplify-frontend-javascript
+
+
+
+
+
+## [2.22.3](https://github.com/aws-amplify/amplify-cli/compare/amplify-frontend-javascript@2.22.2...amplify-frontend-javascript@2.22.3) (2021-06-15)
+
+**Note:** Version bump only for package amplify-frontend-javascript
+
+
+
+
+
+## [2.22.2](https://github.com/aws-amplify/amplify-cli/compare/amplify-frontend-javascript@2.22.1...amplify-frontend-javascript@2.22.2) (2021-05-26)
+
+**Note:** Version bump only for package amplify-frontend-javascript
+
+
+
+
+
+## [2.22.1](https://github.com/aws-amplify/amplify-cli/compare/amplify-frontend-javascript@2.22.0...amplify-frontend-javascript@2.22.1) (2021-05-18)
+
+
+
+## 4.51.1 (2021-05-18)
+
+
+### Bug Fixes
+
+* respect headless frontend JS config input ([#7328](https://github.com/aws-amplify/amplify-cli/issues/7328)) ([4cc2b2c](https://github.com/aws-amplify/amplify-cli/commit/4cc2b2c9bb7fa04d5722f758cdad7e7b8c3cafc7))
+
+
+
+
+
+# [2.22.0](https://github.com/aws-amplify/amplify-cli/compare/amplify-frontend-javascript@2.21.6...amplify-frontend-javascript@2.22.0) (2021-05-14)
+
+
+### Features
+
+* Support for Apple Sign In ([#7265](https://github.com/aws-amplify/amplify-cli/issues/7265)) ([9f5e659](https://github.com/aws-amplify/amplify-cli/commit/9f5e659d63362c7f47eaa147c68d40d5bcc36fcc))
+
+
+
+
+
+## [2.21.6](https://github.com/aws-amplify/amplify-cli/compare/amplify-frontend-javascript@2.21.4...amplify-frontend-javascript@2.21.6) (2021-05-03)
+
+
+
+## 4.50.1 (2021-05-03)
+
+**Note:** Version bump only for package amplify-frontend-javascript
+
+
+
+
+
+## [2.21.5](https://github.com/aws-amplify/amplify-cli/compare/amplify-frontend-javascript@2.21.4...amplify-frontend-javascript@2.21.5) (2021-05-03)
+
+**Note:** Version bump only for package amplify-frontend-javascript
+
+
+
+
+
+## [2.21.4](https://github.com/aws-amplify/amplify-cli/compare/amplify-frontend-javascript@2.21.3...amplify-frontend-javascript@2.21.4) (2021-04-27)
+
+
+### Bug Fixes
+
+* frontend flag not honoring passed in framework ([#7126](https://github.com/aws-amplify/amplify-cli/issues/7126)) (ref [#7046](https://github.com/aws-amplify/amplify-cli/issues/7046)) ([1e67fc9](https://github.com/aws-amplify/amplify-cli/commit/1e67fc9a2fab262334181bbb50cba91999e24c33))
+
+
+
+
+
+## [2.21.3](https://github.com/aws-amplify/amplify-cli/compare/amplify-frontend-javascript@2.21.2...amplify-frontend-javascript@2.21.3) (2021-04-19)
+
+**Note:** Version bump only for package amplify-frontend-javascript
+
+
+
+
+
+## [2.21.2](https://github.com/aws-amplify/amplify-cli/compare/amplify-frontend-javascript@2.21.1...amplify-frontend-javascript@2.21.2) (2021-04-14)
+
+
+### Bug Fixes
+
+* added project to angular ([#7069](https://github.com/aws-amplify/amplify-cli/issues/7069)) ([bdf252b](https://github.com/aws-amplify/amplify-cli/commit/bdf252b9453906b5075f2592159e026b498a3c48))
+
+
+
+
+
+## [2.21.1](https://github.com/aws-amplify/amplify-cli/compare/amplify-frontend-javascript@2.20.11...amplify-frontend-javascript@2.21.1) (2021-04-09)
+
+
+### Bug Fixes
+
+* **cli:** use more inclusive language ([#6919](https://github.com/aws-amplify/amplify-cli/issues/6919)) ([bb70464](https://github.com/aws-amplify/amplify-cli/commit/bb70464d6c24fa931c0eb80d234a496d936913f5))
+
+
+### Reverts
+
+* Revert "Init and Configure DX changes (#6745)" ([9078b69](https://github.com/aws-amplify/amplify-cli/commit/9078b69b5842c99f0624797a5e897353bacb65d0)), closes [#6745](https://github.com/aws-amplify/amplify-cli/issues/6745)
+
+
+
+
+
+## [2.20.11](https://github.com/aws-amplify/amplify-cli/compare/amplify-frontend-javascript@2.20.10...amplify-frontend-javascript@2.20.11) (2021-03-11)
+
+**Note:** Version bump only for package amplify-frontend-javascript
+
+
+
+
+
+## [2.20.10](https://github.com/aws-amplify/amplify-cli/compare/amplify-frontend-javascript@2.20.9...amplify-frontend-javascript@2.20.10) (2021-03-05)
+
+**Note:** Version bump only for package amplify-frontend-javascript
+
+
+
+
+
+## [2.20.9](https://github.com/aws-amplify/amplify-cli/compare/amplify-frontend-javascript@2.20.8...amplify-frontend-javascript@2.20.9) (2021-02-26)
+
+**Note:** Version bump only for package amplify-frontend-javascript
+
+
+
+
+
+## [2.20.8](https://github.com/aws-amplify/amplify-cli/compare/amplify-frontend-javascript@2.20.7...amplify-frontend-javascript@2.20.8) (2021-02-24)
+
+**Note:** Version bump only for package amplify-frontend-javascript
+
+
+
+
+
+## [2.20.7](https://github.com/aws-amplify/amplify-cli/compare/amplify-frontend-javascript@2.20.6...amplify-frontend-javascript@2.20.7) (2021-02-17)
+
+**Note:** Version bump only for package amplify-frontend-javascript
+
+
+
+
+
+## [2.20.6](https://github.com/aws-amplify/amplify-cli/compare/amplify-frontend-javascript@2.20.5...amplify-frontend-javascript@2.20.6) (2021-02-11)
+
+
+### Bug Fixes
+
+* **amplify-codegen:** set sourceDir path to correct graphql schema location ([#6512](https://github.com/aws-amplify/amplify-cli/issues/6512)) ([6edf229](https://github.com/aws-amplify/amplify-cli/commit/6edf2298ebbabda57230f9e0b9c6c4f504f8a275)), closes [aws-amplify/amplify-cli#5483](https://github.com/aws-amplify/amplify-cli/issues/5483) [aws-amplify/amplify-cli#5483](https://github.com/aws-amplify/amplify-cli/issues/5483)
+
+
+
+
+
+## [2.20.5](https://github.com/aws-amplify/amplify-cli/compare/amplify-frontend-javascript@2.20.4...amplify-frontend-javascript@2.20.5) (2021-02-10)
+
+**Note:** Version bump only for package amplify-frontend-javascript
+
+
+
+
+
 ## [2.20.4](https://github.com/aws-amplify/amplify-cli/compare/amplify-frontend-javascript@2.20.3...amplify-frontend-javascript@2.20.4) (2021-01-08)
 
 

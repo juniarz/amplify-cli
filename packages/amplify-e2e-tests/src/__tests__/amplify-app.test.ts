@@ -7,8 +7,7 @@ import {
   amplifyPush,
   addIntegAccountInConfig,
 } from '../amplify-app-helpers/amplify-app-setup';
-import { createNewProjectDir, deleteProjectDir } from 'amplify-e2e-core';
-import { deleteProject } from 'amplify-e2e-core';
+import { createNewProjectDir, deleteProject, deleteProjectDir, isCI } from 'amplify-e2e-core';
 import {
   validateProject,
   validateProjectConfig,
@@ -42,6 +41,12 @@ describe('amplify-app platform tests', () => {
   });
 
   it('should setup an iOS project', async () => {
+    // disable this test locally to prevent execution of
+    // amplify-xcode in an empty folder.
+    // TODO: copy a valid Xcode project before executing this test
+    if (!isCI()) {
+      return;
+    }
     await amplifyAppIos(projRoot);
     validateProject(projRoot, 'ios');
     validateProjectConfig(projRoot, 'ios');
@@ -66,7 +71,7 @@ describe('amplify-app platform tests', () => {
     validateApi(projRoot);
     validateBackendConfig(projRoot);
     validateFeatureFlags(projRoot);
-    await addIntegAccountInConfig(projRoot);
+    addIntegAccountInConfig(projRoot);
     await amplifyModelgen(projRoot);
     validateModelgen(projRoot);
     await amplifyPush(projRoot);

@@ -51,7 +51,7 @@ Conditions:
   ShouldNotCreateEnvResources: !Equals [ !Ref env, NONE ]
   <%if (props.authSelections !=='identityPoolOnly' ) { %>
   ShouldOutputAppClientSecrets: !Equals [!Ref userpoolClientGenerateSecret, true ]
-  <% } %> 
+  <% } %>
 
 Resources:
   <%if (props.verificationBucketName) { %>
@@ -127,7 +127,7 @@ Resources:
           Mutable: true
         <% } %>
       <% } %>
-      <%if (props.triggers && props.triggers !== '{}' && props.dependsOn) { %>
+      <%if (!props.breakCircularDependency && props.triggers && props.triggers !== '{}' && props.dependsOn) { %>
       LambdaConfig:
         <%if (props.dependsOn.find(i => i.resourceName.includes('CreateAuthChallenge'))) { %>
           CreateAuthChallenge: !Ref function<%=props.resourceName%>CreateAuthChallengeArn
@@ -176,13 +176,14 @@ Resources:
       <% } %>
       MfaConfiguration: !Ref mfaConfiguration
       SmsVerificationMessage: !Ref smsVerificationMessage
+      SmsAuthenticationMessage: !Ref smsAuthenticationMessage
       SmsConfiguration:
         SnsCallerArn: !GetAtt SNSRole.Arn
         ExternalId: <%=`${props.resourceNameTruncated}_role_external_id`%>
     <%if (props.mfaConfiguration != 'OFF') { %>
     DependsOn: SNSRole
     <% } %>
-  <%if (props.triggers && props.dependsOn) { %>
+  <%if (!props.breakCircularDependency && props.triggers && props.dependsOn) { %>
   <%if (props.dependsOn.find(i => i.resourceName.includes('CreateAuthChallenge'))) { %>
   UserPoolCreateAuthChallengeLambdaInvokePermission:
     Type: "AWS::Lambda::Permission"
@@ -380,7 +381,7 @@ Resources:
             - ' }'
             - '};'
       Handler: index.handler
-      Runtime: nodejs10.x
+      Runtime: nodejs12.x
       Timeout: '300'
       Role: !GetAtt
         - UserPoolClientRole
@@ -506,7 +507,7 @@ Resources:
 
 
       Handler: index.handler
-      Runtime: nodejs10.x
+      Runtime: nodejs12.x
       Timeout: '300'
       Role: !GetAtt
         - UserPoolClientRole
@@ -638,7 +639,7 @@ Resources:
             - '} '
 
       Handler: index.handler
-      Runtime: nodejs10.x
+      Runtime: nodejs12.x
       Timeout: '300'
       Role: !GetAtt
         - UserPoolClientRole
@@ -737,7 +738,7 @@ Resources:
             - '}'
 
       Handler: index.handler
-      Runtime: nodejs10.x
+      Runtime: nodejs12.x
       Timeout: '300'
       Role: !GetAtt
         - UserPoolClientRole
@@ -858,7 +859,7 @@ Resources:
             - ' }'
             - '};'
       Handler: index.handler
-      Runtime: nodejs10.x
+      Runtime: nodejs12.x
       Timeout: '300'
       Role: !GetAtt
         - MFALambdaRole
@@ -1018,7 +1019,7 @@ Resources:
             - ' }'
             - '};'
       Handler: index.handler
-      Runtime: nodejs10.x
+      Runtime: nodejs12.x
       Timeout: '300'
       Role: !GetAtt
         - OpenIdLambdaRole
@@ -1154,6 +1155,9 @@ Outputs :
   UserPoolId:
     Value: !Ref 'UserPool'
     Description:  Id for the user pool
+  UserPoolArn:
+    Value: !GetAtt UserPool.Arn
+    Description:  Arn for the user pool
   UserPoolName:
     Value: !Ref userPoolName
   AppClientIDWeb:

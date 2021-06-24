@@ -3,6 +3,66 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.6.0](https://github.com/aws-amplify/amplify-cli/compare/amplify-dotnet-function-runtime-provider@1.5.4...amplify-dotnet-function-runtime-provider@1.6.0) (2021-06-15)
+
+
+### Features
+
+* lambda layers rework ([#7375](https://github.com/aws-amplify/amplify-cli/issues/7375)) ([a3b7d3e](https://github.com/aws-amplify/amplify-cli/commit/a3b7d3e427e16bac2b2ea27699fe53b48cf47656))
+
+
+
+
+
+## [1.5.4](https://github.com/aws-amplify/amplify-cli/compare/amplify-dotnet-function-runtime-provider@1.5.2...amplify-dotnet-function-runtime-provider@1.5.4) (2021-05-03)
+
+
+
+## 4.50.1 (2021-05-03)
+
+**Note:** Version bump only for package amplify-dotnet-function-runtime-provider
+
+
+
+
+
+## [1.5.3](https://github.com/aws-amplify/amplify-cli/compare/amplify-dotnet-function-runtime-provider@1.5.2...amplify-dotnet-function-runtime-provider@1.5.3) (2021-05-03)
+
+**Note:** Version bump only for package amplify-dotnet-function-runtime-provider
+
+
+
+
+
+## [1.5.2](https://github.com/aws-amplify/amplify-cli/compare/amplify-dotnet-function-runtime-provider@1.5.0...amplify-dotnet-function-runtime-provider@1.5.2) (2021-02-26)
+
+
+
+## 4.44.2 (2021-02-26)
+
+**Note:** Version bump only for package amplify-dotnet-function-runtime-provider
+
+
+
+
+
+# [1.5.0](https://github.com/aws-amplify/amplify-cli/compare/amplify-dotnet-function-runtime-provider@1.4.1...amplify-dotnet-function-runtime-provider@1.5.0) (2021-02-17)
+
+
+### Bug Fixes
+
+* mock bug fixes and e2e test updates ([#6626](https://github.com/aws-amplify/amplify-cli/issues/6626)) ([af76446](https://github.com/aws-amplify/amplify-cli/commit/af76446d18bf626ca5f91c3ad41081175c959807))
+* mock handles and prints child proc errors ([#6601](https://github.com/aws-amplify/amplify-cli/issues/6601)) ([ce075d9](https://github.com/aws-amplify/amplify-cli/commit/ce075d91c0b93885229ab3c6000a450c6b8cc56a))
+
+
+### Features
+
+* Separate prod and dev lambda function builds ([#6494](https://github.com/aws-amplify/amplify-cli/issues/6494)) ([2977c6a](https://github.com/aws-amplify/amplify-cli/commit/2977c6a886b33a38ef46f898a2adc1ffdb6d228b))
+
+
+
+
+
 ## [1.4.1](https://github.com/aws-amplify/amplify-cli/compare/amplify-dotnet-function-runtime-provider@1.4.0...amplify-dotnet-function-runtime-provider@1.4.1) (2020-12-11)
 
 **Note:** Version bump only for package amplify-dotnet-function-runtime-provider

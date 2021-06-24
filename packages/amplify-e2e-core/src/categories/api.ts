@@ -117,7 +117,7 @@ export function addApiWithSchemaAndConflictDetection(cwd: string, schemaFile: st
       .sendLine(KEY_DOWN_ARROW) // Down
       .wait(/.*Configure additional auth types.*/)
       .sendLine('n')
-      .wait(/.*Configure conflict detection.*/)
+      .wait(/.*Enable conflict detection.*/)
       .sendLine('y')
       .wait(/.*Select the default resolution strategy.*/)
       .sendCarriageReturn()
@@ -184,7 +184,7 @@ export function updateApiWithMultiAuth(cwd: string, settings: any) {
       .sendLine('1000')
       .wait(/.*Enter the number of milliseconds a token is valid after being authenticated.*/)
       .sendLine('2000')
-      .wait('Configure conflict detection?')
+      .wait('Enable conflict detection?')
       .sendLine('n')
       .wait(/.*Successfully updated resource.*/)
       .sendEof()
@@ -235,7 +235,7 @@ export function updateAPIWithResolutionStrategy(cwd: string, settings: any) {
       .sendLine(KEY_DOWN_ARROW) // Down
       .wait(/.*Configure additional auth types.*/)
       .sendLine('n')
-      .wait(/.*Configure conflict detection.*/)
+      .wait(/.*Enable conflict detection.*/)
       .sendLine('y')
       .wait(/.*Select the default resolution strategy.*/)
       .sendLine(KEY_DOWN_ARROW) // Down
@@ -259,10 +259,46 @@ export function addRestApi(cwd: string, settings: any) {
     if (!('existingLambda' in settings) && !('isCrud' in settings)) {
       reject(new Error('Missing property in settings object in addRestApi()'));
     } else {
+      const isFirstRestApi = settings.isFirstRestApi ?? true;
       let chain = spawn(getCLIPath(), ['add', 'api'], { cwd, stripColors: true })
         .wait('Please select from one of the below mentioned services')
         .send(KEY_DOWN_ARROW)
-        .sendCarriageReturn() // REST
+        .sendCarriageReturn(); // REST
+
+      if (!isFirstRestApi) {
+        chain.wait('Would you like to add a new path to an existing REST API');
+
+        if (settings.path) {
+          chain
+            .sendConfirmYes()
+            .wait('Please select the REST API you would want to update')
+            .sendCarriageReturn() // Select the first REST API
+            .wait('Provide a path')
+            .sendLine(settings.path)
+            .wait('Choose a lambda source')
+            .send(KEY_DOWN_ARROW)
+            .sendCarriageReturn() // Existing lambda
+            .wait('Choose the Lambda function to invoke by this path')
+            .sendCarriageReturn() // Pick first one
+            .wait('Restrict API access')
+            .sendConfirmNo() // Do not restrict access
+            .wait('Do you want to add another path')
+            .sendConfirmNo() // Do not add another path
+            .sendEof()
+            .run((err: Error) => {
+              if (err) {
+                reject(err);
+              } else {
+                resolve();
+              }
+            });
+          return;
+        } else {
+          chain.sendConfirmNo();
+        }
+      }
+
+      chain
         .wait('Provide a friendly name for your resource to be used as a label for this category in the project')
         .sendCarriageReturn()
         .wait('Provide a path')
@@ -303,9 +339,30 @@ export function addRestApi(cwd: string, settings: any) {
           .sendLine('n');
       }
 
+      chain.wait('Restrict API access');
+
+      if (settings.restrictAccess) {
+        chain.sendConfirmYes().wait('Who should have access');
+
+        if (!settings.allowGuestUsers) {
+          chain
+            .sendCarriageReturn() // Authenticated users only
+            .wait('What kind of access do you want for Authenticated users')
+            .sendLine('a'); // CRUD permissions
+        } else {
+          chain
+            .sendLine(KEY_DOWN_ARROW)
+            .sendCarriageReturn() // Authenticated and Guest users
+            .wait('What kind of access do you want for Authenticated users')
+            .sendLine('a') // CRUD permissions for authenticated users
+            .wait('What kind of access do you want for Guest users')
+            .sendLine('a'); // CRUD permissions for guest users
+        }
+      } else {
+        chain.sendConfirmNo(); // Do not restrict access
+      }
+
       chain
-        .wait('Restrict API access')
-        .sendLine('n')
         .wait('Do you want to add another path')
         .sendLine('n')
         .sendEof()
@@ -360,7 +417,7 @@ export function addApi(projectDir: string, settings?: any) {
           setupAuthType(authType, chain, settings);
         });
 
-        chain.wait('Configure conflict detection?').sendCarriageReturn(); //No
+        chain.wait('Enable conflict detection?').sendCarriageReturn(); //No
       } else {
         chain.wait('Do you want to configure advanced settings for the GraphQL API').sendCarriageReturn(); //No
       }

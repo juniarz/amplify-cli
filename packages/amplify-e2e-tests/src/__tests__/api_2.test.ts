@@ -1,8 +1,17 @@
-import { amplifyPush, amplifyPushUpdate, deleteProject, initJSProjectWithProfile } from 'amplify-e2e-core';
+import {
+  amplifyPush,
+  amplifyPushUpdate,
+  deleteProject,
+  initJSProjectWithProfile,
+  listAttachedRolePolicies,
+  listRolePolicies,
+  updateAuthAddAdminQueries,
+} from 'amplify-e2e-core';
 import * as path from 'path';
 import { existsSync } from 'fs';
 import AWSAppSyncClient, { AUTH_TYPE } from 'aws-appsync';
 import gql from 'graphql-tag';
+const providerName = 'awscloudformation';
 
 import {
   addApiWithSchema,
@@ -17,7 +26,9 @@ import {
   deleteProjectDir,
   getAppSyncApi,
   getProjectMeta,
+  getLocalEnvInfo,
   getTransformConfig,
+  enableAdminUI,
 } from 'amplify-e2e-core';
 import { TRANSFORM_CURRENT_VERSION } from 'graphql-transformer-core';
 import _ from 'lodash';
@@ -48,7 +59,7 @@ describe('amplify add api (GraphQL)', () => {
     await amplifyPush(projRoot);
 
     const meta = getProjectMeta(projRoot);
-    const region = meta['providers']['awscloudformation']['Region'] as string;
+    const region = meta['providers'][providerName]['Region'] as string;
     const { output } = meta.api[name];
     const url = output.GraphQLAPIEndpointOutput as string;
     const apiKey = output.GraphQLAPIKeyOutput as string;
@@ -82,7 +93,7 @@ describe('amplify add api (GraphQL)', () => {
         note: 'initial note',
       },
     };
-    const createResult = await appSyncClient.mutate({
+    const createResult: any = await appSyncClient.mutate({
       mutation: gql(createMutation),
       fetchPolicy: 'no-cache',
       variables: createInput,
@@ -101,32 +112,35 @@ describe('amplify add api (GraphQL)', () => {
         }
       }
     `;
+    const createResultData = createResult.data as any;
     const updateInput = {
       input: {
-        noteId: createResult.data.createNote.noteId,
+        noteId: createResultData.createNote.noteId,
         note: 'note updated',
-        _version: createResult.data.createNote._version,
+        _version: createResultData.createNote._version,
       },
     };
 
-    const updateResult = await appSyncClient.mutate({
+    const updateResult: any = await appSyncClient.mutate({
       mutation: gql(updateMutation),
       fetchPolicy: 'no-cache',
       variables: updateInput,
     });
+    const updateResultData = updateResult.data as any;
 
-    expect(updateResult.data).toBeDefined();
-    expect(updateResult.data.updateNote).toBeDefined();
-    expect(updateResult.data.updateNote.noteId).toEqual(createResult.data.createNote.noteId);
-    expect(updateResult.data.updateNote.note).not.toEqual(createResult.data.createNote.note);
-    expect(updateResult.data.updateNote._version).not.toEqual(createResult.data.createNote._version);
-    expect(updateResult.data.updateNote.note).toEqual(updateInput.input.note);
+    expect(updateResultData).toBeDefined();
+    expect(updateResultData.updateNote).toBeDefined();
+    expect(updateResultData.updateNote.noteId).toEqual(createResultData.createNote.noteId);
+    expect(updateResultData.updateNote.note).not.toEqual(createResultData.createNote.note);
+    expect(updateResultData.updateNote._version).not.toEqual(createResultData.createNote._version);
+    expect(updateResultData.updateNote.note).toEqual(updateInput.input.note);
   });
 
   it('init a project with conflict detection enabled and toggle disable', async () => {
     const name = `conflictdetection`;
     await initJSProjectWithProfile(projRoot, { name });
     await addApiWithSchemaAndConflictDetection(projRoot, 'simple_model.graphql');
+
     await amplifyPush(projRoot);
 
     const meta = getProjectMeta(projRoot);
@@ -156,6 +170,40 @@ describe('amplify add api (GraphQL)', () => {
     const disableDSConfig = getTransformConfig(projRoot, name);
     expect(disableDSConfig).toBeDefined();
     expect(_.isEmpty(disableDSConfig.ResolverConfig)).toBe(true);
+  });
+
+  it('init a project with conflict detection enabled and admin UI enabled to generate datastore models in the cloud', async () => {
+    const name = `dsadminui`;
+    await initJSProjectWithProfile(projRoot, { disableAmplifyAppCreation: false, name });
+
+    let meta = getProjectMeta(projRoot);
+    const appId = meta.providers?.[providerName]?.AmplifyAppId;
+    const region = meta.providers?.[providerName]?.Region;
+
+    expect(appId).toBeDefined();
+
+    const localEnvInfo = getLocalEnvInfo(projRoot);
+    const envName = localEnvInfo.envName;
+
+    // setupAdminUI
+    await enableAdminUI(appId, envName, region);
+
+    await addApiWithSchemaAndConflictDetection(projRoot, 'simple_model.graphql');
+    await amplifyPush(projRoot);
+
+    meta = getProjectMeta(projRoot);
+
+    const { output } = meta.api[name];
+    const { GraphQLAPIIdOutput, GraphQLAPIEndpointOutput, GraphQLAPIKeyOutput } = output;
+
+    expect(GraphQLAPIIdOutput).toBeDefined();
+    expect(GraphQLAPIEndpointOutput).toBeDefined();
+    expect(GraphQLAPIKeyOutput).toBeDefined();
+
+    const { graphqlApi } = await getAppSyncApi(GraphQLAPIIdOutput, meta.providers.awscloudformation.Region);
+
+    expect(graphqlApi).toBeDefined();
+    expect(graphqlApi.apiId).toEqual(GraphQLAPIIdOutput);
   });
 
   it('init a sync enabled project and update conflict resolution strategy', async () => {
@@ -335,6 +383,60 @@ describe('amplify add api (REST)', () => {
     await initJSProjectWithProfile(projRoot, {});
     await addFunction(projRoot, { functionTemplate: 'Hello World' }, 'nodejs');
     await addRestApi(projRoot, { existingLambda: true });
+    await amplifyPushUpdate(projRoot);
+  });
+
+  it('init a project, create lambda and attach multiple rest apis', async () => {
+    await initJSProjectWithProfile(projRoot, {});
+    await addFunction(projRoot, { functionTemplate: 'Hello World' }, 'nodejs');
+    await addRestApi(projRoot, {
+      existingLambda: true,
+      restrictAccess: true,
+      allowGuestUsers: true,
+    });
+    await addRestApi(projRoot, {
+      isFirstRestApi: false,
+      existingLambda: true,
+      restrictAccess: true,
+      allowGuestUsers: true,
+    });
+    await addRestApi(projRoot, {
+      isFirstRestApi: false,
+      existingLambda: true,
+      restrictAccess: true,
+      allowGuestUsers: false,
+    });
+    await addRestApi(projRoot, { isFirstRestApi: false, existingLambda: true });
+    await updateAuthAddAdminQueries(projRoot);
+    await amplifyPushUpdate(projRoot);
+
+    const amplifyMeta = getProjectMeta(projRoot);
+    const meta = amplifyMeta.providers.awscloudformation;
+    const { AuthRoleName, UnauthRoleName, Region } = meta;
+
+    expect(await listRolePolicies(AuthRoleName, Region)).toEqual([]);
+    expect(await listRolePolicies(UnauthRoleName, Region)).toEqual([]);
+
+    const authPolicies = await listAttachedRolePolicies(AuthRoleName, Region);
+    expect(authPolicies.length).toBeGreaterThan(0);
+
+    for (let i = 0; i < authPolicies.length; i++) {
+      expect(authPolicies[i].PolicyName).toMatch(/PolicyAPIGWAuth\d/);
+    }
+
+    const unauthPolicies = await listAttachedRolePolicies(UnauthRoleName, Region);
+    expect(unauthPolicies.length).toBeGreaterThan(0);
+
+    for (let i = 0; i < unauthPolicies.length; i++) {
+      expect(unauthPolicies[i].PolicyName).toMatch(/PolicyAPIGWUnauth\d/);
+    }
+  });
+
+  it('adds a rest api and then adds a path to the existing api', async () => {
+    await initJSProjectWithProfile(projRoot, {});
+    await addFunction(projRoot, { functionTemplate: 'Hello World' }, 'nodejs');
+    await addRestApi(projRoot, { existingLambda: true });
+    await addRestApi(projRoot, { isFirstRestApi: false, existingLambda: true, path: '/newpath' });
     await amplifyPushUpdate(projRoot);
   });
 });

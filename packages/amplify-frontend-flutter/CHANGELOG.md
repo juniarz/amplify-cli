@@ -3,6 +3,54 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.4.3](https://github.com/aws-amplify/amplify-cli/compare/amplify-frontend-flutter@0.4.1...amplify-frontend-flutter@0.4.3) (2021-05-03)
+
+
+
+## 4.50.1 (2021-05-03)
+
+
+### Bug Fixes
+
+* render the right auth mode for admin queries in config files ([#7118](https://github.com/aws-amplify/amplify-cli/issues/7118)) ([8f8deba](https://github.com/aws-amplify/amplify-cli/commit/8f8deba9171a30433aa6820af1f32f5498db5028)), closes [#6983](https://github.com/aws-amplify/amplify-cli/issues/6983)
+
+
+
+
+
+## [0.4.2](https://github.com/aws-amplify/amplify-cli/compare/amplify-frontend-flutter@0.4.1...amplify-frontend-flutter@0.4.2) (2021-05-03)
+
+
+### Bug Fixes
+
+* render the right auth mode for admin queries in config files ([#7118](https://github.com/aws-amplify/amplify-cli/issues/7118)) ([8f8deba](https://github.com/aws-amplify/amplify-cli/commit/8f8deba9171a30433aa6820af1f32f5498db5028)), closes [#6983](https://github.com/aws-amplify/amplify-cli/issues/6983)
+
+
+
+
+
+## [0.4.1](https://github.com/aws-amplify/amplify-cli/compare/amplify-frontend-flutter@0.3.0...amplify-frontend-flutter@0.4.1) (2021-04-09)
+
+
+### Reverts
+
+* Revert "Init and Configure DX changes (#6745)" ([9078b69](https://github.com/aws-amplify/amplify-cli/commit/9078b69b5842c99f0624797a5e897353bacb65d0)), closes [#6745](https://github.com/aws-amplify/amplify-cli/issues/6745)
+
+
+
+
+
+# [0.3.0](https://github.com/aws-amplify/amplify-cli/compare/amplify-frontend-flutter@0.2.1...amplify-frontend-flutter@0.3.0) (2021-02-10)
+
+
+### Features
+
+* add Flutter  support for Admin UI ([#6516](https://github.com/aws-amplify/amplify-cli/issues/6516)) ([d9ee44b](https://github.com/aws-amplify/amplify-cli/commit/d9ee44be73f43b11da2a07d21fd60108f49b1608))
+
+
+
+
+
 ## [0.2.1](https://github.com/aws-amplify/amplify-cli/compare/amplify-frontend-flutter@0.2.0...amplify-frontend-flutter@0.2.1) (2021-01-08)
 
 

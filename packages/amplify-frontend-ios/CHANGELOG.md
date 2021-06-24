@@ -3,6 +3,177 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.20.4](https://github.com/aws-amplify/amplify-cli/compare/amplify-frontend-ios@2.20.3...amplify-frontend-ios@2.20.4) (2021-06-24)
+
+**Note:** Version bump only for package amplify-frontend-ios
+
+
+
+
+
+## [2.20.3](https://github.com/aws-amplify/amplify-cli/compare/amplify-frontend-ios@2.20.2...amplify-frontend-ios@2.20.3) (2021-06-15)
+
+**Note:** Version bump only for package amplify-frontend-ios
+
+
+
+
+
+## [2.20.2](https://github.com/aws-amplify/amplify-cli/compare/amplify-frontend-ios@2.20.1...amplify-frontend-ios@2.20.2) (2021-05-26)
+
+**Note:** Version bump only for package amplify-frontend-ios
+
+
+
+
+
+## [2.20.1](https://github.com/aws-amplify/amplify-cli/compare/amplify-frontend-ios@2.20.0...amplify-frontend-ios@2.20.1) (2021-05-18)
+
+**Note:** Version bump only for package amplify-frontend-ios
+
+
+
+
+
+# [2.20.0](https://github.com/aws-amplify/amplify-cli/compare/amplify-frontend-ios@2.19.6...amplify-frontend-ios@2.20.0) (2021-05-14)
+
+
+### Bug Fixes
+
+* remove optional chaining in JS file ([#7287](https://github.com/aws-amplify/amplify-cli/issues/7287)) ([abb64f6](https://github.com/aws-amplify/amplify-cli/commit/abb64f618e6b5e52b40d779568c06eed305ac179))
+
+
+### Features
+
+* **amplify-frontend-ios:** amplify-xcode integration ([#6867](https://github.com/aws-amplify/amplify-cli/issues/6867)) ([338cea2](https://github.com/aws-amplify/amplify-cli/commit/338cea2f574bab242311989bc5024b9e149bd48b))
+
+
+
+
+
+## [2.19.6](https://github.com/aws-amplify/amplify-cli/compare/amplify-frontend-ios@2.19.4...amplify-frontend-ios@2.19.6) (2021-05-03)
+
+
+
+## 4.50.1 (2021-05-03)
+
+
+### Bug Fixes
+
+* render the right auth mode for admin queries in config files ([#7118](https://github.com/aws-amplify/amplify-cli/issues/7118)) ([8f8deba](https://github.com/aws-amplify/amplify-cli/commit/8f8deba9171a30433aa6820af1f32f5498db5028)), closes [#6983](https://github.com/aws-amplify/amplify-cli/issues/6983)
+
+
+
+
+
+## [2.19.5](https://github.com/aws-amplify/amplify-cli/compare/amplify-frontend-ios@2.19.4...amplify-frontend-ios@2.19.5) (2021-05-03)
+
+
+### Bug Fixes
+
+* render the right auth mode for admin queries in config files ([#7118](https://github.com/aws-amplify/amplify-cli/issues/7118)) ([8f8deba](https://github.com/aws-amplify/amplify-cli/commit/8f8deba9171a30433aa6820af1f32f5498db5028)), closes [#6983](https://github.com/aws-amplify/amplify-cli/issues/6983)
+
+
+
+
+
+## [2.19.4](https://github.com/aws-amplify/amplify-cli/compare/amplify-frontend-ios@2.19.3...amplify-frontend-ios@2.19.4) (2021-04-27)
+
+
+### Bug Fixes
+
+* **amplify-frontend-ios:** update xcode project on pull ([#7152](https://github.com/aws-amplify/amplify-cli/issues/7152)) ([9d5cb21](https://github.com/aws-amplify/amplify-cli/commit/9d5cb21b08ebc6a09c5c005e8130f4ba7db757ea))
+
+
+
+
+
+## [2.19.3](https://github.com/aws-amplify/amplify-cli/compare/amplify-frontend-ios@2.19.2...amplify-frontend-ios@2.19.3) (2021-04-19)
+
+**Note:** Version bump only for package amplify-frontend-ios
+
+
+
+
+
+## [2.19.2](https://github.com/aws-amplify/amplify-cli/compare/amplify-frontend-ios@2.19.1...amplify-frontend-ios@2.19.2) (2021-04-14)
+
+**Note:** Version bump only for package amplify-frontend-ios
+
+
+
+
+
+## [2.19.1](https://github.com/aws-amplify/amplify-cli/compare/amplify-frontend-ios@2.18.11...amplify-frontend-ios@2.19.1) (2021-04-09)
+
+
+### Reverts
+
+* Revert "Init and Configure DX changes (#6745)" ([9078b69](https://github.com/aws-amplify/amplify-cli/commit/9078b69b5842c99f0624797a5e897353bacb65d0)), closes [#6745](https://github.com/aws-amplify/amplify-cli/issues/6745)
+
+
+
+
+
+## [2.18.11](https://github.com/aws-amplify/amplify-cli/compare/amplify-frontend-ios@2.18.10...amplify-frontend-ios@2.18.11) (2021-03-11)
+
+**Note:** Version bump only for package amplify-frontend-ios
+
+
+
+
+
+## [2.18.10](https://github.com/aws-amplify/amplify-cli/compare/amplify-frontend-ios@2.18.9...amplify-frontend-ios@2.18.10) (2021-03-05)
+
+**Note:** Version bump only for package amplify-frontend-ios
+
+
+
+
+
+## [2.18.9](https://github.com/aws-amplify/amplify-cli/compare/amplify-frontend-ios@2.18.8...amplify-frontend-ios@2.18.9) (2021-02-26)
+
+**Note:** Version bump only for package amplify-frontend-ios
+
+
+
+
+
+## [2.18.8](https://github.com/aws-amplify/amplify-cli/compare/amplify-frontend-ios@2.18.7...amplify-frontend-ios@2.18.8) (2021-02-24)
+
+**Note:** Version bump only for package amplify-frontend-ios
+
+
+
+
+
+## [2.18.7](https://github.com/aws-amplify/amplify-cli/compare/amplify-frontend-ios@2.18.6...amplify-frontend-ios@2.18.7) (2021-02-17)
+
+**Note:** Version bump only for package amplify-frontend-ios
+
+
+
+
+
+## [2.18.6](https://github.com/aws-amplify/amplify-cli/compare/amplify-frontend-ios@2.18.5...amplify-frontend-ios@2.18.6) (2021-02-11)
+
+**Note:** Version bump only for package amplify-frontend-ios
+
+
+
+
+
+## [2.18.5](https://github.com/aws-amplify/amplify-cli/compare/amplify-frontend-ios@2.18.4...amplify-frontend-ios@2.18.5) (2021-02-10)
+
+
+### Bug Fixes
+
+* appclient secret output default to false ([#6333](https://github.com/aws-amplify/amplify-cli/issues/6333)) ([3da53b7](https://github.com/aws-amplify/amplify-cli/commit/3da53b7c9aacf718ebd8ea63e59928425af20764))
+
+
+
+
+
 ## [2.18.4](https://github.com/aws-amplify/amplify-cli/compare/amplify-frontend-ios@2.18.3...amplify-frontend-ios@2.18.4) (2021-01-13)
 
 **Note:** Version bump only for package amplify-frontend-ios

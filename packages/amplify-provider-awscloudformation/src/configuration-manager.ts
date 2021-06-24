@@ -1,17 +1,15 @@
 import { exitOnNextTick, JSONUtilities, pathManager, stateManager, $TSAny, $TSContext } from 'amplify-cli-core';
 import fs from 'fs-extra';
 import chalk from 'chalk';
-import { isCI } from 'ci-info';
 import { prompt } from 'inquirer';
 import _ from 'lodash';
 import path from 'path';
 import proxyAgent from 'proxy-agent';
-import { adminLoginFlow } from './admin-login';
 import awsRegions from './aws-regions';
 import constants from './constants';
 import setupNewUser from './setup-new-user';
 import obfuscateUtil from './utility-obfuscate';
-import systemConfigManager from './system-config-manager';
+import * as systemConfigManager from './system-config-manager';
 import { doAdminTokensExist, getTempCredsWithAdminTokens, isAmplifyAdminApp } from './utils/admin-helpers';
 import { resolveAppId } from './utils/resolve-appId';
 import { AuthFlow, AuthFlowConfig, AwsSdkConfig } from './utils/auth-types';
@@ -22,7 +20,9 @@ import {
   profileNameQuestion,
   removeProjectComfirmQuestion,
   updateOrRemoveQuestion,
+  retryAuthConfig,
 } from './question-flows/configuration-questions';
+import { STS } from 'aws-sdk';
 
 interface AwsConfig extends AwsSecrets {
   useProfile?: boolean;
@@ -36,7 +36,7 @@ interface ProjectConfig {
   config?: AwsConfig;
 }
 
-interface AwsSecrets {
+export interface AwsSecrets {
   accessKeyId?: string;
   secretAccessKey?: string;
   region?: string;
@@ -79,18 +79,22 @@ export async function configure(context: $TSContext) {
   context.exeInfo = context.exeInfo || context.amplify.getProjectDetails();
   normalizeInputParams(context);
   context.exeInfo.awsConfigInfo = getCurrentConfig(context);
-  await enableServerlessContainers(context);
+  if (context.exeInfo.inputParams.containerSetting) {
+    await enableServerlessContainers(context);
+  }
 
-  await newUserCheck(context);
-  printProfileInfo(context);
-  await setProjectConfigAction(context);
-  return await carryOutConfigAction(context);
+  if (context.exeInfo.inputParams.profileSetting) {
+    await newUserCheck(context);
+    printProfileInfo(context);
+    await setProjectConfigAction(context);
+    return await carryOutConfigAction(context);
+  }
 }
 
 async function enableServerlessContainers(context: $TSContext) {
   const frontend = context.exeInfo.projectConfig.frontend;
   const { config = {} } = context.exeInfo.projectConfig[frontend] || {};
-
+  // TODO: check for headless mode parameter to avoid the question
   const { ServerlessContainers } = await prompt({
     type: 'confirm',
     name: 'ServerlessContainers',
@@ -221,9 +225,34 @@ async function initialize(context: $TSContext, authConfig?: AuthFlowConfig) {
     }
   }
 
-  validateConfig(context);
+  await validateConfig(context);
   if (!awsConfigInfo.configValidated) {
-    throw new Error('Invalid configuration settings');
+    context.print.error('Invalid configuration settings!');
+    const { retryConfirmation } = await prompt(retryAuthConfig);
+    if (retryConfirmation) {
+      // Cleaning up broken configurations
+      if (authConfig.type === 'admin') {
+        context.exeInfo.awsConfigInfo = {
+          configLevel: 'amplifyAdmin',
+          config: {},
+        };
+      } else if (authConfig.type === 'accessKeys') {
+        context.exeInfo.awsConfigInfo = {
+          configLevel: 'project',
+          config: { useProfile: false },
+        };
+      } else {
+        context.exeInfo.awsConfigInfo = {
+          configLevel: 'project',
+          config: defaultAWSConfig,
+        };
+      }
+
+      return initialize(context, authConfig);
+    } else {
+      context.print.error('Exiting...');
+      exitOnNextTick(1);
+    }
   }
 
   return context;
@@ -245,7 +274,7 @@ async function create(context: $TSContext) {
     await promptForAuthConfig(context);
   }
 
-  validateConfig(context);
+  await validateConfig(context);
   if (awsConfigInfo.configValidated) {
     persistLocalEnvConfig(context);
   } else {
@@ -262,7 +291,7 @@ async function update(context: $TSContext) {
   } else {
     await promptForAuthConfig(context);
   }
-  validateConfig(context);
+  await validateConfig(context);
   if (awsConfigInfo.configValidated) {
     updateProjectConfig(context);
   } else {
@@ -301,7 +330,6 @@ async function setProjectConfigAction(context: $TSContext) {
     } else if (inputParams.configLevel === 'project') {
       context.exeInfo.awsConfigInfo.action = 'create';
       context.exeInfo.awsConfigInfo.configLevel = 'project';
-      context.exeInfo.awsConfigInfo.config = defaultAWSConfig;
     } else {
       context.exeInfo.awsConfigInfo.action = 'none';
       context.exeInfo.awsConfigInfo.configLevel = 'general';
@@ -317,7 +345,6 @@ async function setProjectConfigAction(context: $TSContext) {
       if (answer.setProjectLevelConfig) {
         context.exeInfo.awsConfigInfo.action = 'create';
         context.exeInfo.awsConfigInfo.configLevel = 'project';
-        context.exeInfo.awsConfigInfo.config = defaultAWSConfig;
       } else {
         context.exeInfo.awsConfigInfo.action = 'none';
         context.exeInfo.awsConfigInfo.configLevel = 'general';
@@ -347,13 +374,34 @@ async function promptForAuthConfig(context: $TSContext, authConfig?: AuthFlowCon
   let answers: $TSAny;
 
   if (availableProfiles && availableProfiles.length > 0) {
-    const authType = authConfig.type ?? (await askAuthType());
+    let authType: AuthFlow;
+    let isAdminApp = false;
+
+    if (authConfig?.type) {
+      authType = authConfig.type;
+    } else {
+      try {
+        const appId = resolveAppId(context);
+        isAdminApp = (await isAmplifyAdminApp(appId))?.isAdminApp || false;
+      } catch {
+        isAdminApp = false;
+      }
+      authType = await askAuthType(isAdminApp);
+    }
+
     if (authType === 'profile') {
       printProfileInfo(context);
       awsConfigInfo.config.useProfile = true;
       answers = await prompt(profileNameQuestion(availableProfiles, awsConfigInfo.config.profileName));
       awsConfigInfo.config.profileName = answers.profileName;
       return;
+    } else if (authType === 'admin') {
+      awsConfigInfo.configLevel = 'amplifyAdmin';
+      awsConfigInfo.config.useProfile = false;
+      return;
+    } else {
+      awsConfigInfo.config.useProfile = false;
+      delete awsConfigInfo.config.profileName;
     }
   } else {
     awsConfigInfo.config.useProfile = false;
@@ -366,6 +414,8 @@ async function promptForAuthConfig(context: $TSContext, authConfig?: AuthFlowCon
         ? obfuscateUtil.obfuscate(awsConfigInfo.config.secretAccessKey)
         : constants.DefaultAWSSecretAccessKey,
       awsConfigInfo.config.region || constants.DefaultAWSRegion,
+      validateAccessKeyId,
+      validateSecretAccessKey,
       obfuscateUtil.transform,
     ),
   );
@@ -378,7 +428,7 @@ async function promptForAuthConfig(context: $TSContext, authConfig?: AuthFlowCon
   awsConfigInfo.config.region = answers.region;
 }
 
-function validateConfig(context: $TSContext) {
+async function validateConfig(context: $TSContext) {
   const { awsConfigInfo } = context.exeInfo;
   awsConfigInfo.configValidated = false;
   if (awsConfigInfo.configLevel === 'general' || awsConfigInfo.configLevel === 'amplifyAdmin') {
@@ -396,6 +446,17 @@ function validateConfig(context: $TSContext) {
         awsConfigInfo.config.secretAccessKey !== constants.DefaultAWSSecretAccessKey &&
         awsConfigInfo.config.region &&
         awsRegions.regions.includes(awsConfigInfo.config.region);
+      const sts = new STS({
+        credentials: {
+          accessKeyId: awsConfigInfo.config.accessKeyId,
+          secretAccessKey: awsConfigInfo.config.secretAccessKey,
+        },
+      });
+      try {
+        await sts.getCallerIdentity({}).promise();
+      } catch (err) {
+        awsConfigInfo.configValidated = false;
+      }
     }
   }
   return context;
@@ -457,11 +518,11 @@ function persistLocalEnvConfig(context: $TSContext) {
 
 function getCurrentConfig(context: $TSContext) {
   const { envName }: { envName: string } = context.amplify.getEnvInfo();
-  return getConfigForEnv(envName);
+  return getConfigForEnv(context, envName);
 }
 
-function getConfigForEnv(envName: string) {
-  const projectConfigInfo: ProjectConfig = {
+function getConfigForEnv(context: $TSContext, envName: string) {
+  const projectConfigInfo: ProjectConfig = context?.exeInfo?.awsConfig || {
     configLevel: 'general',
     config: {},
   };
@@ -520,7 +581,7 @@ function removeProjectConfig(envName: string) {
   }
 }
 
-export async function loadConfiguration(context: $TSContext) {
+export async function loadConfiguration(context: $TSContext): Promise<AwsSecrets> {
   const { envName } = context.amplify.getEnvInfo();
   const config = await loadConfigurationForEnv(context, envName);
   return config;
@@ -546,29 +607,27 @@ export async function loadConfigurationForEnv(context: $TSContext, env: string, 
     return awsConfigInfo.config;
   }
 
-  const projectConfigInfo = getConfigForEnv(env);
+  const projectConfigInfo = getConfigForEnv(context, env);
   const authType = await determineAuthFlow(context, projectConfigInfo);
-  const { print, usageData } = context;
   let awsConfig: AwsSdkConfig;
 
   if (authType.type === 'admin') {
     projectConfigInfo.configLevel = 'amplifyAdmin';
     appId = appId || authType.appId;
-    if (!doAdminTokensExist(appId)) {
-      adminLoginFlow(context, appId, env, authType.region);
-    }
     try {
-      awsConfig = await getTempCredsWithAdminTokens(appId, print);
-    } catch (error) {
-      print.error(`Failed to get credentials: ${error.message || error}`);
-      await usageData.emitError(error);
+      awsConfig = await getTempCredsWithAdminTokens(context, appId);
+    } catch (e) {
+      context.print.error(`Failed to get credentials: ${e.message || e}`);
+      await context.usageData.emitError(e);
       exitOnNextTick(1);
     }
   } else if (authType.type === 'profile') {
-    if (authType?.profileName) {
+    try {
       awsConfig = await systemConfigManager.getProfiledAwsConfig(context, authType.profileName);
-    } else {
-      throw Error('Project configuration invalid. Missing profile name.');
+    } catch (e) {
+      context.print.error(`Failed to get profile: ${e.message || e}`);
+      await context.usageData.emitError(e);
+      exitOnNextTick(1);
     }
   } else if (authType.type === 'accessKeys') {
     awsConfig = loadConfigFromPath(projectConfigInfo.config.awsConfigFilePath);
@@ -606,31 +665,28 @@ export function resolveRegion(): string {
 async function newUserCheck(context: $TSContext) {
   const configSource = scanConfig(context);
   if (!configSource) {
-    let needToSetupNewUser = true;
     if (context.exeInfo.inputParams[constants.ProviderName]) {
       const inputParams = context.exeInfo.inputParams[constants.ProviderName];
       const inputConfigSufficient =
         inputParams.configLevel === 'general' || (inputParams.configLevel === 'project' && !inputParams.config.useProfile);
       if (inputConfigSufficient) {
-        needToSetupNewUser = false;
+        return;
       }
     }
-    if (needToSetupNewUser) {
-      if (context.exeInfo.inputParams.yes) {
-        throw new Error('AWS access credentials can not be found.');
-      } else {
-        context.print.info('AWS access credentials can not be found.');
-        const answer = await prompt([
-          {
-            type: 'confirm',
-            name: 'setupNewUser',
-            message: 'Setup new user',
-            default: true,
-          },
-        ]);
-        if (answer.setupNewUser) {
-          context.newUserInfo = await setupNewUser.run(context);
-        }
+    if (context.exeInfo.inputParams.yes) {
+      throw new Error('AWS access credentials can not be found.');
+    } else {
+      context.print.info('AWS access credentials can not be found.');
+      const answer = await prompt([
+        {
+          type: 'confirm',
+          name: 'setupNewUser',
+          message: 'Setup new user',
+          default: true,
+        },
+      ]);
+      if (answer.setupNewUser) {
+        context.newUserInfo = await setupNewUser.run(context);
       }
     }
   }
@@ -685,14 +741,20 @@ function getConfigLevel(context: $TSContext): ProjectType {
   return configLevel;
 }
 
-export async function getAwsConfig(context: $TSContext): Promise<AwsConfig> {
+export async function getAwsConfig(context: $TSContext): Promise<AwsSdkConfig> {
   const { awsConfigInfo } = context.exeInfo;
   const httpProxy = process.env.HTTP_PROXY || process.env.HTTPS_PROXY;
 
   let awsConfig: AwsSdkConfig;
   if (awsConfigInfo.configLevel === 'project') {
     if (awsConfigInfo.config.useProfile) {
-      awsConfig = await systemConfigManager.getProfiledAwsConfig(context, awsConfigInfo.config.profileName);
+      try {
+        awsConfig = await systemConfigManager.getProfiledAwsConfig(context, awsConfigInfo.config.profileName);
+      } catch (e) {
+        context.print.error(`Failed to get profile: ${e.message || e}`);
+        await context.usageData.emitError(e);
+        exitOnNextTick(1);
+      }
     } else {
       awsConfig = {
         accessKeyId: awsConfigInfo.config.accessKeyId,
@@ -702,12 +764,8 @@ export async function getAwsConfig(context: $TSContext): Promise<AwsConfig> {
     }
   } else if (awsConfigInfo.configLevel === 'amplifyAdmin') {
     const appId = resolveAppId(context);
-
-    if (!doAdminTokensExist(appId)) {
-      await adminLoginFlow(context, appId, context.amplify.getEnvInfo().envName);
-    }
     try {
-      awsConfig = await getTempCredsWithAdminTokens(appId, context.print);
+      awsConfig = await getTempCredsWithAdminTokens(context, appId);
     } catch (err) {
       context.print.error('Failed to fetch Amplify Admin credentials');
       throw new Error(err);
@@ -726,42 +784,40 @@ export async function getAwsConfig(context: $TSContext): Promise<AwsConfig> {
 
 async function determineAuthFlow(context: $TSContext, projectConfig?: ProjectConfig): Promise<AuthFlowConfig> {
   // Check for headless parameters
-  let { accessKeyId, profileName, region, secretAccessKey, useProfile } = _.get(
-    context,
-    ['exeInfo', 'inputParams', 'awscloudformation'],
-    {},
-  );
-
-  if (isCI) {
-    accessKeyId = accessKeyId || process.env.AWS_ACCESS_KEY_ID;
-    secretAccessKey = secretAccessKey || process.env.AWS_SECRET_ACCESS_KEY;
+  // TODO fix how input parameters are handled
+  let cfnParams = _.get(context, ['exeInfo', 'inputParams', 'awscloudformation'], undefined);
+  if (cfnParams?.config) {
+    cfnParams = cfnParams.config;
   }
-  region = region || resolveRegion();
+  let {
+    accessKeyId,
+    profileName,
+    region,
+    secretAccessKey,
+    useProfile,
+  }: {
+    accessKeyId: string;
+    profileName: string;
+    region: string;
+    secretAccessKey: string;
+    useProfile: boolean;
+  } = cfnParams || {};
 
   // Check for local project config
   useProfile = useProfile ?? projectConfig?.config?.useProfile;
   profileName = profileName ?? projectConfig?.config?.profileName;
 
-  if (accessKeyId && secretAccessKey) {
-    return { type: 'accessKeys', accessKeyId, region, secretAccessKey };
-  }
-
   if (useProfile && profileName) {
     return { type: 'profile', profileName };
+  }
+
+  if (accessKeyId && secretAccessKey && region) {
+    return { type: 'accessKeys', accessKeyId, region, secretAccessKey };
   }
 
   if (projectConfig?.config?.awsConfigFilePath) {
     const awsConfig = loadConfigFromPath(projectConfig.config.awsConfigFilePath);
     return { ...awsConfig, type: 'accessKeys' };
-  }
-
-  if (isCI) {
-    const errorMessage = 'Failed to resolve AWS access keys in CI.';
-    const docsUrl = 'https://docs.amplify.aws/cli/usage/headless';
-    context.print.error(errorMessage);
-    context.print.info(`Access keys for continuous integration can be configured with headless paramaters: ${chalk.green(docsUrl)}`);
-    await context.usageData.emitError(errorMessage);
-    exitOnNextTick(1);
   }
 
   let appId: string;
@@ -770,15 +826,44 @@ async function determineAuthFlow(context: $TSContext, projectConfig?: ProjectCon
     appId = resolveAppId(context);
     if (appId) {
       adminAppConfig = await isAmplifyAdminApp(appId);
-      if (adminAppConfig.isAdminApp && doAdminTokensExist(appId)) {
-        return { type: 'admin', appId, region: adminAppConfig.region };
+      if (adminAppConfig.isAdminApp && adminAppConfig.region) {
+        region = adminAppConfig.region;
+        if (doAdminTokensExist(appId) && projectConfig?.configLevel === 'amplifyAdmin') {
+          return { type: 'admin', appId, region };
+        }
       }
     }
   } catch (e) {
     // do nothing, appId might not be defined for a new project
   }
 
+  if (context?.exeInfo?.inputParams?.yes) {
+    if (process.env.AWS_SDK_LOAD_CONFIG) {
+      profileName = profileName || process.env.AWS_PROFILE || 'default';
+      return { type: 'profile', profileName };
+    } else {
+      accessKeyId = accessKeyId || process.env.AWS_ACCESS_KEY_ID;
+      secretAccessKey = secretAccessKey || process.env.AWS_SECRET_ACCESS_KEY;
+      region = region || resolveRegion();
+      if (accessKeyId && secretAccessKey && region) {
+        return { type: 'accessKeys', accessKeyId, region, secretAccessKey };
+      }
+    }
+  }
+
+  if (context?.exeInfo?.inputParams?.yes) {
+    const errorMessage = 'Failed to resolve AWS credentials with --yes flag.';
+    const docsUrl = 'https://docs.amplify.aws/cli/usage/headless';
+    context.print.error(errorMessage);
+    context.print.info(`Access keys for continuous integration can be configured with headless paramaters: ${chalk.green(docsUrl)}`);
+    await context.usageData.emitError(errorMessage);
+    exitOnNextTick(1);
+  }
+
   const authType = await askAuthType(adminAppConfig?.isAdminApp);
+  if (authType === 'admin') {
+    return { type: authType, appId, region };
+  }
   return { type: authType };
 }
 
@@ -795,4 +880,17 @@ async function askAuthType(isAdminAvailable: boolean = false): Promise<AuthFlow>
   const { authChoice }: { authChoice?: AuthFlow } = await prompt(authTypeQuestion(choices));
 
   return authChoice;
+}
+
+// Regex adapted from: https://aws.amazon.com/blogs/security/a-safer-way-to-distribute-aws-credentials-to-ec2/
+
+function validateAccessKeyId(input: $TSAny): string | boolean {
+  const INVALID_ACCESS_KEY_ID = 'Access Key ID must be 20 characters, and uppercase alphanumeric only.';
+  const accessKeyIdRegex = /^[A-Z0-9]{20}$/;
+  return accessKeyIdRegex.test(input) ? true : INVALID_ACCESS_KEY_ID;
+}
+function validateSecretAccessKey(input: $TSAny): string | boolean {
+  const INVALID_SECRET_ACCESS_KEY = 'Secret Access Key must be 40 characters, and base-64 string only.';
+  const secretAccessKeyRegex = /^[A-Za-z0-9/+=]{40}$/;
+  return secretAccessKeyRegex.test(input) ? true : INVALID_SECRET_ACCESS_KEY;
 }

@@ -3,6 +3,54 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.15.3](https://github.com/aws-amplify/amplify-cli/compare/amplify-frontend-android@2.15.1...amplify-frontend-android@2.15.3) (2021-05-03)
+
+
+
+## 4.50.1 (2021-05-03)
+
+
+### Bug Fixes
+
+* render the right auth mode for admin queries in config files ([#7118](https://github.com/aws-amplify/amplify-cli/issues/7118)) ([8f8deba](https://github.com/aws-amplify/amplify-cli/commit/8f8deba9171a30433aa6820af1f32f5498db5028)), closes [#6983](https://github.com/aws-amplify/amplify-cli/issues/6983)
+
+
+
+
+
+## [2.15.2](https://github.com/aws-amplify/amplify-cli/compare/amplify-frontend-android@2.15.1...amplify-frontend-android@2.15.2) (2021-05-03)
+
+
+### Bug Fixes
+
+* render the right auth mode for admin queries in config files ([#7118](https://github.com/aws-amplify/amplify-cli/issues/7118)) ([8f8deba](https://github.com/aws-amplify/amplify-cli/commit/8f8deba9171a30433aa6820af1f32f5498db5028)), closes [#6983](https://github.com/aws-amplify/amplify-cli/issues/6983)
+
+
+
+
+
+## [2.15.1](https://github.com/aws-amplify/amplify-cli/compare/amplify-frontend-android@2.14.5...amplify-frontend-android@2.15.1) (2021-04-09)
+
+
+### Reverts
+
+* Revert "Init and Configure DX changes (#6745)" ([9078b69](https://github.com/aws-amplify/amplify-cli/commit/9078b69b5842c99f0624797a5e897353bacb65d0)), closes [#6745](https://github.com/aws-amplify/amplify-cli/issues/6745)
+
+
+
+
+
+## [2.14.5](https://github.com/aws-amplify/amplify-cli/compare/amplify-frontend-android@2.14.4...amplify-frontend-android@2.14.5) (2021-02-10)
+
+
+### Bug Fixes
+
+* appclient secret output default to false ([#6333](https://github.com/aws-amplify/amplify-cli/issues/6333)) ([3da53b7](https://github.com/aws-amplify/amplify-cli/commit/3da53b7c9aacf718ebd8ea63e59928425af20764))
+
+
+
+
+
 ## [2.14.4](https://github.com/aws-amplify/amplify-cli/compare/amplify-frontend-android@2.14.3...amplify-frontend-android@2.14.4) (2021-01-13)
 
 

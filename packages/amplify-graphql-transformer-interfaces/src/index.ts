@@ -9,12 +9,12 @@ export {
   StackManagerProvider,
   TransformerResolversManagerProvider,
   DataSourceInstance,
-  TranformerTransformSchemaStepContextProvider,
+  TransformerTransformSchemaStepContextProvider,
   TransformerBeforeStepContextProvider,
   TransformerPrepareStepContextProvider,
   TransformerSchemaVisitStepContextProvider,
   TransformerValidationStepContextProvider,
-  TransformerResourceHelperProvider
+  TransformerResourceHelperProvider,
 } from './transformer-context';
 export { TransformerPluginProvider, TransformerPluginType } from './transformer-plugin-provider';
 export {
@@ -32,6 +32,7 @@ export {
   DataSourceOptions,
   MappingTemplateProvider,
   S3MappingTemplateProvider,
+  S3MappingFunctionCodeProvider,
   InlineMappingTemplateProvider,
   APIIAMResourceProvider,
   TemplateType as MappingTemplateType,

@@ -3,6 +3,171 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.8.4](https://github.com/aws-amplify/amplify-cli/compare/amplify-java-function-runtime-provider@1.8.3...amplify-java-function-runtime-provider@1.8.4) (2021-06-24)
+
+**Note:** Version bump only for package amplify-java-function-runtime-provider
+
+
+
+
+
+## [1.8.3](https://github.com/aws-amplify/amplify-cli/compare/amplify-java-function-runtime-provider@1.8.2...amplify-java-function-runtime-provider@1.8.3) (2021-06-15)
+
+**Note:** Version bump only for package amplify-java-function-runtime-provider
+
+
+
+
+
+## [1.8.2](https://github.com/aws-amplify/amplify-cli/compare/amplify-java-function-runtime-provider@1.8.1...amplify-java-function-runtime-provider@1.8.2) (2021-05-26)
+
+**Note:** Version bump only for package amplify-java-function-runtime-provider
+
+
+
+
+
+## [1.8.1](https://github.com/aws-amplify/amplify-cli/compare/amplify-java-function-runtime-provider@1.8.0...amplify-java-function-runtime-provider@1.8.1) (2021-05-18)
+
+**Note:** Version bump only for package amplify-java-function-runtime-provider
+
+
+
+
+
+# [1.8.0](https://github.com/aws-amplify/amplify-cli/compare/amplify-java-function-runtime-provider@1.7.6...amplify-java-function-runtime-provider@1.8.0) (2021-05-14)
+
+
+
+# 4.51.0 (2021-05-13)
+
+
+### Features
+
+* prep work for SMS Sandbox support ([#7302](https://github.com/aws-amplify/amplify-cli/issues/7302)) ([d1f85d2](https://github.com/aws-amplify/amplify-cli/commit/d1f85d2e0a9c367b71defefe6d9e00737f681ca4))
+
+
+
+
+
+## [1.7.6](https://github.com/aws-amplify/amplify-cli/compare/amplify-java-function-runtime-provider@1.7.4...amplify-java-function-runtime-provider@1.7.6) (2021-05-03)
+
+
+
+## 4.50.1 (2021-05-03)
+
+**Note:** Version bump only for package amplify-java-function-runtime-provider
+
+
+
+
+
+## [1.7.5](https://github.com/aws-amplify/amplify-cli/compare/amplify-java-function-runtime-provider@1.7.4...amplify-java-function-runtime-provider@1.7.5) (2021-05-03)
+
+**Note:** Version bump only for package amplify-java-function-runtime-provider
+
+
+
+
+
+## [1.7.4](https://github.com/aws-amplify/amplify-cli/compare/amplify-java-function-runtime-provider@1.7.3...amplify-java-function-runtime-provider@1.7.4) (2021-04-27)
+
+**Note:** Version bump only for package amplify-java-function-runtime-provider
+
+
+
+
+
+## [1.7.3](https://github.com/aws-amplify/amplify-cli/compare/amplify-java-function-runtime-provider@1.7.2...amplify-java-function-runtime-provider@1.7.3) (2021-04-19)
+
+**Note:** Version bump only for package amplify-java-function-runtime-provider
+
+
+
+
+
+## [1.7.2](https://github.com/aws-amplify/amplify-cli/compare/amplify-java-function-runtime-provider@1.7.1...amplify-java-function-runtime-provider@1.7.2) (2021-04-14)
+
+**Note:** Version bump only for package amplify-java-function-runtime-provider
+
+
+
+
+
+## [1.7.1](https://github.com/aws-amplify/amplify-cli/compare/amplify-java-function-runtime-provider@1.6.4...amplify-java-function-runtime-provider@1.7.1) (2021-04-09)
+
+**Note:** Version bump only for package amplify-java-function-runtime-provider
+
+
+
+
+
+## [1.6.4](https://github.com/aws-amplify/amplify-cli/compare/amplify-java-function-runtime-provider@1.6.3...amplify-java-function-runtime-provider@1.6.4) (2021-03-11)
+
+**Note:** Version bump only for package amplify-java-function-runtime-provider
+
+
+
+
+
+## [1.6.3](https://github.com/aws-amplify/amplify-cli/compare/amplify-java-function-runtime-provider@1.6.2...amplify-java-function-runtime-provider@1.6.3) (2021-03-05)
+
+**Note:** Version bump only for package amplify-java-function-runtime-provider
+
+
+
+
+
+## [1.6.2](https://github.com/aws-amplify/amplify-cli/compare/amplify-java-function-runtime-provider@1.6.1...amplify-java-function-runtime-provider@1.6.2) (2021-02-26)
+
+**Note:** Version bump only for package amplify-java-function-runtime-provider
+
+
+
+
+
+## [1.6.1](https://github.com/aws-amplify/amplify-cli/compare/amplify-java-function-runtime-provider@1.6.0...amplify-java-function-runtime-provider@1.6.1) (2021-02-24)
+
+**Note:** Version bump only for package amplify-java-function-runtime-provider
+
+
+
+
+
+# [1.6.0](https://github.com/aws-amplify/amplify-cli/compare/amplify-java-function-runtime-provider@1.5.8...amplify-java-function-runtime-provider@1.6.0) (2021-02-17)
+
+
+### Bug Fixes
+
+* mock bug fixes and e2e test updates ([#6626](https://github.com/aws-amplify/amplify-cli/issues/6626)) ([af76446](https://github.com/aws-amplify/amplify-cli/commit/af76446d18bf626ca5f91c3ad41081175c959807))
+* mock handles and prints child proc errors ([#6601](https://github.com/aws-amplify/amplify-cli/issues/6601)) ([ce075d9](https://github.com/aws-amplify/amplify-cli/commit/ce075d91c0b93885229ab3c6000a450c6b8cc56a))
+
+
+### Features
+
+* fully populate mock function environment variables ([#6551](https://github.com/aws-amplify/amplify-cli/issues/6551)) ([dceb13a](https://github.com/aws-amplify/amplify-cli/commit/dceb13a76a85a05940078868a3e2e1ca85656938))
+* Separate prod and dev lambda function builds ([#6494](https://github.com/aws-amplify/amplify-cli/issues/6494)) ([2977c6a](https://github.com/aws-amplify/amplify-cli/commit/2977c6a886b33a38ef46f898a2adc1ffdb6d228b))
+
+
+
+
+
+## [1.5.8](https://github.com/aws-amplify/amplify-cli/compare/amplify-java-function-runtime-provider@1.5.7...amplify-java-function-runtime-provider@1.5.8) (2021-02-11)
+
+**Note:** Version bump only for package amplify-java-function-runtime-provider
+
+
+
+
+
+## [1.5.7](https://github.com/aws-amplify/amplify-cli/compare/amplify-java-function-runtime-provider@1.5.6...amplify-java-function-runtime-provider@1.5.7) (2021-02-10)
+
+**Note:** Version bump only for package amplify-java-function-runtime-provider
+
+
+
+
+
 ## [1.5.6](https://github.com/aws-amplify/amplify-cli/compare/amplify-java-function-runtime-provider@1.5.5...amplify-java-function-runtime-provider@1.5.6) (2021-01-08)
 
 **Note:** Version bump only for package amplify-java-function-runtime-provider

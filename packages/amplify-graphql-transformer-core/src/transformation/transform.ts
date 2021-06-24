@@ -37,6 +37,7 @@ import {
 } from './utils';
 import { validateModelSchema } from './validation';
 
+// eslint-disable-next-line @typescript-eslint/ban-types
 function isFunction(obj: any): obj is Function {
   return obj && typeof obj === 'function';
 }
@@ -305,17 +306,19 @@ export class GraphQLTransform {
     const fileAssets = stackManager.getMappingTemplates();
     const pipelineFunctions: Record<string, string> = {};
     const resolvers: Record<string, string> = {};
-
+    const functions: Record<string, string> = {};
     for (let [templateName, template] of fileAssets) {
       if (templateName.startsWith('pipelineFunctions/')) {
         pipelineFunctions[templateName.replace('pipelineFunctions/', '')] = template;
       } else if (templateName.startsWith('resolvers/')) {
         resolvers[templateName.replace('resolvers/', '')] = template;
+      } else if (templateName.startsWith('functions/')) {
+        functions[templateName.replace('functions/', '')] = template;
       }
     }
     const schema = fileAssets.get('schema.graphql') || '';
     return {
-      functions: {},
+      functions,
       pipelineFunctions,
       stackMapping: {},
       resolvers,

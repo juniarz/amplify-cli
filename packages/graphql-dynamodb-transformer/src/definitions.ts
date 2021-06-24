@@ -15,6 +15,7 @@ import {
 import {
   wrapNonNull,
   unwrapNonNull,
+  isNonNullType,
   makeNamedType,
   toUpper,
   graphqlName,
@@ -202,6 +203,21 @@ export function makeCreateInputObject(
     directives: [],
   };
 }
+export function getFieldsOptionalNonNullableField(fields: InputValueDefinitionNode[], obj: ObjectTypeDefinitionNode): string[] {
+  const fieldMap = fields.reduce((map, field) => {
+    map.set(field.name.value, field);
+    return map;
+  }, new Map<string, InputValueDefinitionNode>());
+
+  return obj.fields
+    .filter(
+      r =>
+        fieldMap.has(r.name.value) && //field exists in the model
+        isNonNullType(r.type) && // field was non null type in model
+        fieldMap.get(r.name.value).type.kind !== Kind.NON_NULL_TYPE, // field is not nullable type in update mutation model
+    )
+    .map(r => r.name.value);
+}
 
 export function makeUpdateInputObject(
   obj: ObjectTypeDefinitionNode,
@@ -266,7 +282,7 @@ export function makeDeleteInputObject(obj: ObjectTypeDefinitionNode, isSync: boo
     {
       kind: Kind.INPUT_VALUE_DEFINITION,
       name: { kind: 'Name', value: 'id' },
-      type: makeNamedType('ID'),
+      type: wrapNonNull(makeNamedType('ID')),
       // TODO: Service does not support new style descriptions so wait.
       // description: {
       //     kind: 'StringValue',
@@ -565,7 +581,7 @@ export function makeModelScalarFilterInputObject(type: string, supportsCondition
   const conditions = getScalarConditions(type);
   const fields: InputValueDefinitionNode[] = conditions.map((condition: string) => ({
     kind: Kind.INPUT_VALUE_DEFINITION,
-    name: { kind: 'Name' as 'Name', value: condition },
+    name: { kind: 'Name' as const, value: condition },
     type: getScalarFilterInputType(condition, type, name),
     // TODO: Service does not support new style descriptions so wait.
     // description: field.description,
@@ -624,7 +640,7 @@ function makeSizeInputType(): InputObjectTypeDefinitionNode {
   const name = ModelResourceIDs.ModelSizeInputTypeName();
   const fields: InputValueDefinitionNode[] = SIZE_CONDITIONS.map((condition: string) => ({
     kind: Kind.INPUT_VALUE_DEFINITION,
-    name: { kind: 'Name' as 'Name', value: condition },
+    name: { kind: 'Name' as const, value: condition },
     type: getScalarFilterInputType(condition, 'Int', '' /* unused */),
     // TODO: Service does not support new style descriptions so wait.
     // description: field.description,
@@ -670,7 +686,7 @@ function makeFunctionInputFields(typeName: string): InputValueDefinitionNode[] {
   if (functions.has('attributeExists')) {
     fields.push({
       kind: Kind.INPUT_VALUE_DEFINITION,
-      name: { kind: 'Name' as 'Name', value: 'attributeExists' },
+      name: { kind: 'Name' as const, value: 'attributeExists' },
       type: makeNamedType('Boolean'),
       // TODO: Service does not support new style descriptions so wait.
       // description: field.description,
@@ -681,7 +697,7 @@ function makeFunctionInputFields(typeName: string): InputValueDefinitionNode[] {
   if (functions.has('attributeType')) {
     fields.push({
       kind: Kind.INPUT_VALUE_DEFINITION,
-      name: { kind: 'Name' as 'Name', value: 'attributeType' },
+      name: { kind: 'Name' as const, value: 'attributeType' },
       type: makeNamedType(ModelResourceIDs.ModelAttributeTypesName()),
       // TODO: Service does not support new style descriptions so wait.
       // description: field.description,
@@ -692,7 +708,7 @@ function makeFunctionInputFields(typeName: string): InputValueDefinitionNode[] {
   if (functions.has('size')) {
     fields.push({
       kind: Kind.INPUT_VALUE_DEFINITION,
-      name: { kind: 'Name' as 'Name', value: 'size' },
+      name: { kind: 'Name' as const, value: 'size' },
       type: makeNamedType(ModelResourceIDs.ModelSizeInputTypeName()),
       // TODO: Service does not support new style descriptions so wait.
       // description: field.description,
@@ -706,13 +722,13 @@ function makeFunctionInputFields(typeName: string): InputValueDefinitionNode[] {
 export function makeAttributeTypeEnum(): EnumTypeDefinitionNode {
   const makeEnumValue = (enumValue: string): EnumValueDefinitionNode => ({
     kind: Kind.ENUM_VALUE_DEFINITION,
-    name: { kind: 'Name' as 'Name', value: enumValue },
+    name: { kind: 'Name' as const, value: enumValue },
     directives: [],
   });
 
   return {
     kind: Kind.ENUM_TYPE_DEFINITION,
-    name: { kind: 'Name' as 'Name', value: ModelResourceIDs.ModelAttributeTypesName() },
+    name: { kind: 'Name' as const, value: ModelResourceIDs.ModelAttributeTypesName() },
     values: ATTRIBUTE_TYPES.map(t => makeEnumValue(t)),
     directives: [],
   };

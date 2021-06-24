@@ -3,7 +3,6 @@ const initializer = require('./initializer');
 const initializeEnv = require('./initialize-env');
 const resourcePusher = require('./push-resources');
 const envRemover = require('./delete-env');
-const resourceBuilder = require('./build-resources');
 const providerUtils = require('./utility-functions');
 const constants = require('./constants');
 const configManager = require('./configuration-manager');
@@ -24,6 +23,15 @@ import { CognitoUserPoolService, createCognitoUserPoolService } from './aws-util
 import { IdentityPoolService, createIdentityPoolService } from './aws-utils/IdentityPoolService';
 import { S3Service, createS3Service } from './aws-utils/S3Service';
 import { DynamoDBService, createDynamoDBService } from './aws-utils/DynamoDBService';
+import { resolveAppId } from './utils/resolve-appId';
+import { loadConfigurationForEnv } from './configuration-manager';
+import { Lambda } from './aws-utils/aws-lambda';
+import CloudFormation from './aws-utils/aws-cfn';
+import { $TSContext } from 'amplify-cli-core';
+
+export { resolveAppId } from './utils/resolve-appId';
+export { loadConfigurationForEnv } from './configuration-manager';
+import { updateEnv } from './update-env';
 
 function init(context) {
   return initializer.run(context);
@@ -57,10 +65,6 @@ function deleteEnv(context, envName, deleteS3) {
 
 function configure(context) {
   return configManager.configure(context);
-}
-
-function buildResources(context, category, resourceName) {
-  return resourceBuilder.run(context, category, resourceName);
 }
 
 async function getConfiguredAWSClient(context, category, action) {
@@ -98,6 +102,14 @@ function openConsole(context) {
   return consoleCommand.run(context);
 }
 
+async function getLambdaSdk(context: $TSContext) {
+  return await new Lambda(context);
+}
+
+async function getCloudFormationSdk(context: $TSContext) {
+  return await new CloudFormation(context);
+}
+
 module.exports = {
   adminBackendMap,
   adminLoginFlow,
@@ -106,13 +118,14 @@ module.exports = {
   init,
   initEnv,
   isAmplifyAdminApp,
+  getCloudFormationSdk,
+  getLambdaSdk,
   onInitSuccessful,
   configure,
   configureNewUser,
   constants,
   pushResources,
   storeCurrentCloudBackend,
-  buildResources,
   providerUtils,
   setupNewUser,
   getConfiguredAWSClient,
@@ -134,4 +147,7 @@ module.exports = {
   createS3Service,
   DynamoDBService,
   createDynamoDBService,
+  resolveAppId,
+  loadConfigurationForEnv,
+  updateEnv,
 };

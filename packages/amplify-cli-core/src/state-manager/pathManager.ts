@@ -1,6 +1,7 @@
 import * as path from 'path';
 import * as fs from 'fs-extra';
 import { homedir } from 'os';
+import { NotInitializedError } from '../errors';
 
 export const PathConstants = {
   // in home directory
@@ -38,6 +39,8 @@ export const PathConstants = {
   CLIJSONFileName: 'cli.json',
   CLIJSONFileNameGlob: 'cli*.json',
   CLIJsonWithEnvironmentFileName: (env: string) => `cli.${env}.json`,
+
+  CfnFileName: (resourceName: string) => `${resourceName}-awscloudformation-template.json`,
 };
 
 export class PathManager {
@@ -77,6 +80,12 @@ export class PathManager {
   getCurrentCloudBackendDirPath = (projectPath?: string): string =>
     this.constructPath(projectPath, [PathConstants.AmplifyDirName, PathConstants.CurrentCloudBackendDirName]);
 
+  getCurrentResourceParametersJsonPath = (projectPath: string | undefined, categoryName: string, resourceName: string): string =>
+    path.join(this.getCurrentCloudBackendDirPath(projectPath), categoryName, resourceName, PathConstants.ParametersJsonFileName);
+
+  getCurrentCfnTemplatePath = (projectPath: string | undefined, categoryName: string, resourceName: string): string =>
+    path.join(this.getCurrentCloudBackendDirPath(projectPath), categoryName, resourceName, PathConstants.CfnFileName(resourceName));
+
   getAmplifyRcFilePath = (projectPath?: string): string => this.constructPath(projectPath, [PathConstants.AmplifyRcFileName]);
 
   getGitIgnoreFilePath = (projectPath?: string): string => this.constructPath(projectPath, [PathConstants.GitIgnoreFileName]);
@@ -99,26 +108,20 @@ export class PathManager {
   getBackendConfigFilePath = (projectPath?: string): string =>
     this.constructPath(projectPath, [PathConstants.AmplifyDirName, PathConstants.BackendDirName, PathConstants.BackendConfigFileName]);
 
-  getTagFilePath = (projectPath?: string): string => {
-    return this.constructPath(projectPath, [PathConstants.AmplifyDirName, PathConstants.BackendDirName, PathConstants.TagsFileName]);
-  };
+  getTagFilePath = (projectPath?: string): string =>
+    this.constructPath(projectPath, [PathConstants.AmplifyDirName, PathConstants.BackendDirName, PathConstants.TagsFileName]);
 
-  getCurrentTagFilePath = (projectPath?: string): string => {
-    return this.constructPath(projectPath, [
-      PathConstants.AmplifyDirName,
-      PathConstants.CurrentCloudBackendDirName,
-      PathConstants.TagsFileName,
-    ]);
-  };
+  getCurrentTagFilePath = (projectPath?: string): string =>
+    this.constructPath(projectPath, [PathConstants.AmplifyDirName, PathConstants.CurrentCloudBackendDirName, PathConstants.TagsFileName]);
 
-  getResourceParamatersFilePath = (projectPath: string | undefined, category: string, resourceName: string): string =>
-    this.constructPath(projectPath, [
-      PathConstants.AmplifyDirName,
-      PathConstants.BackendDirName,
-      category,
-      resourceName,
-      PathConstants.ParametersJsonFileName,
-    ]);
+  getResourceDirectoryPath = (projectPath: string | undefined, category: string, resourceName: string): string =>
+    this.constructPath(projectPath, [PathConstants.AmplifyDirName, PathConstants.BackendDirName, category, resourceName]);
+
+  getResourceParametersFilePath = (projectPath: string | undefined, category: string, resourceName: string): string =>
+    path.join(this.getResourceDirectoryPath(projectPath, category, resourceName), PathConstants.ParametersJsonFileName);
+
+  getResourceCfnTemplatePath = (projectPath: string | undefined, category: string, resourceName: string): string =>
+    path.join(this.getResourceDirectoryPath(projectPath, category, resourceName), PathConstants.CfnFileName(resourceName));
 
   getReadMeFilePath = (projectPath?: string): string =>
     this.constructPath(projectPath, [PathConstants.AmplifyDirName, PathConstants.ReadMeFileName]);
@@ -162,7 +165,7 @@ export class PathManager {
       return path.normalize(path.join(projectPath, ...segments));
     }
 
-    throw this.createNotInitializedError();
+    throw new NotInitializedError();
   };
 
   private validateProjectPath = (projectPath: string): boolean => {
@@ -195,17 +198,6 @@ export class PathManager {
     }
 
     return undefined;
-  };
-
-  private createNotInitializedError = (): Error => {
-    const error = new Error(
-      "You are not working inside a valid Amplify project.\nUse 'amplify init' in the root of your app directory to initialize your project, or 'amplify pull' to pull down an existing project.",
-    );
-
-    error.name = 'NotInitialized';
-    error.stack = undefined;
-
-    return error;
   };
 }
 

@@ -13,12 +13,13 @@ declare global {
   }
 }
 
-import { isRegExp, format } from 'util';
+import { types, format } from 'util';
 import { Recorder } from '../asciinema-recorder';
 import { AssertionError } from 'assert';
 import strip = require('strip-ansi');
 import { EOL } from 'os';
 import retimer = require('retimer');
+import { join, parse } from 'path';
 
 const DEFAULT_NO_OUTPUT_TIMEOUT = 5 * 60 * 1000; // 5 Minutes
 const EXIT_CODE_TIMEOUT = 2;
@@ -27,6 +28,8 @@ const EXIT_CODE_GENERIC_ERROR = 3;
 // https://notes.burke.libbey.me/ansi-escape-codes/
 export const KEY_UP_ARROW = '\x1b[A';
 export const KEY_DOWN_ARROW = '\x1b[B';
+// https://donsnotes.com/tech/charsets/ascii.html
+export const CONTROL_C = '\x03';
 
 type ExecutionStep = {
   fn: (data: string) => boolean;
@@ -62,6 +65,7 @@ export type ExecutionContext = {
   sendKeyUp: (repeat?: number) => ExecutionContext;
   sendConfirmYes: () => ExecutionContext;
   sendConfirmNo: () => ExecutionContext;
+  sendCtrlC: () => ExecutionContext;
   sendEof: () => ExecutionContext;
   delay: (milliseconds: number) => ExecutionContext;
   run: (cb: (err: any, signal?: any) => void) => ExecutionContext;
@@ -73,6 +77,7 @@ export type SpawnOptions = {
   env?: object | any;
   stripColors?: boolean;
   ignoreCase?: boolean;
+  disableCIDetection?: boolean;
 };
 
 function chain(context: Context): ExecutionContext {
@@ -107,7 +112,7 @@ function chain(context: Context): ExecutionContext {
 
       return chain(context);
     },
-    expect: function(expectation: string | RegExp): ExecutionContext {
+    expect: function (expectation: string | RegExp): ExecutionContext {
       let _expect: ExecutionStep = {
         fn: data => {
           return testExpectation(data, expectation, context);
@@ -123,7 +128,7 @@ function chain(context: Context): ExecutionContext {
       return chain(context);
     },
 
-    wait: function(expectation: string | RegExp, callback = (data: string) => {}): ExecutionContext {
+    wait: function (expectation: string | RegExp, callback = (data: string) => {}): ExecutionContext {
       let _wait: ExecutionStep = {
         fn: data => {
           var val = testExpectation(data, expectation, context);
@@ -141,7 +146,7 @@ function chain(context: Context): ExecutionContext {
       context.queue.push(_wait);
       return chain(context);
     },
-    sendLine: function(line: string): ExecutionContext {
+    sendLine: function (line: string): ExecutionContext {
       let _sendline: ExecutionStep = {
         fn: () => {
           context.process.write(`${line}${EOL}`);
@@ -155,7 +160,7 @@ function chain(context: Context): ExecutionContext {
       context.queue.push(_sendline);
       return chain(context);
     },
-    sendCarriageReturn: function(): ExecutionContext {
+    sendCarriageReturn: function (): ExecutionContext {
       let _sendline: ExecutionStep = {
         fn: () => {
           context.process.write(EOL);
@@ -169,7 +174,7 @@ function chain(context: Context): ExecutionContext {
       context.queue.push(_sendline);
       return chain(context);
     },
-    send: function(line: string): ExecutionContext {
+    send: function (line: string): ExecutionContext {
       var _send: ExecutionStep = {
         fn: () => {
           context.process.write(line);
@@ -183,41 +188,41 @@ function chain(context: Context): ExecutionContext {
       context.queue.push(_send);
       return chain(context);
     },
-    sendKeyDown: function(repeat?: number): ExecutionContext {
-      const repeatitions = repeat ? Math.max(1, repeat) : 1;
+    sendKeyDown: function (repeat?: number): ExecutionContext {
+      const repetitions = repeat ? Math.max(1, repeat) : 1;
       var _send: ExecutionStep = {
         fn: () => {
-          for (let i = 0; i < repeatitions; i++) {
+          for (let i = 0; i < repetitions; ++i) {
             context.process.write(KEY_DOWN_ARROW);
           }
           return true;
         },
         name: '_send',
         shift: true,
-        description: `'[send] <Down> (${repeatitions})`,
+        description: `'[send] <Down> (${repetitions})`,
         requiresInput: false,
       };
       context.queue.push(_send);
       return chain(context);
     },
-    sendKeyUp: function(repeat?: number): ExecutionContext {
-      const repeatitions = repeat ? Math.max(1, repeat) : 1;
+    sendKeyUp: function (repeat?: number): ExecutionContext {
+      const repetitions = repeat ? Math.max(1, repeat) : 1;
       var _send: ExecutionStep = {
         fn: () => {
-          for (let i = 0; i < repeatitions; i++) {
+          for (let i = 0; i < repetitions; ++i) {
             context.process.write(KEY_UP_ARROW);
           }
           return true;
         },
         name: '_send',
         shift: true,
-        description: `'[send] <Up> (${repeatitions})`,
+        description: `'[send] <Up> (${repetitions})`,
         requiresInput: false,
       };
       context.queue.push(_send);
       return chain(context);
     },
-    sendConfirmYes: function(): ExecutionContext {
+    sendConfirmYes: function (): ExecutionContext {
       var _send: ExecutionStep = {
         fn: () => {
           context.process.write(`Y${EOL}`);
@@ -231,7 +236,7 @@ function chain(context: Context): ExecutionContext {
       context.queue.push(_send);
       return chain(context);
     },
-    sendConfirmNo: function(): ExecutionContext {
+    sendConfirmNo: function (): ExecutionContext {
       var _send: ExecutionStep = {
         fn: () => {
           context.process.write(`N${EOL}`);
@@ -245,7 +250,21 @@ function chain(context: Context): ExecutionContext {
       context.queue.push(_send);
       return chain(context);
     },
-    sendEof: function(): ExecutionContext {
+    sendCtrlC: function (): ExecutionContext {
+      var _send: ExecutionStep = {
+        fn: () => {
+          context.process.write(`${CONTROL_C}${EOL}`);
+          return true;
+        },
+        name: '_send',
+        shift: true,
+        description: '[send] Ctrl+C',
+        requiresInput: false,
+      };
+      context.queue.push(_send);
+      return chain(context);
+    },
+    sendEof: function (): ExecutionContext {
       var _sendEof: ExecutionStep = {
         fn: () => {
           context.process.write('');
@@ -259,7 +278,7 @@ function chain(context: Context): ExecutionContext {
       context.queue.push(_sendEof);
       return chain(context);
     },
-    delay: function(milliseconds: number): ExecutionContext {
+    delay: function (milliseconds: number): ExecutionContext {
       var _delay: ExecutionStep = {
         fn: () => {
           const startCallback = Date.now();
@@ -276,7 +295,7 @@ function chain(context: Context): ExecutionContext {
       context.queue.push(_delay);
       return chain(context);
     },
-    run: function(callback: (err: any, code?: number, signal?: string | number) => void): ExecutionContext {
+    run: function (callback: (err: any, code?: number, signal?: string | number) => void): ExecutionContext {
       let errState: any = null;
       let responded = false;
       let stdout: string[] = [];
@@ -289,8 +308,9 @@ function chain(context: Context): ExecutionContext {
         if (code !== 0) {
           if (code === EXIT_CODE_TIMEOUT) {
             const err = new Error(
-              `Killed the process as no output receive for ${context.noOutputTimeout /
-                1000} Sec. The no output timeout is set to ${context.noOutputTimeout / 1000}`,
+              `Killed the process as no output receive for ${context.noOutputTimeout / 1000} Sec. The no output timeout is set to ${
+                context.noOutputTimeout / 1000
+              }`,
             );
             return onError(err, true);
           } else if (code === 127) {
@@ -434,14 +454,19 @@ function chain(context: Context): ExecutionContext {
       function onLine(data: string | Buffer) {
         noOutputTimer.reschedule(context.noOutputTimeout);
         data = data.toString();
-        if (process.env && process.env.VERBOSE_LOGGING_DO_NOT_USE_OR_YOU_WILL_BE_FIRED) {
-          console.log(data);
+
+        if (process.env && process.env.VERBOSE_LOGGING_DO_NOT_USE_IN_CI_OR_YOU_WILL_BE_FIRED) {
+          const spinnerRegex = new RegExp(/.*(⠋|⠙|⠹|⠸|⠼|⠴|⠦|⠧|⠇|⠏).*/);
+          if (spinnerRegex.test(data) === false && strip(data).trim().length > 0) {
+            console.log(data);
+          }
         }
+
         if (context.stripColors) {
           data = strip(data);
         }
 
-        var lines = data.split(EOL).filter(function(line) {
+        var lines = data.split(EOL).filter(function (line) {
           return line.length > 0 && line !== '\r';
         });
         stdout = stdout.concat(lines);
@@ -530,7 +555,7 @@ function chain(context: Context): ExecutionContext {
 }
 
 function testExpectation(data: string, expectation: string | RegExp, context: Context): boolean {
-  if (isRegExp(expectation)) {
+  if (types.isRegExp(expectation)) {
     return expectation.test(data);
   } else if (context.ignoreCase) {
     return data.toLowerCase().indexOf(expectation.toLowerCase()) > -1;
@@ -540,7 +565,7 @@ function testExpectation(data: string, expectation: string | RegExp, context: Co
 }
 
 function createUnexpectedEndError(message: string, remainingQueue: ExecutionStep[]) {
-  const desc: string[] = remainingQueue.map(function(it) {
+  const desc: string[] = remainingQueue.map(function (it) {
     return it.description;
   });
   var msg = message + '\n' + desc.join('\n');
@@ -554,7 +579,7 @@ function createUnexpectedEndError(message: string, remainingQueue: ExecutionStep
 
 function createExpectationError(expected: string | RegExp, actual: string) {
   var expectation;
-  if (isRegExp(expected)) {
+  if (types.isRegExp(expected)) {
     expectation = 'to match ' + expected;
   } else {
     expectation = 'to contain ' + JSON.stringify(expected);
@@ -573,9 +598,10 @@ export function nspawn(command: string | string[], params: string[] = [], option
     params = command;
     command = params.shift();
   } else if (typeof command === 'string') {
-    command = command.split(' ');
-    params = params || command.slice(1);
-    command = command[0];
+    const parsedPath = parse(command);
+    const parsedArgs = parsedPath.base.split(' ');
+    command = join(parsedPath.dir, parsedArgs[0]);
+    params = params || parsedArgs.slice(1);
   }
 
   let childEnv = undefined;
@@ -592,12 +618,24 @@ export function nspawn(command: string | string[], params: string[] = [], option
 
   // If we have an environment passed in we've to add the current process' environment, otherwised the forked
   // process would not have $PATH and others that is required to run amplify-cli successfully.
-  if (options.env || pushEnv) {
+  // to be able to disable CI detection we do need to pass in a childEnv
+  if (options.env || pushEnv || options.disableCIDetection === true) {
     childEnv = {
       ...process.env,
       ...pushEnv,
       ...options.env,
     };
+
+    // Undo ci-info detection, required for some tests
+    if (options.disableCIDetection === true) {
+      delete childEnv.CI;
+      delete childEnv.CONTINUOUS_INTEGRATION;
+      delete childEnv.BUILD_NUMBER;
+      delete childEnv.TRAVIS;
+      delete childEnv.GITHUB_ACTIONS;
+      delete childEnv.CIRCLECI;
+      delete childEnv.CIRCLE_PULL_REQUEST;
+    }
   }
 
   let context: Context = {

@@ -1,5 +1,4 @@
 import { nspawn as spawn, getCLIPath, singleSelect } from '..';
-import { ExecutionContext } from '../utils';
 
 type AmplifyConfiguration = {
   accessKeyId: string;
@@ -14,7 +13,7 @@ const defaultSettings = {
   userName: '\r',
 };
 
-const regionOptions = [
+export const amplifyRegions = [
   'us-east-1',
   'us-east-2',
   'us-west-2',
@@ -26,16 +25,16 @@ const regionOptions = [
   'ap-southeast-1',
   'ap-southeast-2',
   'ap-south-1',
+  'ca-central-1',
 ];
 
-const profileOptions = [
-  'cancel',
-  'update',
-  'remove',
-];
+const configurationOptions = ['Project information', 'AWS Profile setting', 'Advanced: Container-based deployments'];
+const profileOptions = ['No', 'Update AWS Profile', 'Remove AWS Profile'];
+const authenticationOptions = ['AWS profile', 'AWS access keys'];
 
 const MANDATORY_PARAMS = ['accessKeyId', 'secretAccessKey', 'region'];
-export function amplifyConfigure(settings: AmplifyConfiguration) {
+
+export function amplifyConfigure(settings: AmplifyConfiguration): Promise<void> {
   const s = { ...defaultSettings, ...settings };
   const missingParam = MANDATORY_PARAMS.filter(p => !Object.keys(s).includes(p));
   if (missingParam.length) {
@@ -49,7 +48,7 @@ export function amplifyConfigure(settings: AmplifyConfiguration) {
       .sendCarriageReturn()
       .wait('Specify the AWS Region');
 
-    singleSelect(chain, s.region, regionOptions);
+    singleSelect(chain, s.region, amplifyRegions);
 
     chain
       .wait('user name:')
@@ -75,43 +74,61 @@ export function amplifyConfigure(settings: AmplifyConfiguration) {
   });
 }
 
-export function amplifyConfigureProject(settings: { cwd: string, enableContainers: boolean}) {
-  const { enableContainers = false, cwd } = settings;
-
-  const confirmContainers: keyof Pick<ExecutionContext, 'sendConfirmYes' | 'sendConfirmNo'> = enableContainers ? 'sendConfirmYes': 'sendConfirmNo';
+// TODO amplify admin enabled case
+export function amplifyConfigureProject(settings: {
+  cwd: string;
+  enableContainers?: boolean;
+  configLevel?: string;
+  profileOption?: string;
+  authenticationOption?: string;
+  region?: string;
+}): Promise<void> {
+  const {
+    cwd,
+    enableContainers = false,
+    profileOption = profileOptions[0],
+    authenticationOption,
+    configLevel = 'project',
+    region = defaultSettings.region,
+  } = settings;
 
   return new Promise((resolve, reject) => {
-    const chain = spawn(getCLIPath(), ['configure', 'project'], { cwd, stripColors: true })
-      .wait('Enter a name for the project')
-      .sendCarriageReturn()
-      .wait('Choose your default editor:')
-      .sendCarriageReturn()
-      .wait('Choose the type of app that you\'re building')
-      .sendCarriageReturn()
-      .wait('What javascript framework are you using')
-      .sendCarriageReturn()
-      .wait('Source Directory Path:')
-      .sendCarriageReturn()
-      .wait('Distribution Directory Path:')
-      .sendCarriageReturn()
-      .wait('Build Command:')
-      .sendCarriageReturn()
-      .wait('Start Command:')
-      .sendCarriageReturn()
-      .wait('Do you want to enable container-based deployments?')
-      [confirmContainers]()
-      .wait('Do you want to update or remove the project level AWS profile?');
+    const chain = spawn(getCLIPath(), ['configure', 'project'], { cwd, stripColors: true }).wait('Which setting do you want to configure?');
 
-    singleSelect(chain, profileOptions[0], profileOptions);
+    if (enableContainers) {
+      singleSelect(chain, configurationOptions[2], configurationOptions);
+      chain.wait('Do you want to enable container-based deployments?').sendConfirmYes();
+    } else {
+      singleSelect(chain, configurationOptions[1], configurationOptions);
 
-    chain
-      .wait('Successfully made configuration changes to your project.')
-      .run((err: Error) => {
-        if (!err) {
-          resolve();
-        } else {
-          reject(err);
+      if (configLevel === 'project') {
+        chain.wait('Do you want to update or remove the project level AWS profile?');
+        singleSelect(chain, profileOption, profileOptions);
+      } else {
+        chain.wait('Do you want to set the project level configuration').sendConfirmYes();
+      }
+
+      if (profileOption === profileOptions[1] || configLevel === 'general') {
+        chain.wait('Select the authentication method you want to use:');
+        singleSelect(chain, authenticationOption, authenticationOptions);
+
+        if (authenticationOption === authenticationOptions[0]) {
+          chain.wait('Please choose the profile you want to use').sendCarriageReturn(); // Default profile
+        } else if (authenticationOption === authenticationOptions[1]) {
+          chain.wait('accessKeyId:').sendLine(process.env.AWS_ACCESS_KEY_ID);
+          chain.wait('secretAccessKey:').sendLine(process.env.AWS_SECRET_ACCESS_KEY);
+          chain.wait('region:');
+          singleSelect(chain, region, amplifyRegions);
         }
-      });
+      }
+    }
+
+    chain.wait('Successfully made configuration changes to your project.').run((err: Error) => {
+      if (!err) {
+        resolve();
+      } else {
+        reject(err);
+      }
+    });
   });
 }

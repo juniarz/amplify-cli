@@ -1,6 +1,6 @@
 {
   "name": "graphql-transformers-e2e-tests",
-  "version": "6.21.3",
+  "version": "6.24.2",
   "description": "End to end functional tests for appsync supported transformers.",
   "private": true,
   "repository": {
@@ -19,40 +19,40 @@
   ],
   "scripts": {
     "e2e": "jest",
-    "build-tests": "tsc --build tsconfig.tests.json"
+    "build-tests": "yarn tsc --build tsconfig.tests.json"
   },
   "dependencies": {
     "amazon-cognito-identity-js": "^3.2.2",
     "axios": "^0.21.1",
     "cloudform-types": "^4.2.0",
     "graphql": "^14.5.8",
-    "graphql-transformer-common": "4.18.1",
-    "graphql-transformer-core": "6.25.1",
+    "graphql-transformer-common": "4.19.3",
+    "graphql-transformer-core": "6.28.11",
     "moment": "^2.24.0"
   },
   "devDependencies": {
     "@aws-amplify/core": "^2.1.0",
-    "@types/node": "^10.17.13",
+    "@types/node": "^12.12.6",
     "aws-amplify": "^2.2.2",
-    "aws-appsync": "^2.0.2",
-    "aws-cdk": "^1.32.2",
-    "aws-sdk": "^2.765.0",
+    "aws-appsync": "^4.0.3",
+    "aws-cdk": "~1.72.0",
+    "aws-sdk": "^2.919.0",
     "execa": "4.1.0",
     "fs-extra": "^8.1.0",
-    "graphql-auth-transformer": "6.23.3",
-    "graphql-connection-transformer": "4.19.4",
-    "graphql-dynamodb-transformer": "6.21.4",
-    "graphql-elasticsearch-transformer": "4.10.0",
-    "graphql-function-transformer": "2.4.4",
-    "graphql-http-transformer": "4.16.4",
-    "graphql-key-transformer": "2.20.4",
-    "graphql-predictions-transformer": "2.4.4",
+    "graphql-auth-transformer": "6.24.12",
+    "graphql-connection-transformer": "4.21.12",
+    "graphql-dynamodb-transformer": "6.22.12",
+    "graphql-elasticsearch-transformer": "4.11.12",
+    "graphql-function-transformer": "2.5.11",
+    "graphql-http-transformer": "4.17.11",
+    "graphql-key-transformer": "2.23.12",
+    "graphql-predictions-transformer": "2.5.11",
     "graphql-tag": "^2.10.1",
-    "graphql-versioned-transformer": "4.16.4",
+    "graphql-versioned-transformer": "4.17.12",
     "isomorphic-fetch": "^2.2.1",
     "jest-junit": "^12.0.0",
     "node-fetch": "^2.6.1",
-    "ws": "^7.2.1"
+    "ws": "^7.4.6"
   },
   "jest": {
     "transform": {

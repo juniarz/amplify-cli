@@ -3,10 +3,9 @@ import path from 'path';
 import fs from 'fs-extra';
 import os from 'os';
 import uuid from 'uuid';
-import open from 'open';
 import { rootAssetDir } from '../aws-constants';
 import { checkForPathOverlap, validatePathName, formatCFNPathParamsForExpressJs } from '../utils/rest-api-path-utils';
-import { ResourceDoesNotExistError, exitOnNextTick, $TSContext, stateManager } from 'amplify-cli-core';
+import { ResourceDoesNotExistError, exitOnNextTick, $TSContext, stateManager, open } from 'amplify-cli-core';
 
 // keep in sync with ServiceName in amplify-category-function, but probably it will not change
 const FunctionServiceNameLambdaFunction = 'Lambda';
@@ -67,6 +66,7 @@ export async function updateWalkthrough(context, defaultValuesFilename) {
       name: 'operation',
       message: 'What would you like to do',
       type: 'list',
+      when: context.input.command !== 'add',
       choices: [
         { name: 'Add another path', value: 'add' },
         { name: 'Update path', value: 'update' },
@@ -76,6 +76,12 @@ export async function updateWalkthrough(context, defaultValuesFilename) {
   ];
 
   const updateApi = await inquirer.prompt(question);
+
+  // Inquirer does not currently support combining 'when' and 'default', so
+  // manually set the operation if the user ended up here via amplify api add.
+  if (context.input.command === 'add') {
+    updateApi.operation = 'add';
+  }
 
   if (updateApi.resourceName === 'AdminQueries') {
     const errMessage = `The Admin Queries API is maintained through the Auth category and should be updated using 'amplify update auth' command`;
@@ -470,7 +476,7 @@ async function askPaths(context, answers, currentPath) {
           await inquirer.prompt({
             name: 'isOverlappingPathOK',
             type: 'confirm',
-            message: `This path ${lowerOrderPath} is overlapping with ${higherOrderPath}. ${higherOrderPath} is going to catch all requests from ${lowerOrderPath}. Are you sure you want to continue?`,
+            message: `The path ${lowerOrderPath} overlaps with ${higherOrderPath}. Users authorized to access ${higherOrderPath} will also have access to ${lowerOrderPath}. Are you sure you want to continue?`,
             default: false,
           })
         ).isOverlappingPathOK;

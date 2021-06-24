@@ -10,8 +10,9 @@ const ini = require('ini');
 const semver = require('semver');
 const { engines } = require('../package.json');
 const { initializeAwsExports } = require('amplify-frontend-javascript');
+const { initializeAmplifyConfiguration } = require('amplify-frontend-flutter');
 const { callAmplify } = require('./call-amplify');
-
+const Ora = require('ora');
 const isWin = process.platform.startsWith('win');
 const npm = isWin ? 'npm.cmd' : 'npm';
 const amplifyCliPackageName = '@aws-amplify/cli';
@@ -50,12 +51,6 @@ const run = async opts => {
     const platform = await guessPlatform(opts.platform, opts.framework);
     if (!opts.skipInit) {
       await createAmplifySkeletonProject(platform.frontend);
-    }
-    if (platform.frontend === 'ios' && !opts.internalOnlyIosCallback) {
-      // the ios frontend plugin handles the post init event to call back to ampfliy-app
-      // So we need to return here if this is the original invocation of amplify-app (aka not the callback)
-      // yes, this needs to be refactored
-      return;
     }
     updateFrameworkInProjectConfig(platform.framework);
     await createAmplifyHelperFiles(platform.frontend);
@@ -183,6 +178,7 @@ const guessPlatform = async (providedPlatform, providedJSFramework) => {
     javascript: 'amplify-frontend-javascript',
     android: 'amplify-frontend-android',
     ios: 'amplify-frontend-ios',
+    flutter: 'amplify-frontend-flutter',
   };
 
   let suitableFrontend;
@@ -421,8 +417,12 @@ async function createIosHelperFiles() {
     fs.writeFileSync(amplifyConfigFile, configJsonStr);
   }
 
+  console.log('Checking for existing amplify project...');
   if (fs.existsSync(path.join(amplifyDir, 'backend'))) {
+    const spinner = new Ora('Generating Amplify configuration files...');
+    spinner.start();
     await addAmplifyFiles();
+    spinner.succeed();
   }
 }
 
@@ -438,6 +438,10 @@ async function createAmplifyHelperFiles(frontend) {
 
   if (frontend === 'ios') {
     await createIosHelperFiles();
+  }
+
+  if (frontend === 'flutter') {
+    initializeAmplifyConfiguration(path.resolve('lib'));
   }
 
   return frontend;

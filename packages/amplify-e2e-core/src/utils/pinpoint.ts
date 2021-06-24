@@ -69,7 +69,7 @@ export async function pinpointAppExist(pinpointProjectId: string): Promise<boole
   return result;
 }
 
-export function initProjectForPinpoint(cwd: string) {
+export function initProjectForPinpoint(cwd: string): Promise<void> {
   addCircleCITags(cwd);
 
   return new Promise((resolve, reject) => {
@@ -82,6 +82,8 @@ export function initProjectForPinpoint(cwd: string) {
     })
       .wait('Enter a name for the project')
       .sendLine(settings.name)
+      .wait('Initialize the project with the above configuration?')
+      .sendLine('n')
       .wait('Enter a name for the environment')
       .sendLine(settings.envName)
       .wait('Choose your default editor:')
@@ -143,7 +145,7 @@ export function addPinpointAnalytics(cwd: string): Promise<string> {
   });
 }
 
-export function pushToCloud(cwd: string) {
+export function pushToCloud(cwd: string): Promise<void> {
   return new Promise((resolve, reject) => {
     spawn(getCLIPath(), ['push'], { cwd, stripColors: true })
       .wait('Are you sure you want to continue')
@@ -160,7 +162,7 @@ export function pushToCloud(cwd: string) {
   });
 }
 
-export function amplifyDelete(cwd: string) {
+export function amplifyDelete(cwd: string): Promise<void> {
   return new Promise((resolve, reject) => {
     spawn(getCLIPath(), ['delete'], { cwd, stripColors: true })
       .wait('Are you sure you want to continue?')

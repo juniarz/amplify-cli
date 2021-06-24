@@ -3,6 +3,350 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.0.2](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/cli@5.0.1...@aws-amplify/cli@5.0.2) (2021-06-24)
+
+
+### Bug Fixes
+
+* **cli:** make sure to await returned promise from async functions ([#7379](https://github.com/aws-amplify/amplify-cli/issues/7379)) ([af2a52a](https://github.com/aws-amplify/amplify-cli/commit/af2a52a445266f875d2849898501b6c0ca82288f))
+
+
+
+
+
+## [5.0.1](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/cli@5.0.0...@aws-amplify/cli@5.0.1) (2021-06-19)
+
+
+
+## 5.0.1 (2021-06-18)
+
+
+### Bug Fixes
+
+* catch no updates CFN error and fix CFN poller hang ([#7548](https://github.com/aws-amplify/amplify-cli/issues/7548)) ([312eec3](https://github.com/aws-amplify/amplify-cli/commit/312eec3b5cd9019b500cf1984919af1dee5ef2e0))
+
+
+
+
+
+# [5.0.0](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/cli@4.52.0...@aws-amplify/cli@5.0.0) (2021-06-15)
+
+
+### Bug Fixes
+
+* bump amplify-cli to v5 and fix layers migration tests ([#7493](https://github.com/aws-amplify/amplify-cli/issues/7493)) ([cb196ab](https://github.com/aws-amplify/amplify-cli/commit/cb196ab4d1c9e25ef30b5276c55202a3ef347c75))
+
+
+### Features
+
+* add support for defining IAM Permissions Boundary for Project ([#7144](https://github.com/aws-amplify/amplify-cli/issues/7144)) ([acf031b](https://github.com/aws-amplify/amplify-cli/commit/acf031b29d4e554d647da39ffb8293010cf1d8ad))
+* Define IAM Permissions Boundary for Project ([#7502](https://github.com/aws-amplify/amplify-cli/issues/7502)) (ref [#4618](https://github.com/aws-amplify/amplify-cli/issues/4618)) ([08f7a3c](https://github.com/aws-amplify/amplify-cli/commit/08f7a3c45b2e98535ef325eb0a97c5bc4d3008c6)), closes [#7053](https://github.com/aws-amplify/amplify-cli/issues/7053)
+* lambda layers rework ([#7375](https://github.com/aws-amplify/amplify-cli/issues/7375)) ([a3b7d3e](https://github.com/aws-amplify/amplify-cli/commit/a3b7d3e427e16bac2b2ea27699fe53b48cf47656))
+
+
+### Reverts
+
+* Revert "feat: add support for defining IAM Permissions Boundary for Project (#7144)" (#7453) ([08704f0](https://github.com/aws-amplify/amplify-cli/commit/08704f0271f6f5d0e0e98ad7002f4b35c3890924)), closes [#7144](https://github.com/aws-amplify/amplify-cli/issues/7144) [#7453](https://github.com/aws-amplify/amplify-cli/issues/7453)
+
+
+### BREAKING CHANGES
+
+* bump amplify-cli to v5 for Lambda layers rework
+
+
+
+
+
+# [4.52.0](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/cli@4.51.4...@aws-amplify/cli@4.52.0) (2021-06-02)
+
+
+
+# 4.52.0 (2021-06-01)
+
+
+### Features
+
+* add support for SMS Sandbox ([#7436](https://github.com/aws-amplify/amplify-cli/issues/7436)) ([cdcb626](https://github.com/aws-amplify/amplify-cli/commit/cdcb6260c11bbedef5b056fdcd730612d8bb3230))
+
+
+
+
+
+## [4.51.4](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/cli@4.51.3...@aws-amplify/cli@4.51.4) (2021-05-29)
+
+**Note:** Version bump only for package @aws-amplify/cli
+
+
+
+
+
+## [4.51.3](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/cli@4.51.2...@aws-amplify/cli@4.51.3) (2021-05-26)
+
+**Note:** Version bump only for package @aws-amplify/cli
+
+
+
+
+
+## [4.51.2](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/cli@4.51.1...@aws-amplify/cli@4.51.2) (2021-05-22)
+
+**Note:** Version bump only for package @aws-amplify/cli
+
+
+
+
+
+## [4.51.1](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/cli@4.51.0...@aws-amplify/cli@4.51.1) (2021-05-18)
+
+**Note:** Version bump only for package @aws-amplify/cli
+
+
+
+
+
+# [4.51.0](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/cli@4.50.2...@aws-amplify/cli@4.51.0) (2021-05-14)
+
+
+
+# 4.51.0 (2021-05-13)
+
+
+### Bug Fixes
+
+* cross resource permission handling ([#7289](https://github.com/aws-amplify/amplify-cli/issues/7289)) ([4a9fb78](https://github.com/aws-amplify/amplify-cli/commit/4a9fb78d4e1fecdf79634c1782bdefa17d803632))
+* respect headless frontend input ([#7257](https://github.com/aws-amplify/amplify-cli/issues/7257)) ([aab4275](https://github.com/aws-amplify/amplify-cli/commit/aab4275ef3aba2c648b53ca46ecf530d2521cbc9))
+
+
+### Features
+
+* defer root stack creation to first `amplify push` ([#7174](https://github.com/aws-amplify/amplify-cli/issues/7174)) ([d28dd1c](https://github.com/aws-amplify/amplify-cli/commit/d28dd1caca86b19a858dab0e7aa907d1cc74c86a))
+* prep work for SMS Sandbox support ([#7302](https://github.com/aws-amplify/amplify-cli/issues/7302)) ([d1f85d2](https://github.com/aws-amplify/amplify-cli/commit/d1f85d2e0a9c367b71defefe6d9e00737f681ca4))
+* **amplify-frontend-ios:** amplify-xcode integration ([#6867](https://github.com/aws-amplify/amplify-cli/issues/6867)) ([338cea2](https://github.com/aws-amplify/amplify-cli/commit/338cea2f574bab242311989bc5024b9e149bd48b))
+
+
+### Reverts
+
+* Revert "feat: defer root stack creation to first `amplify push` (#7174)" (#7306) ([78854eb](https://github.com/aws-amplify/amplify-cli/commit/78854ebd4a3d41d34d68736d6556045302101265)), closes [#7174](https://github.com/aws-amplify/amplify-cli/issues/7174) [#7306](https://github.com/aws-amplify/amplify-cli/issues/7306)
+
+
+
+
+
+## [4.50.2](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/cli@4.50.0...@aws-amplify/cli@4.50.2) (2021-05-03)
+
+
+
+## 4.50.1 (2021-05-03)
+
+**Note:** Version bump only for package @aws-amplify/cli
+
+
+
+
+
+## [4.50.1](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/cli@4.50.0...@aws-amplify/cli@4.50.1) (2021-05-03)
+
+**Note:** Version bump only for package @aws-amplify/cli
+
+
+
+
+
+# [4.50.0](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/cli@4.49.0...@aws-amplify/cli@4.50.0) (2021-04-27)
+
+
+### Features
+
+* S3 SSE by default ([#7039](https://github.com/aws-amplify/amplify-cli/issues/7039)) (ref [#5708](https://github.com/aws-amplify/amplify-cli/issues/5708)) ([c1369ed](https://github.com/aws-amplify/amplify-cli/commit/c1369ed6f9c204c89ee2d4c805314a40d6eeaf92))
+
+
+
+
+
+# [4.49.0](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/cli@4.48.0...@aws-amplify/cli@4.49.0) (2021-04-19)
+
+
+### Bug Fixes
+
+* **cli:** adds dart config to git ignore; rebased branch ([808edd9](https://github.com/aws-amplify/amplify-cli/commit/808edd9fa7f7431cc0d7cdb4c450be23b8a8d2ca))
+* removed sts call ([#7092](https://github.com/aws-amplify/amplify-cli/issues/7092)) ([550a135](https://github.com/aws-amplify/amplify-cli/commit/550a135c9f1271e859f08f43cd685d7fff46e949))
+
+
+### Features
+
+* **cli:** validate iterative rollback input ([9cd69c9](https://github.com/aws-amplify/amplify-cli/commit/9cd69c9732d4824601e1d33806937e574155778b))
+
+
+
+
+
+# [4.48.0](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/cli@4.47.1...@aws-amplify/cli@4.48.0) (2021-04-14)
+
+
+### Bug Fixes
+
+* **cli:** display gql schema errors on failed push ([#7001](https://github.com/aws-amplify/amplify-cli/issues/7001)) ([3e88993](https://github.com/aws-amplify/amplify-cli/commit/3e88993a4a91794690099205580cf0ae935eff40))
+* fixes e2e bug ([#7067](https://github.com/aws-amplify/amplify-cli/issues/7067)) ([18c9a31](https://github.com/aws-amplify/amplify-cli/commit/18c9a310fd6fbc25c01df40dfd7d0ad731da17d1))
+
+
+### Features
+
+* added new fields to usage data ([#6911](https://github.com/aws-amplify/amplify-cli/issues/6911)) ([dc1d256](https://github.com/aws-amplify/amplify-cli/commit/dc1d256edecec2009ca6649da0995be571886b03))
+
+
+
+
+
+## [4.47.1](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/cli@4.46.1...@aws-amplify/cli@4.47.1) (2021-04-09)
+
+
+### Bug Fixes
+
+* update delete prompt text color to red ([#6881](https://github.com/aws-amplify/amplify-cli/issues/6881)) ([0546850](https://github.com/aws-amplify/amplify-cli/commit/0546850484fac85023573b4bbeba7d46c0b34970))
+* **amplify-cli:** add a warning on entering invalid subcommand for amplify env ([#6925](https://github.com/aws-amplify/amplify-cli/issues/6925)) ([2dfd2ac](https://github.com/aws-amplify/amplify-cli/commit/2dfd2acac1a721e174818eebd36332679197d25d))
+
+
+
+
+
+## [4.46.1](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/cli@4.46.0...@aws-amplify/cli@4.46.1) (2021-03-24)
+
+
+### Reverts
+
+* Revert "Init and Configure DX changes (#6745)" ([9078b69](https://github.com/aws-amplify/amplify-cli/commit/9078b69b5842c99f0624797a5e897353bacb65d0)), closes [#6745](https://github.com/aws-amplify/amplify-cli/issues/6745)
+
+
+
+
+
+# [4.46.0](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/cli@4.45.2...@aws-amplify/cli@4.46.0) (2021-03-23)
+
+
+### Bug Fixes
+
+* **cli:** freeze constants object to not be changed ([#6821](https://github.com/aws-amplify/amplify-cli/issues/6821)) ([10a4160](https://github.com/aws-amplify/amplify-cli/commit/10a41601912d00770b2fae6e2884c6a57d69ee80))
+* detect changes in dockerfile ([#6495](https://github.com/aws-amplify/amplify-cli/issues/6495)) ([2333dec](https://github.com/aws-amplify/amplify-cli/commit/2333decdd61c2a5421a7030723f20d05f3c00269)), closes [#6359](https://github.com/aws-amplify/amplify-cli/issues/6359)
+* fix s3Cloudfront exception on push ([#6913](https://github.com/aws-amplify/amplify-cli/issues/6913)) ([1799089](https://github.com/aws-amplify/amplify-cli/commit/1799089ef8f84bb2a7b853e62d95b62eeea8cd31))
+
+
+### Features
+
+* **cli:** add 'amplify env ls' alias ([#6618](https://github.com/aws-amplify/amplify-cli/issues/6618)) ([50a5775](https://github.com/aws-amplify/amplify-cli/commit/50a5775a4468ea88e3ba5050c0365b29691afb61))
+
+
+
+
+
+## [4.45.2](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/cli@4.45.1...@aws-amplify/cli@4.45.2) (2021-03-12)
+
+
+
+## 4.45.2 (2021-03-12)
+
+
+### Bug Fixes
+
+* bump codegen versions ([#6871](https://github.com/aws-amplify/amplify-cli/issues/6871)) ([e53175d](https://github.com/aws-amplify/amplify-cli/commit/e53175d96136fba57662b1a035d3cea4a65a7601))
+
+
+
+
+
+## [4.45.1](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/cli@4.45.0...@aws-amplify/cli@4.45.1) (2021-03-11)
+
+**Note:** Version bump only for package @aws-amplify/cli
+
+
+
+
+
+# [4.45.0](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/cli@4.44.2...@aws-amplify/cli@4.45.0) (2021-03-05)
+
+
+### Bug Fixes
+
+* **amplify-codegen:** update dependency on amplify-codegen to latest ([#6796](https://github.com/aws-amplify/amplify-cli/issues/6796)) ([33f4c15](https://github.com/aws-amplify/amplify-cli/commit/33f4c156153ef6398659dd5c24a7de8b0d9b13f2))
+* [#5765](https://github.com/aws-amplify/amplify-cli/issues/5765) add support for android studio, xcode ([#6527](https://github.com/aws-amplify/amplify-cli/issues/6527)) ([092afa2](https://github.com/aws-amplify/amplify-cli/commit/092afa2340762cac781336ac411d489e3affccb0))
+* [#6681](https://github.com/aws-amplify/amplify-cli/issues/6681), handling case when no frontend plugins found ([#6688](https://github.com/aws-amplify/amplify-cli/issues/6688)) ([fd9f50f](https://github.com/aws-amplify/amplify-cli/commit/fd9f50f39a3cf97bae902cf10c42ce54d1ae3d5b))
+* **cli:** add defensive coding to isContainersEnabled() ([#6758](https://github.com/aws-amplify/amplify-cli/issues/6758)) ([78bb42d](https://github.com/aws-amplify/amplify-cli/commit/78bb42d6f73d774741a4d5dc93ae31176becac62))
+
+
+### Features
+
+* **amplify-codegen:** Migrate codegen ([#6730](https://github.com/aws-amplify/amplify-cli/issues/6730)) ([9c7a69a](https://github.com/aws-amplify/amplify-cli/commit/9c7a69a7d72e31c42572f3ebf2131c6053f96abd))
+
+
+
+
+
+## [4.44.2](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/cli@4.44.1...@aws-amplify/cli@4.44.2) (2021-02-26)
+
+
+
+## 4.44.2 (2021-02-26)
+
+
+### Bug Fixes
+
+* truncate long app names on pull ([#6741](https://github.com/aws-amplify/amplify-cli/issues/6741)) ([748b252](https://github.com/aws-amplify/amplify-cli/commit/748b2524115e6ea071e09430f0d8174110c84829))
+
+
+
+
+
+## [4.44.1](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/cli@4.44.0...@aws-amplify/cli@4.44.1) (2021-02-24)
+
+
+### Bug Fixes
+
+* [#6153](https://github.com/aws-amplify/amplify-cli/issues/6153) highlight the destructive delete prompt ([#6528](https://github.com/aws-amplify/amplify-cli/issues/6528)) ([13333b2](https://github.com/aws-amplify/amplify-cli/commit/13333b2e7a128b9b33dc08960422d3183dcb7e28))
+
+
+
+
+
+# [4.44.0](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/cli@4.43.0...@aws-amplify/cli@4.44.0) (2021-02-17)
+
+
+### Features
+
+* Separate prod and dev lambda function builds ([#6494](https://github.com/aws-amplify/amplify-cli/issues/6494)) ([2977c6a](https://github.com/aws-amplify/amplify-cli/commit/2977c6a886b33a38ef46f898a2adc1ffdb6d228b))
+
+
+
+
+
+# [4.43.0](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/cli@4.42.0...@aws-amplify/cli@4.43.0) (2021-02-11)
+
+
+### Features
+
+* dont open urls when CLI is running in CI ([#6503](https://github.com/aws-amplify/amplify-cli/issues/6503)) ([27546a7](https://github.com/aws-amplify/amplify-cli/commit/27546a78159ea95c636dbbd094fe6a4f7fb8f8f4)), closes [#5973](https://github.com/aws-amplify/amplify-cli/issues/5973)
+
+
+
+
+
+# [4.42.0](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/cli@4.41.2...@aws-amplify/cli@4.42.0) (2021-02-10)
+
+
+### Bug Fixes
+
+* **amplify-category-function:** use ref for S3Bucket and S3Key in CFN ([#6358](https://github.com/aws-amplify/amplify-cli/issues/6358)) ([84a141a](https://github.com/aws-amplify/amplify-cli/commit/84a141ac4812d95c27b14c8d9f81e4a5c8fadef8))
+* [#6397](https://github.com/aws-amplify/amplify-cli/issues/6397) - auth update overwrite parameters ([#6403](https://github.com/aws-amplify/amplify-cli/issues/6403)) ([75f5ace](https://github.com/aws-amplify/amplify-cli/commit/75f5ace173a6b36b943e2110845e411a2cce5d6d))
+* check for local env file and then fall back on exeinfo ([#6500](https://github.com/aws-amplify/amplify-cli/issues/6500)) ([d2bc6d8](https://github.com/aws-amplify/amplify-cli/commit/d2bc6d86ada45fbda8014a54ed2d09459411d7ab))
+* persist s3bucket metadata on pull and env change ([#6502](https://github.com/aws-amplify/amplify-cli/issues/6502)) ([357f787](https://github.com/aws-amplify/amplify-cli/commit/357f787c2d816e1defa1d0909b06f82775c35255))
+
+
+### Features
+
+* add Flutter  support for Admin UI ([#6516](https://github.com/aws-amplify/amplify-cli/issues/6516)) ([d9ee44b](https://github.com/aws-amplify/amplify-cli/commit/d9ee44be73f43b11da2a07d21fd60108f49b1608))
+
+
+
+
+
 ## [4.41.2](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/cli@4.41.1...@aws-amplify/cli@4.41.2) (2021-01-13)
 
 **Note:** Version bump only for package @aws-amplify/cli

@@ -4,7 +4,7 @@ import { $TSMeta, $TSTeamProviderInfo, $TSAny, DeploymentSecrets } from '..';
 import { JSONUtilities } from '../jsonUtilities';
 import _ from 'lodash';
 import { SecretFileMode } from '../cliConstants';
-import { Tag, ReadValidateTags, HydrateTags } from '../tags';
+import { Tag, ReadTags, HydrateTags } from '../tags';
 
 export type GetOptions<T> = {
   throwIfNotExist?: boolean;
@@ -54,9 +54,9 @@ export class StateManager {
     );
   };
 
-  getProjectTags = (projectPath?: string): Tag[] => ReadValidateTags(pathManager.getTagFilePath(projectPath));
+  getProjectTags = (projectPath?: string): Tag[] => ReadTags(pathManager.getTagFilePath(projectPath));
 
-  getCurrentProjectTags = (projectPath?: string): Tag[] => ReadValidateTags(pathManager.getCurrentTagFilePath(projectPath));
+  getCurrentProjectTags = (projectPath?: string): Tag[] => ReadTags(pathManager.getCurrentTagFilePath(projectPath));
 
   teamProviderInfoExists = (projectPath?: string): boolean => this.doesExist(pathManager.getTeamProviderInfoFilePath, projectPath);
 
@@ -124,7 +124,22 @@ export class StateManager {
     resourceName: string,
     options?: GetOptions<$TSAny>,
   ): $TSAny => {
-    const filePath = pathManager.getResourceParamatersFilePath(projectPath, category, resourceName);
+    const filePath = pathManager.getResourceParametersFilePath(projectPath, category, resourceName);
+    const mergedOptions = {
+      throwIfNotExist: true,
+      ...options,
+    };
+
+    return this.getData<$TSAny>(filePath, mergedOptions);
+  };
+
+  getCurrentResourceParametersJson = (
+    projectPath: string | undefined,
+    category: string,
+    resourceName: string,
+    options?: GetOptions<$TSAny>,
+  ): $TSAny => {
+    const filePath = pathManager.getCurrentResourceParametersJsonPath(projectPath, category, resourceName);
     const mergedOptions = {
       throwIfNotExist: true,
       ...options,
@@ -217,7 +232,7 @@ export class StateManager {
   };
 
   setResourceParametersJson = (projectPath: string | undefined, category: string, resourceName: string, parameters: $TSAny): void => {
-    const filePath = pathManager.getResourceParamatersFilePath(projectPath, category, resourceName);
+    const filePath = pathManager.getResourceParametersFilePath(projectPath, category, resourceName);
 
     JSONUtilities.writeJson(filePath, parameters);
   };
