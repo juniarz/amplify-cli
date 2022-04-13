@@ -1,8 +1,8 @@
-const { dictionary } = require('./.eslint-dictionary');
+const dictionary = require('./.eslint-dictionary.json');
 /**
  * README if you have come here because you are sick and tired of some rule being on your case all the time:
  * If you are trying to modify a rule for normal code, see the docs for each of the lint plugins we are using in the "rules" section.
- * If you are trying to add a word to spellcheck: add it to .eslint-dictionary.js
+ * If you are trying to add a word to spellcheck: run `yarn addwords <word1> <word2> ...`
  * If you are trying to ignore certain files from spellchecking, see the "overrides" section
  * If you are trying to modify rules that run in test files, see the "overrides" section
  * If you are trying to ignore certain files from linting, see "ignorePatterns" at the bottom of the file
@@ -66,7 +66,7 @@ module.exports = {
       },
       {
         selector: ['typeLike'],
-        format: ['StrictPascalCase'],
+        format: ['PascalCase'],
       },
       {
         selector: 'default',
@@ -75,14 +75,16 @@ module.exports = {
     ],
     '@typescript-eslint/explicit-function-return-type': ['error', { allowExpressions: true }],
     '@typescript-eslint/no-explicit-any': 'error',
-    // ESLint rule conflicts with the corresponding typescript rule
-    'no-unused-vars': 'off',
-    '@typescript-eslint/no-unused-vars': ['error', { vars: 'all', args: 'all' }],
     '@typescript-eslint/no-useless-constructor': 'error',
     '@typescript-eslint/method-signature-style': ['error', 'property'],
-    // ESLint rule conflicts with the corresponding typescript rule
+
+    // Some ESLint rules conflict with the corresponding TS rule. These ESLint rules are turned off in favor of the corresponding TS rules
     'no-invalid-this': 'off',
     '@typescript-eslint/no-invalid-this': 'error',
+    'no-unused-vars': 'off',
+    '@typescript-eslint/no-unused-vars': ['error', { vars: 'all', args: 'all', argsIgnorePattern: '^_$' }],
+    'no-shadow': 'off',
+    '@typescript-eslint/no-shadow': 'error',
 
     // Import Rules
     // Extends recommended rules here: https://github.com/import-js/eslint-plugin-import/blob/6c957e7df178d1b81d01cf219d62ba91b4e6d9e8/config/recommended.js
@@ -102,9 +104,14 @@ module.exports = {
       publicOnly: true,
       require: {
         ClassDeclaration: true,
-        MethodDefinition: true,
         ArrowFunctionExpression: true,
       },
+      contexts: [
+        'MethodDefinition:not([accessibility=/(private|protected)/]) > FunctionExpression', // Require JSDoc on public methods
+        'TSInterfaceDeclaration',
+        'TSTypeAliasDeclaration',
+        'TSEnumDeclaration',
+      ],
       checkConstructors: false
     }],
     'jsdoc/require-description': ['error', { contexts: ['any'] }
@@ -130,7 +137,6 @@ module.exports = {
     'lines-between-class-members': ['error', 'always', { exceptAfterSingleLine: true }],
     'max-classes-per-file': 'error',
     'no-lonely-if': 'error',
-    'no-shadow': 'error',
     'no-unneeded-ternary': 'error',
     'no-use-before-define': 'off',
     'consistent-return': 'error',
@@ -148,6 +154,14 @@ module.exports = {
     'arrow-parens': ['error', 'as-needed'],
     'func-style': ['error', 'expression'],
     'prefer-arrow/prefer-arrow-functions': ['error', { disallowPrototype: true }],
+    // yes I know these are all supposed to be errors, but this one requires too much functional refactoring at the moment
+    // we should still aim to keep funcitons small moving forward
+    'max-lines-per-function': ['warn', {
+      max: 50,
+      skipBlankLines: true,
+      skipComments: true,
+    }],
+    'max-depth': ['error', 4],
   },
   overrides: [
     {
