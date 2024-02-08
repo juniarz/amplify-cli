@@ -28,6 +28,13 @@ export type ResourceEntry = {
   resource: Record<string, unknown>;
 };
 
+export type CustomPermissions = {
+  policies: {
+    [key: string]: CustomIAMPolicies;
+  };
+  attributes: string[];
+};
+
 /**
  * Amplify configuration state manager
  */
@@ -97,6 +104,11 @@ export class StateManager {
   getCustomPolicies = (categoryName: string, resourceName: string): CustomIAMPolicies => {
     const filePath = pathManager.getCustomPoliciesPath(categoryName, resourceName);
     return JSONUtilities.readJson<CustomIAMPolicies>(filePath, { throwIfNotExist: false }) || [];
+  };
+
+  getCustomPermissions = (categoryName: string, resourceName: string): CustomPermissions => {
+    const filePath = pathManager.getCustomPermissionsPath(categoryName, resourceName);
+    return JSONUtilities.readJson<CustomPermissions>(filePath, { throwIfNotExist: false }) || { policies: {}, attributes: [] };
   };
 
   getCurrentRegion = (projectPath?: string): string | undefined => this.getMeta(projectPath).providers.awscloudformation.Region;

@@ -49,3 +49,57 @@ export const transformCategoryStack = async (context: $TSContext, resource: IAmp
 };
 
 // force major version bump for cdk v2
+export async function getPermissionPolicies(context: $TSContext, resourceOpsMapping: $TSAny) {
+  const permissionPolicies: any[] = [];
+  const resourceAttributes: any[] = [];
+
+  Object.keys(resourceOpsMapping).forEach((resourceName) => {
+    let customResource = stateManager.getCustomPermissions(categoryName, resourceName);
+
+    let customResourceJSON = JSON.stringify(customResource);
+
+    customResourceJSON = customResourceJSON.replace(/\$\{categoryName\}/, categoryName);
+    customResourceJSON = customResourceJSON.replace(/\$\{resourceName\}/, resourceName);
+
+    customResource = JSON.parse(customResourceJSON);
+
+    const crudOptions = resourceOpsMapping[resourceName];
+
+    if (customResource.policies) {
+      crudOptions.forEach((crudOption: string) => {
+        const policies = customResource.policies[crudOption].map((policy: any) => {
+          if (!policy.Effect) {
+            return {
+              Effect: 'Allow',
+              Action: policy.Action,
+              Resource: policy.Resource,
+            };
+          }
+          return policy;
+        });
+
+        for (const policy of policies) {
+          if (!policy.Action || !policy.Resource) {
+            printer.error(`Invalid policy in resources.json for ${categoryName}/${resourceName}.`);
+          }
+
+          permissionPolicies.push(policy);
+        }
+      });
+    } else {
+      printer.info(`No policies found for ${categoryName}/${resourceName}.`);
+    }
+
+    const attributes = customResource.attributes;
+
+    if (attributes.length > 0) {
+      resourceAttributes.push({
+        resourceName,
+        attributes,
+        category: categoryName,
+      });
+    }
+  });
+
+  return { permissionPolicies, resourceAttributes };
+}

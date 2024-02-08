@@ -32,6 +32,12 @@ export const handleAmplifyEvent: (__context: $TSContext, args: $TSAny) => Promis
 // @public (undocumented)
 export const transformCategoryStack: (context: $TSContext, resource: IAmplifyResource) => Promise<void>;
 
+// @public (undocumented)
+export function getPermissionPolicies(context: any, resourceOpsMapping: any): Promise<{
+    permissionPolicies: any[];
+    resourceAttributes: any[];
+}>;
+
 // (No @packageDocumentation comment for this package)
 
 ```

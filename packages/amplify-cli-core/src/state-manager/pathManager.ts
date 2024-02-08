@@ -61,6 +61,8 @@ export const PathConstants = {
 
   CustomPoliciesFilename: 'custom-policies.json',
 
+  CustomPermissionsFilename: 'custom-permissions.json',
+
   DefaultFrontEndExportFolder: './exported-amplify-front-end-config',
   DefaultExportFolder: './export-amplify-stack',
   ExportManifestJsonFilename: 'amplify-export-manifest.json',
@@ -200,6 +202,9 @@ export class PathManager {
 
   getCustomPoliciesPath = (category: string, resourceName: string): string =>
     path.join(this.getResourceDirectoryPath(undefined, category, resourceName), PathConstants.CustomPoliciesFilename);
+
+  getCustomPermissionsPath = (category: string, resourceName: string): string =>
+    path.join(this.getResourceDirectoryPath(undefined, category, resourceName), PathConstants.CustomPermissionsFilename);
 
   getAWSCredentialsFilePath = (): string =>
     process.env.AWS_SHARED_CREDENTIALS_FILE || path.normalize(path.join(this.getDotAWSDirPath(), PathConstants.AWSCredentials));
