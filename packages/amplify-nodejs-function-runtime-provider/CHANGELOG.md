@@ -3,6 +3,159 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.5.32](https://github.com/aws-amplify/amplify-cli/compare/amplify-nodejs-function-runtime-provider@2.5.31...amplify-nodejs-function-runtime-provider@2.5.32) (2025-10-31)
+
+
+### Reverts
+
+* Revert "refactor: amplify-category-notifications aws sdk v3 migration (#14271)" (#14285) ([510560d](https://github.com/aws-amplify/amplify-cli/commit/510560decb0735a0e8633aadfa6c23fae376dfe1)), closes [#14271](https://github.com/aws-amplify/amplify-cli/issues/14271) [#14285](https://github.com/aws-amplify/amplify-cli/issues/14285)
+
+
+
+
+
+## [2.5.31](https://github.com/aws-amplify/amplify-cli/compare/amplify-nodejs-function-runtime-provider@2.5.30...amplify-nodejs-function-runtime-provider@2.5.31) (2025-10-08)
+
+**Note:** Version bump only for package amplify-nodejs-function-runtime-provider
+
+
+
+
+
+## [2.5.30](https://github.com/aws-amplify/amplify-cli/compare/amplify-nodejs-function-runtime-provider@2.5.29...amplify-nodejs-function-runtime-provider@2.5.30) (2025-07-01)
+
+
+### Bug Fixes
+
+* upgrade most packages that use `rimraf` and `glob` ([#14153](https://github.com/aws-amplify/amplify-cli/issues/14153)) ([c85ed14](https://github.com/aws-amplify/amplify-cli/commit/c85ed14b2fe61c09a026f7bb7c82857b5227dff2))
+
+
+
+
+
+## [2.5.29](https://github.com/aws-amplify/amplify-cli/compare/amplify-nodejs-function-runtime-provider@2.5.28...amplify-nodejs-function-runtime-provider@2.5.29) (2025-04-17)
+
+**Note:** Version bump only for package amplify-nodejs-function-runtime-provider
+
+
+
+
+
+## [2.5.28](https://github.com/aws-amplify/amplify-cli/compare/amplify-nodejs-function-runtime-provider@2.5.27...amplify-nodejs-function-runtime-provider@2.5.28) (2025-02-25)
+
+**Note:** Version bump only for package amplify-nodejs-function-runtime-provider
+
+
+
+
+
+## [2.5.27](https://github.com/aws-amplify/amplify-cli/compare/amplify-nodejs-function-runtime-provider@2.5.26...amplify-nodejs-function-runtime-provider@2.5.27) (2025-02-20)
+
+**Note:** Version bump only for package amplify-nodejs-function-runtime-provider
+
+
+
+
+
+## [2.5.26](https://github.com/aws-amplify/amplify-cli/compare/amplify-nodejs-function-runtime-provider@2.5.25...amplify-nodejs-function-runtime-provider@2.5.26) (2025-02-07)
+
+**Note:** Version bump only for package amplify-nodejs-function-runtime-provider
+
+
+
+
+
+## [2.5.25](https://github.com/aws-amplify/amplify-cli/compare/amplify-nodejs-function-runtime-provider@2.5.24...amplify-nodejs-function-runtime-provider@2.5.25) (2025-01-30)
+
+**Note:** Version bump only for package amplify-nodejs-function-runtime-provider
+
+
+
+
+
+## [2.5.24](https://github.com/aws-amplify/amplify-cli/compare/amplify-nodejs-function-runtime-provider@2.5.23...amplify-nodejs-function-runtime-provider@2.5.24) (2024-08-02)
+
+**Note:** Version bump only for package amplify-nodejs-function-runtime-provider
+
+
+
+
+
+## [2.5.23](https://github.com/aws-amplify/amplify-cli/compare/amplify-nodejs-function-runtime-provider@2.5.22...amplify-nodejs-function-runtime-provider@2.5.23) (2024-06-27)
+
+**Note:** Version bump only for package amplify-nodejs-function-runtime-provider
+
+
+
+
+
+## [2.5.22](https://github.com/aws-amplify/amplify-cli/compare/amplify-nodejs-function-runtime-provider@2.5.21...amplify-nodejs-function-runtime-provider@2.5.22) (2024-06-20)
+
+**Note:** Version bump only for package amplify-nodejs-function-runtime-provider
+
+
+
+
+
+## [2.5.21](https://github.com/aws-amplify/amplify-cli/compare/amplify-nodejs-function-runtime-provider@2.5.20...amplify-nodejs-function-runtime-provider@2.5.21) (2024-06-06)
+
+**Note:** Version bump only for package amplify-nodejs-function-runtime-provider
+
+
+
+
+
+## [2.5.20](https://github.com/aws-amplify/amplify-cli/compare/amplify-nodejs-function-runtime-provider@2.5.19...amplify-nodejs-function-runtime-provider@2.5.20) (2024-05-24)
+
+**Note:** Version bump only for package amplify-nodejs-function-runtime-provider
+
+
+
+
+
+## [2.5.19](https://github.com/aws-amplify/amplify-cli/compare/amplify-nodejs-function-runtime-provider@2.5.18...amplify-nodejs-function-runtime-provider@2.5.19) (2024-05-07)
+
+**Note:** Version bump only for package amplify-nodejs-function-runtime-provider
+
+
+
+
+
+## [2.5.18](https://github.com/aws-amplify/amplify-cli/compare/amplify-nodejs-function-runtime-provider@2.5.17...amplify-nodejs-function-runtime-provider@2.5.18) (2024-04-18)
+
+**Note:** Version bump only for package amplify-nodejs-function-runtime-provider
+
+
+
+
+
+## [2.5.17](https://github.com/aws-amplify/amplify-cli/compare/amplify-nodejs-function-runtime-provider@2.5.16...amplify-nodejs-function-runtime-provider@2.5.17) (2024-04-15)
+
+
+### Bug Fixes
+
+* yarn modern install workspace ([#13197](https://github.com/aws-amplify/amplify-cli/issues/13197)) ([3ca4aa9](https://github.com/aws-amplify/amplify-cli/commit/3ca4aa99457e54a89805f86e56b475aaef531d7e))
+
+
+
+
+
+## [2.5.16](https://github.com/aws-amplify/amplify-cli/compare/amplify-nodejs-function-runtime-provider@2.5.15...amplify-nodejs-function-runtime-provider@2.5.16) (2024-03-29)
+
+**Note:** Version bump only for package amplify-nodejs-function-runtime-provider
+
+
+
+
+
+## [2.5.15](https://github.com/aws-amplify/amplify-cli/compare/amplify-nodejs-function-runtime-provider@2.5.14...amplify-nodejs-function-runtime-provider@2.5.15) (2024-03-06)
+
+**Note:** Version bump only for package amplify-nodejs-function-runtime-provider
+
+
+
+
+
 ## [2.5.14](https://github.com/aws-amplify/amplify-cli/compare/amplify-nodejs-function-runtime-provider@2.5.13...amplify-nodejs-function-runtime-provider@2.5.14) (2023-12-11)
 
 **Note:** Version bump only for package amplify-nodejs-function-runtime-provider

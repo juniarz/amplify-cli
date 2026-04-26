@@ -3,6 +3,156 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.7.15](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-frontend-ios@3.7.14...@aws-amplify/amplify-frontend-ios@3.7.15) (2025-10-31)
+
+**Note:** Version bump only for package @aws-amplify/amplify-frontend-ios
+
+
+
+
+
+## [3.7.14](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-frontend-ios@3.7.13...@aws-amplify/amplify-frontend-ios@3.7.14) (2025-10-08)
+
+**Note:** Version bump only for package @aws-amplify/amplify-frontend-ios
+
+
+
+
+
+## [3.7.13](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-frontend-ios@3.7.12...@aws-amplify/amplify-frontend-ios@3.7.13) (2025-07-01)
+
+**Note:** Version bump only for package @aws-amplify/amplify-frontend-ios
+
+
+
+
+
+## [3.7.12](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-frontend-ios@3.7.11...@aws-amplify/amplify-frontend-ios@3.7.12) (2025-04-17)
+
+**Note:** Version bump only for package @aws-amplify/amplify-frontend-ios
+
+
+
+
+
+## [3.7.11](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-frontend-ios@3.7.10...@aws-amplify/amplify-frontend-ios@3.7.11) (2025-02-20)
+
+**Note:** Version bump only for package @aws-amplify/amplify-frontend-ios
+
+
+
+
+
+## [3.7.10](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-frontend-ios@3.7.9...@aws-amplify/amplify-frontend-ios@3.7.10) (2025-02-07)
+
+**Note:** Version bump only for package @aws-amplify/amplify-frontend-ios
+
+
+
+
+
+## [3.7.9](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-frontend-ios@3.7.8...@aws-amplify/amplify-frontend-ios@3.7.9) (2025-01-30)
+
+**Note:** Version bump only for package @aws-amplify/amplify-frontend-ios
+
+
+
+
+
+## [3.7.8](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-frontend-ios@3.7.7...@aws-amplify/amplify-frontend-ios@3.7.8) (2025-01-02)
+
+
+### Bug Fixes
+
+* **amplify-xode:** updated to support Xcode 16 ([#14029](https://github.com/aws-amplify/amplify-cli/issues/14029)) ([b8b6498](https://github.com/aws-amplify/amplify-cli/commit/b8b6498a350639d6bb798d6fcea167481a3718ae))
+
+
+
+
+
+## [3.7.7](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-frontend-ios@3.7.6...@aws-amplify/amplify-frontend-ios@3.7.7) (2024-08-02)
+
+**Note:** Version bump only for package @aws-amplify/amplify-frontend-ios
+
+
+
+
+
+## [3.7.6](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-frontend-ios@3.7.5...@aws-amplify/amplify-frontend-ios@3.7.6) (2024-06-27)
+
+**Note:** Version bump only for package @aws-amplify/amplify-frontend-ios
+
+
+
+
+
+## [3.7.5](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-frontend-ios@3.7.4...@aws-amplify/amplify-frontend-ios@3.7.5) (2024-06-20)
+
+**Note:** Version bump only for package @aws-amplify/amplify-frontend-ios
+
+
+
+
+
+## [3.7.4](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-frontend-ios@3.7.3...@aws-amplify/amplify-frontend-ios@3.7.4) (2024-06-06)
+
+**Note:** Version bump only for package @aws-amplify/amplify-frontend-ios
+
+
+
+
+
+## [3.7.3](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-frontend-ios@3.7.2...@aws-amplify/amplify-frontend-ios@3.7.3) (2024-05-24)
+
+**Note:** Version bump only for package @aws-amplify/amplify-frontend-ios
+
+
+
+
+
+## [3.7.2](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-frontend-ios@3.7.1...@aws-amplify/amplify-frontend-ios@3.7.2) (2024-05-07)
+
+**Note:** Version bump only for package @aws-amplify/amplify-frontend-ios
+
+
+
+
+
+## [3.7.1](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-frontend-ios@3.7.0...@aws-amplify/amplify-frontend-ios@3.7.1) (2024-04-18)
+
+**Note:** Version bump only for package @aws-amplify/amplify-frontend-ios
+
+
+
+
+
+# [3.7.0](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-frontend-ios@3.6.29...@aws-amplify/amplify-frontend-ios@3.7.0) (2024-04-15)
+
+
+### Features
+
+* **amplify-frontend-ios:** update amplify-xcode integration ([#13616](https://github.com/aws-amplify/amplify-cli/issues/13616)) ([46c6334](https://github.com/aws-amplify/amplify-cli/commit/46c6334bbf087edd19ccfc5612e84d626c8dd5d2))
+
+
+
+
+
+## [3.6.29](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-frontend-ios@3.6.28...@aws-amplify/amplify-frontend-ios@3.6.29) (2024-03-29)
+
+**Note:** Version bump only for package @aws-amplify/amplify-frontend-ios
+
+
+
+
+
+## [3.6.28](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-frontend-ios@3.6.27...@aws-amplify/amplify-frontend-ios@3.6.28) (2024-03-06)
+
+**Note:** Version bump only for package @aws-amplify/amplify-frontend-ios
+
+
+
+
+
 ## [3.6.27](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-frontend-ios@3.6.26...@aws-amplify/amplify-frontend-ios@3.6.27) (2023-12-11)
 
 **Note:** Version bump only for package @aws-amplify/amplify-frontend-ios

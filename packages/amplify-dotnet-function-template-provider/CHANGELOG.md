@@ -3,6 +3,167 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.7.8](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-dotnet-function-template-provider@2.7.7...@aws-amplify/amplify-dotnet-function-template-provider@2.7.8) (2025-11-20)
+
+**Note:** Version bump only for package @aws-amplify/amplify-dotnet-function-template-provider
+
+
+
+
+
+## [2.7.7](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-dotnet-function-template-provider@2.7.6...@aws-amplify/amplify-dotnet-function-template-provider@2.7.7) (2025-10-31)
+
+
+### Reverts
+
+* Revert "refactor: amplify-category-notifications aws sdk v3 migration (#14271)" (#14285) ([510560d](https://github.com/aws-amplify/amplify-cli/commit/510560decb0735a0e8633aadfa6c23fae376dfe1)), closes [#14271](https://github.com/aws-amplify/amplify-cli/issues/14271) [#14285](https://github.com/aws-amplify/amplify-cli/issues/14285)
+
+
+
+
+
+## [2.7.6](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-dotnet-function-template-provider@2.7.5...@aws-amplify/amplify-dotnet-function-template-provider@2.7.6) (2025-10-08)
+
+**Note:** Version bump only for package @aws-amplify/amplify-dotnet-function-template-provider
+
+
+
+
+
+## [2.7.5](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-dotnet-function-template-provider@2.7.4...@aws-amplify/amplify-dotnet-function-template-provider@2.7.5) (2025-07-01)
+
+**Note:** Version bump only for package @aws-amplify/amplify-dotnet-function-template-provider
+
+
+
+
+
+## [2.7.4](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-dotnet-function-template-provider@2.7.3...@aws-amplify/amplify-dotnet-function-template-provider@2.7.4) (2025-04-17)
+
+**Note:** Version bump only for package @aws-amplify/amplify-dotnet-function-template-provider
+
+
+
+
+
+## [2.7.3](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-dotnet-function-template-provider@2.7.2...@aws-amplify/amplify-dotnet-function-template-provider@2.7.3) (2025-02-20)
+
+**Note:** Version bump only for package @aws-amplify/amplify-dotnet-function-template-provider
+
+
+
+
+
+## [2.7.2](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-dotnet-function-template-provider@2.7.1...@aws-amplify/amplify-dotnet-function-template-provider@2.7.2) (2025-02-07)
+
+**Note:** Version bump only for package @aws-amplify/amplify-dotnet-function-template-provider
+
+
+
+
+
+## [2.7.1](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-dotnet-function-template-provider@2.7.0...@aws-amplify/amplify-dotnet-function-template-provider@2.7.1) (2025-01-30)
+
+**Note:** Version bump only for package @aws-amplify/amplify-dotnet-function-template-provider
+
+
+
+
+
+# [2.7.0](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-dotnet-function-template-provider@2.6.10...@aws-amplify/amplify-dotnet-function-template-provider@2.7.0) (2025-01-02)
+
+
+### Features
+
+* lambda dotnet 8 support ([#14026](https://github.com/aws-amplify/amplify-cli/issues/14026)) ([540bfe1](https://github.com/aws-amplify/amplify-cli/commit/540bfe1187907609c3c813e1208c12b6a2a6ac6c))
+
+
+
+
+
+## [2.6.10](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-dotnet-function-template-provider@2.6.9...@aws-amplify/amplify-dotnet-function-template-provider@2.6.10) (2024-08-02)
+
+**Note:** Version bump only for package @aws-amplify/amplify-dotnet-function-template-provider
+
+
+
+
+
+## [2.6.9](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-dotnet-function-template-provider@2.6.8...@aws-amplify/amplify-dotnet-function-template-provider@2.6.9) (2024-06-27)
+
+**Note:** Version bump only for package @aws-amplify/amplify-dotnet-function-template-provider
+
+
+
+
+
+## [2.6.8](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-dotnet-function-template-provider@2.6.7...@aws-amplify/amplify-dotnet-function-template-provider@2.6.8) (2024-06-20)
+
+**Note:** Version bump only for package @aws-amplify/amplify-dotnet-function-template-provider
+
+
+
+
+
+## [2.6.7](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-dotnet-function-template-provider@2.6.6...@aws-amplify/amplify-dotnet-function-template-provider@2.6.7) (2024-06-06)
+
+**Note:** Version bump only for package @aws-amplify/amplify-dotnet-function-template-provider
+
+
+
+
+
+## [2.6.6](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-dotnet-function-template-provider@2.6.5...@aws-amplify/amplify-dotnet-function-template-provider@2.6.6) (2024-05-24)
+
+**Note:** Version bump only for package @aws-amplify/amplify-dotnet-function-template-provider
+
+
+
+
+
+## [2.6.5](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-dotnet-function-template-provider@2.6.4...@aws-amplify/amplify-dotnet-function-template-provider@2.6.5) (2024-05-07)
+
+**Note:** Version bump only for package @aws-amplify/amplify-dotnet-function-template-provider
+
+
+
+
+
+## [2.6.4](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-dotnet-function-template-provider@2.6.3...@aws-amplify/amplify-dotnet-function-template-provider@2.6.4) (2024-04-18)
+
+**Note:** Version bump only for package @aws-amplify/amplify-dotnet-function-template-provider
+
+
+
+
+
+## [2.6.3](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-dotnet-function-template-provider@2.6.2...@aws-amplify/amplify-dotnet-function-template-provider@2.6.3) (2024-04-15)
+
+**Note:** Version bump only for package @aws-amplify/amplify-dotnet-function-template-provider
+
+
+
+
+
+## [2.6.2](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-dotnet-function-template-provider@2.6.1...@aws-amplify/amplify-dotnet-function-template-provider@2.6.2) (2024-03-29)
+
+**Note:** Version bump only for package @aws-amplify/amplify-dotnet-function-template-provider
+
+
+
+
+
+## [2.6.1](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-dotnet-function-template-provider@2.6.0...@aws-amplify/amplify-dotnet-function-template-provider@2.6.1) (2024-03-06)
+
+
+### Reverts
+
+* Revert "chore: bump data package versions (#13486)" (#13487) ([3280d40](https://github.com/aws-amplify/amplify-cli/commit/3280d40a5ab50c675b0e2b8050ad35a69c83cdc2)), closes [#13486](https://github.com/aws-amplify/amplify-cli/issues/13486) [#13487](https://github.com/aws-amplify/amplify-cli/issues/13487)
+
+
+
+
+
 # [2.6.0](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-dotnet-function-template-provider@2.5.23...@aws-amplify/amplify-dotnet-function-template-provider@2.6.0) (2023-12-11)
 
 

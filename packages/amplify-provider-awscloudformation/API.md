@@ -7,9 +7,31 @@
 import { $TSAny } from '@aws-amplify/amplify-cli-core';
 import { $TSContext } from '@aws-amplify/amplify-cli-core';
 import { $TSObject } from '@aws-amplify/amplify-cli-core';
-import * as AWS_2 from 'aws-sdk';
+import { CognitoIdentityProviderClient } from '@aws-sdk/client-cognito-identity-provider';
 import { IAmplifyResource } from '@aws-amplify/amplify-cli-core';
+import { LocationClient } from '@aws-sdk/client-location';
+import { NodeHttpHandler } from '@smithy/node-http-handler';
+import { SSMClient } from '@aws-sdk/client-ssm';
 import { Template } from '@aws-amplify/amplify-cli-core';
+
+// @public (undocumented)
+export interface AwsSdkConfig {
+    // (undocumented)
+    credentials: {
+        accessKeyId: string;
+        secretAccessKey: string;
+        sessionToken?: string;
+        expiration?: Date;
+    };
+    // (undocumented)
+    httpOptions?: {
+        agent: $TSAny;
+    };
+    // (undocumented)
+    region: string;
+    // (undocumented)
+    requestHandler?: NodeHttpHandler;
+}
 
 // @public (undocumented)
 export const cfnRootStackFileName = "root-cloudformation-stack.json";
@@ -50,13 +72,9 @@ export const getLocationRegionMapping: () => $TSObject;
 // @public (undocumented)
 export const getLocationSupportedRegion: (region: string) => string;
 
-// Warning: (ae-forgotten-export) The symbol "AwsSecrets" needs to be exported by the entry point index.d.ts
-//
 // @public (undocumented)
-export function loadConfiguration(context: $TSContext): Promise<AwsSecrets>;
+export function loadConfiguration(context: $TSContext): Promise<AwsSdkConfig>;
 
-// Warning: (ae-forgotten-export) The symbol "AwsSdkConfig" needs to be exported by the entry point index.d.ts
-//
 // @public (undocumented)
 export function loadConfigurationForEnv(context: $TSContext, env: string, appId?: string): Promise<AwsSdkConfig>;
 

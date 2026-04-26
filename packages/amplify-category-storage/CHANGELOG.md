@@ -3,6 +3,179 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.5.25](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-category-storage@5.5.24...@aws-amplify/amplify-category-storage@5.5.25) (2025-10-31)
+
+
+### Bug Fixes
+
+* upgrade `@aws-sdk/*` to latest ([#14306](https://github.com/aws-amplify/amplify-cli/issues/14306)) ([faca740](https://github.com/aws-amplify/amplify-cli/commit/faca7400e65374536e28f58119bb6a66c48aa4d7))
+
+
+
+
+
+## [5.5.24](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-category-storage@5.5.23...@aws-amplify/amplify-category-storage@5.5.24) (2025-10-22)
+
+
+### Reverts
+
+* Revert "refactor: amplify-category-notifications aws sdk v3 migration (#14271)" (#14285) ([510560d](https://github.com/aws-amplify/amplify-cli/commit/510560decb0735a0e8633aadfa6c23fae376dfe1)), closes [#14271](https://github.com/aws-amplify/amplify-cli/issues/14271) [#14285](https://github.com/aws-amplify/amplify-cli/issues/14285)
+
+
+
+
+
+## [5.5.23](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-category-storage@5.5.22...@aws-amplify/amplify-category-storage@5.5.23) (2025-10-08)
+
+**Note:** Version bump only for package @aws-amplify/amplify-category-storage
+
+
+
+
+
+## [5.5.22](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-category-storage@5.5.21...@aws-amplify/amplify-category-storage@5.5.22) (2025-09-17)
+
+**Note:** Version bump only for package @aws-amplify/amplify-category-storage
+
+
+
+
+
+## [5.5.21](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-category-storage@5.5.20...@aws-amplify/amplify-category-storage@5.5.21) (2025-07-01)
+
+
+### Bug Fixes
+
+* pin CDK version again ([#14186](https://github.com/aws-amplify/amplify-cli/issues/14186)) ([ef7f5eb](https://github.com/aws-amplify/amplify-cli/commit/ef7f5ebe0136049865554c6ec0235abc9b816fea))
+* upgrade most packages that use `rimraf` and `glob` ([#14153](https://github.com/aws-amplify/amplify-cli/issues/14153)) ([c85ed14](https://github.com/aws-amplify/amplify-cli/commit/c85ed14b2fe61c09a026f7bb7c82857b5227dff2))
+
+
+
+
+
+## [5.5.20](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-category-storage@5.5.19...@aws-amplify/amplify-category-storage@5.5.20) (2025-04-17)
+
+**Note:** Version bump only for package @aws-amplify/amplify-category-storage
+
+
+
+
+
+## [5.5.19](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-category-storage@5.5.18...@aws-amplify/amplify-category-storage@5.5.19) (2025-02-25)
+
+**Note:** Version bump only for package @aws-amplify/amplify-category-storage
+
+
+
+
+
+## [5.5.18](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-category-storage@5.5.17...@aws-amplify/amplify-category-storage@5.5.18) (2025-02-20)
+
+**Note:** Version bump only for package @aws-amplify/amplify-category-storage
+
+
+
+
+
+## [5.5.17](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-category-storage@5.5.16...@aws-amplify/amplify-category-storage@5.5.17) (2025-02-07)
+
+**Note:** Version bump only for package @aws-amplify/amplify-category-storage
+
+
+
+
+
+## [5.5.16](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-category-storage@5.5.15...@aws-amplify/amplify-category-storage@5.5.16) (2025-01-30)
+
+**Note:** Version bump only for package @aws-amplify/amplify-category-storage
+
+
+
+
+
+## [5.5.15](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-category-storage@5.5.14...@aws-amplify/amplify-category-storage@5.5.15) (2024-08-02)
+
+**Note:** Version bump only for package @aws-amplify/amplify-category-storage
+
+
+
+
+
+## [5.5.14](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-category-storage@5.5.13...@aws-amplify/amplify-category-storage@5.5.14) (2024-06-27)
+
+**Note:** Version bump only for package @aws-amplify/amplify-category-storage
+
+
+
+
+
+## [5.5.13](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-category-storage@5.5.12...@aws-amplify/amplify-category-storage@5.5.13) (2024-06-20)
+
+**Note:** Version bump only for package @aws-amplify/amplify-category-storage
+
+
+
+
+
+## [5.5.12](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-category-storage@5.5.11...@aws-amplify/amplify-category-storage@5.5.12) (2024-06-06)
+
+**Note:** Version bump only for package @aws-amplify/amplify-category-storage
+
+
+
+
+
+## [5.5.11](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-category-storage@5.5.10...@aws-amplify/amplify-category-storage@5.5.11) (2024-05-24)
+
+**Note:** Version bump only for package @aws-amplify/amplify-category-storage
+
+
+
+
+
+## [5.5.10](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-category-storage@5.5.9...@aws-amplify/amplify-category-storage@5.5.10) (2024-05-07)
+
+**Note:** Version bump only for package @aws-amplify/amplify-category-storage
+
+
+
+
+
+## [5.5.9](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-category-storage@5.5.8...@aws-amplify/amplify-category-storage@5.5.9) (2024-04-18)
+
+**Note:** Version bump only for package @aws-amplify/amplify-category-storage
+
+
+
+
+
+## [5.5.8](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-category-storage@5.5.7...@aws-amplify/amplify-category-storage@5.5.8) (2024-04-15)
+
+
+### Bug Fixes
+
+* upgrade Go runtime and fix e2e ([#13671](https://github.com/aws-amplify/amplify-cli/issues/13671)) ([395f717](https://github.com/aws-amplify/amplify-cli/commit/395f717cf52e7beef76f00ee08d37877138b0c30))
+
+
+
+
+
+## [5.5.7](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-category-storage@5.5.6...@aws-amplify/amplify-category-storage@5.5.7) (2024-03-29)
+
+**Note:** Version bump only for package @aws-amplify/amplify-category-storage
+
+
+
+
+
+## [5.5.6](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-category-storage@5.5.5...@aws-amplify/amplify-category-storage@5.5.6) (2024-03-06)
+
+**Note:** Version bump only for package @aws-amplify/amplify-category-storage
+
+
+
+
+
 ## [5.5.5](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-category-storage@5.5.4...@aws-amplify/amplify-category-storage@5.5.5) (2023-12-11)
 
 **Note:** Version bump only for package @aws-amplify/amplify-category-storage

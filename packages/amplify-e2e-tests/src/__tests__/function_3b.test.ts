@@ -43,10 +43,10 @@ describe('dotnet function tests', () => {
   const assertDotNetVersion = (): void => {
     const functionPath = pathManager.getResourceDirectoryPath(projRoot, AmplifyCategories.FUNCTION, funcName);
     const { functionRuntime } = JSONUtilities.readJson<any>(path.join(functionPath, 'amplify.state'));
-    expect(functionRuntime).toEqual('dotnet6');
+    expect(functionRuntime).toEqual('dotnet8');
     const functionProjFilePath = path.join(functionPath, 'src', `${funcName}.csproj`);
     const functionProjFileContent = fs.readFileSync(functionProjFilePath, 'utf8');
-    expect(functionProjFileContent).toContain('<TargetFramework>net6.0</TargetFramework>');
+    expect(functionProjFileContent).toContain('<TargetFramework>net8.0</TargetFramework>');
   };
 
   it('add dotnet hello world function and mock locally', async () => {
@@ -56,7 +56,7 @@ describe('dotnet function tests', () => {
         name: funcName,
         functionTemplate: 'Hello World',
       },
-      'dotnet6',
+      'dotnet8',
     );
     await functionMockAssert(projRoot, {
       funcName,
@@ -74,12 +74,12 @@ describe('dotnet function tests', () => {
         name: funcName,
         functionTemplate: 'Hello World',
       },
-      'dotnet6',
+      'dotnet8',
     );
     const payload = '{"key1":"value1","key2":"value2","key3":"value3"}';
     await amplifyPushAuth(projRoot);
     const response = await functionCloudInvoke(projRoot, { funcName, payload });
-    expect(JSON.parse(response.Payload.toString())).toEqual(helloWorldSuccessObj);
+    expect(JSON.parse(response.Payload.transformToString())).toEqual(helloWorldSuccessObj);
 
     assertDotNetVersion();
   });
@@ -91,7 +91,7 @@ describe('dotnet function tests', () => {
         name: funcName,
         functionTemplate: 'Serverless',
       },
-      'dotnet6',
+      'dotnet8',
     );
     await functionMockAssert(projRoot, {
       funcName,
@@ -109,7 +109,7 @@ describe('dotnet function tests', () => {
         name: funcName,
         functionTemplate: 'CRUD function for DynamoDB (Integration with API Gateway)',
       },
-      'dotnet6',
+      'dotnet8',
       createNewDynamoDBForCrudTemplate,
     );
     const payload = JSON.stringify({
@@ -120,7 +120,7 @@ describe('dotnet function tests', () => {
     });
     await amplifyPushAuth(projRoot);
     const response = await functionCloudInvoke(projRoot, { funcName, payload });
-    expect(JSON.parse(response.Payload.toString()).statusCode).toEqual(200);
+    expect(JSON.parse(response.Payload.transformToString()).statusCode).toEqual(200);
 
     assertDotNetVersion();
   });
@@ -135,7 +135,7 @@ describe('dotnet function tests', () => {
         triggerType: 'DynamoDB',
         eventSource: 'DynamoDB',
       },
-      'dotnet6',
+      'dotnet8',
       addLambdaTrigger, // Adds DDB trigger by default
     );
     await functionMockAssert(projRoot, {
@@ -156,7 +156,7 @@ describe('dotnet function tests', () => {
         functionTemplate: 'Trigger (DynamoDb, Kinesis)',
         triggerType: 'Kinesis',
       },
-      'dotnet6',
+      'dotnet8',
       addLambdaTrigger, // Adds DDB trigger by default
     );
     await functionMockAssert(projRoot, {

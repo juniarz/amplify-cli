@@ -1,5 +1,7 @@
-const aws = require('./aws.js');
+const { DynamoDBClient } = require('@aws-sdk/client-dynamodb');
+const { NodeHttpHandler } = require('@smithy/node-http-handler');
 const configurationManager = require('../configuration-manager');
+const { proxyAgent } = require('./aws-globals');
 
 class DynamoDB {
   constructor(context, options = {}) {
@@ -11,7 +13,15 @@ class DynamoDB {
         // ignore errors
       }
       this.context = context;
-      this.dynamodb = new aws.DynamoDB({ ...cred, ...options });
+
+      this.dynamodb = new DynamoDBClient({
+        ...cred,
+        ...options,
+        requestHandler: new NodeHttpHandler({
+          httpAgent: proxyAgent(),
+          httpsAgent: proxyAgent(),
+        }),
+      });
       return this;
     })();
   }

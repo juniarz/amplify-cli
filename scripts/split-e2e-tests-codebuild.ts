@@ -1,16 +1,15 @@
-import * as glob from 'glob';
+import { globSync } from 'glob';
 import * as fs from 'fs-extra';
 import { join } from 'path';
 import * as yaml from 'js-yaml';
-import { AWS_REGIONS_TO_RUN_TESTS as regions } from './cci-utils';
 import { REPO_ROOT } from './cci-utils';
 import { FORCE_REGION_MAP, getOldJobNameWithoutSuffixes, loadTestTimings, USE_PARENT_ACCOUNT } from './cci-utils';
-import { migrationFromV10Tests, migrationFromV12Tests, migrationFromV8Tests } from './split-e2e-test-filters';
 const CODEBUILD_CONFIG_BASE_PATH = join(REPO_ROOT, 'codebuild_specs', 'e2e_workflow_base.yml');
 const CODEBUILD_GENERATE_CONFIG_PATH = join(REPO_ROOT, 'codebuild_specs', 'e2e_workflow_generated');
 const RUN_SOLO = [
   'src/__tests__/auth_2c.test.ts',
   'src/__tests__/auth_2e.test.ts',
+  'src/__tests__/aws-exports/js-frontend-config.test.ts',
   'src/__tests__/containers-api-1.test.ts',
   'src/__tests__/containers-api-2.test.ts',
   'src/__tests__/env-3.test.ts',
@@ -43,6 +42,20 @@ const RUN_SOLO = [
   'src/__tests__/transformer-migrations/searchable-migration.test.ts',
   'src/__tests__/uibuilder.test.ts',
 ];
+const RUN_DUO = [
+  'src/__tests__/api_6c.test.ts',
+  'src/__tests__/auth_9.test.ts',
+  'src/__tests__/function_2a.test.ts',
+  'src/__tests__/geo-add-d.test.ts',
+  'src/__tests__/migration/api.key.migration5.test.ts',
+  'src/__tests__/export-pull-a.test.ts',
+  'src/__tests__/export-pull-c.test.ts',
+  'src/__tests__/hosting.test.ts',
+  'src/__tests__/notifications-analytics-compatibility-in-app-2.test.ts',
+  'src/__tests__/schema-iterative-update-4.test.ts',
+  'src/__tests__/schema-searchable.test.ts',
+  'src/__tests__/studio-modelgen.test.ts',
+];
 const DISABLE_COVERAGE = [
   'src/__tests__/datastore-modelgen.test.ts',
   'src/__tests__/amplify-app.test.ts',
@@ -68,7 +81,10 @@ const TEST_EXCLUSIONS: { l: string[]; w: string[] } = {
     'src/__tests__/env-2.test.ts',
     'src/__tests__/pr-previews-multi-env-1.test.ts',
     'src/__tests__/export.test.ts',
-    'src/__tests__/function_3a.test.ts',
+    'src/__tests__/function_3a_dotnet.test.ts',
+    'src/__tests__/function_3a_python.test.ts',
+    'src/__tests__/function_3a_go.test.ts',
+    'src/__tests__/function_3a_nodejs.test.ts',
     'src/__tests__/function_3b.test.ts',
     'src/__tests__/function_4.test.ts',
     'src/__tests__/function_6.test.ts',
@@ -122,7 +138,7 @@ export function saveConfig(config: any): void {
   fs.writeFileSync(`${CODEBUILD_GENERATE_CONFIG_PATH}.yml`, output.join('\n'));
 }
 export function getTestFiles(dir: string, pattern = 'src/**/*.test.ts'): string[] {
-  return glob.sync(pattern, { cwd: dir });
+  return globSync(pattern, { cwd: dir });
 }
 type COMPUTE_TYPE = 'BUILD_GENERAL1_MEDIUM' | 'BUILD_GENERAL1_LARGE';
 type BatchBuildJob = {
@@ -144,9 +160,10 @@ type ConfigBase = {
   };
 };
 const MAX_WORKERS = 3;
+const MAX_WORKERS_WINDOWS = 2;
 type OS_TYPE = 'w' | 'l';
 type CandidateJob = {
-  region: string;
+  region?: string;
   os: OS_TYPE;
   executor: string;
   tests: string[];
@@ -154,9 +171,7 @@ type CandidateJob = {
   disableCoverage: boolean;
 };
 const createRandomJob = (os: OS_TYPE): CandidateJob => {
-  const region = regions[Math.floor(Math.random() * regions.length)];
   return {
-    region,
     os,
     executor: os === 'l' ? 'l_large' : 'w_medium',
     tests: [],
@@ -194,7 +209,7 @@ const splitTestsV3 = (
     const soloJobs = [];
     const osJobs = [createRandomJob(os)];
     for (let test of testSuites) {
-      const currentJob = osJobs[osJobs.length - 1];
+      let currentJob = osJobs[osJobs.length - 1];
 
       // if the current test is excluded from this OS, skip it
       if (TEST_EXCLUSIONS[os].find((excluded) => test === excluded)) {
@@ -220,6 +235,17 @@ const splitTestsV3 = (
         continue;
       }
 
+      let maxWorkers = os === 'w' ? MAX_WORKERS_WINDOWS : MAX_WORKERS;
+      if (os === 'l' && (RUN_DUO.find((duo) => test === duo) || currentJob.tests.some((duo) => RUN_DUO.includes(duo)))) {
+        maxWorkers = 2;
+        // if we had a test that requires it is in a job with only 2 tests and a job already has 2 tests, set up a new job
+        // this may mean there will occasionally be jobs that can run with 3 tests will be running with 2
+        if (currentJob.tests.length === maxWorkers) {
+          osJobs.push(createRandomJob(os));
+          currentJob = osJobs[osJobs.length - 1];
+        }
+      }
+
       // add the test
       currentJob.tests.push(test);
       if (FORCE_REGION) {
@@ -230,7 +256,7 @@ const splitTestsV3 = (
       }
 
       // create a new job once the current job is full;
-      if (currentJob.tests.length >= MAX_WORKERS) {
+      if (currentJob.tests.length >= maxWorkers) {
         osJobs.push(createRandomJob(os));
       }
     }
@@ -262,7 +288,11 @@ const splitTestsV3 = (
         formattedJob.env.variables['compute-type'] = 'BUILD_GENERAL1_SMALL';
       }
       formattedJob.env.variables.TEST_SUITE = job.tests.join('|');
-      formattedJob.env.variables.CLI_REGION = job.region;
+      if (job.region) {
+        // Jobs with forced region are assigned one explicitly.
+        // Otherwise, region is assigned at runtime by select-region-for-e2e-test.ts script.
+        formattedJob.env.variables.CLI_REGION = job.region;
+      }
       if (job.useParentAccount) {
         formattedJob.env.variables.USE_PARENT_ACCOUNT = 1;
       }
@@ -283,7 +313,11 @@ const splitTestsV3 = (
       };
       formattedJob.env.variables = {};
       formattedJob.env.variables.TEST_SUITE = job.tests.join('|');
-      formattedJob.env.variables.CLI_REGION = job.region;
+      if (job.region) {
+        // Jobs with forced region are assigned one explicitly.
+        // Otherwise, region is assigned at runtime by select-region-for-e2e-test.ts script.
+        formattedJob.env.variables.CLI_REGION = job.region;
+      }
       if (job.useParentAccount) {
         formattedJob.env.variables.USE_PARENT_ACCOUNT = 1;
       }
@@ -309,7 +343,7 @@ function main(): void {
       identifier: 'run_e2e_tests_windows',
       buildspec: 'codebuild_specs/run_e2e_tests_windows.yml',
       env: {
-        type: 'WINDOWS_SERVER_2019_CONTAINER',
+        type: 'WINDOWS_SERVER_2022_CONTAINER',
         image: '$WINDOWS_IMAGE_2019',
       },
       'depend-on': ['build_windows', 'upb'],
@@ -318,50 +352,8 @@ function main(): void {
     false,
     undefined,
   );
-  const splitMigrationV8Tests = splitTestsV3(
-    {
-      identifier: 'migration_tests_v8',
-      buildspec: 'codebuild_specs/migration_tests_v8.yml',
-      env: {},
-      'depend-on': ['upb'],
-    },
-    undefined,
-    join(REPO_ROOT, 'packages', 'amplify-migration-tests'),
-    true,
-    (tests: string[]) => {
-      return tests.filter((testName) => migrationFromV8Tests.find((t: string) => t === testName));
-    },
-  );
-  const splitMigrationV10Tests = splitTestsV3(
-    {
-      identifier: 'migration_tests_v10',
-      buildspec: 'codebuild_specs/migration_tests_v10.yml',
-      env: {},
-      'depend-on': ['upb'],
-    },
-    undefined,
-    join(REPO_ROOT, 'packages', 'amplify-migration-tests'),
-    true,
-    (tests: string[]) => {
-      return tests.filter((testName) => migrationFromV10Tests.find((t) => t === testName));
-    },
-  );
-  const splitMigrationV12Tests = splitTestsV3(
-    {
-      identifier: 'migration_tests_v12',
-      buildspec: 'codebuild_specs/migration_tests_v12.yml',
-      env: {},
-      'depend-on': ['upb'],
-    },
-    undefined,
-    join(REPO_ROOT, 'packages', 'amplify-migration-tests'),
-    true,
-    (tests: string[]) => {
-      return tests.filter((testName) => migrationFromV12Tests.find((t) => t === testName));
-    },
-  );
 
-  let allBuilds = [...splitE2ETests, ...splitMigrationV8Tests, ...splitMigrationV10Tests, ...splitMigrationV12Tests];
+  let allBuilds = [...splitE2ETests];
   const dependeeIdentifiers: string[] = allBuilds.map((buildObject) => buildObject.identifier).sort();
   const dependeeIdentifiersFileContents = `${JSON.stringify(dependeeIdentifiers, null, 2)}\n`;
   const waitForIdsFilePath = './codebuild_specs/wait_for_ids.json';

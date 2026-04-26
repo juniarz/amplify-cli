@@ -3,6 +3,142 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.5.44](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-category-hosting@3.5.43...@aws-amplify/amplify-category-hosting@3.5.44) (2025-10-31)
+
+**Note:** Version bump only for package @aws-amplify/amplify-category-hosting
+
+
+
+
+
+## [3.5.43](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-category-hosting@3.5.42...@aws-amplify/amplify-category-hosting@3.5.43) (2025-10-08)
+
+**Note:** Version bump only for package @aws-amplify/amplify-category-hosting
+
+
+
+
+
+## [3.5.42](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-category-hosting@3.5.41...@aws-amplify/amplify-category-hosting@3.5.42) (2025-07-01)
+
+**Note:** Version bump only for package @aws-amplify/amplify-category-hosting
+
+
+
+
+
+## [3.5.41](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-category-hosting@3.5.40...@aws-amplify/amplify-category-hosting@3.5.41) (2025-04-17)
+
+**Note:** Version bump only for package @aws-amplify/amplify-category-hosting
+
+
+
+
+
+## [3.5.40](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-category-hosting@3.5.39...@aws-amplify/amplify-category-hosting@3.5.40) (2025-02-20)
+
+**Note:** Version bump only for package @aws-amplify/amplify-category-hosting
+
+
+
+
+
+## [3.5.39](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-category-hosting@3.5.38...@aws-amplify/amplify-category-hosting@3.5.39) (2025-02-07)
+
+**Note:** Version bump only for package @aws-amplify/amplify-category-hosting
+
+
+
+
+
+## [3.5.38](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-category-hosting@3.5.37...@aws-amplify/amplify-category-hosting@3.5.38) (2025-01-30)
+
+**Note:** Version bump only for package @aws-amplify/amplify-category-hosting
+
+
+
+
+
+## [3.5.37](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-category-hosting@3.5.36...@aws-amplify/amplify-category-hosting@3.5.37) (2024-08-02)
+
+**Note:** Version bump only for package @aws-amplify/amplify-category-hosting
+
+
+
+
+
+## [3.5.36](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-category-hosting@3.5.35...@aws-amplify/amplify-category-hosting@3.5.36) (2024-06-27)
+
+**Note:** Version bump only for package @aws-amplify/amplify-category-hosting
+
+
+
+
+
+## [3.5.35](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-category-hosting@3.5.34...@aws-amplify/amplify-category-hosting@3.5.35) (2024-06-20)
+
+**Note:** Version bump only for package @aws-amplify/amplify-category-hosting
+
+
+
+
+
+## [3.5.34](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-category-hosting@3.5.33...@aws-amplify/amplify-category-hosting@3.5.34) (2024-06-06)
+
+**Note:** Version bump only for package @aws-amplify/amplify-category-hosting
+
+
+
+
+
+## [3.5.33](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-category-hosting@3.5.32...@aws-amplify/amplify-category-hosting@3.5.33) (2024-05-24)
+
+**Note:** Version bump only for package @aws-amplify/amplify-category-hosting
+
+
+
+
+
+## [3.5.32](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-category-hosting@3.5.31...@aws-amplify/amplify-category-hosting@3.5.32) (2024-05-07)
+
+**Note:** Version bump only for package @aws-amplify/amplify-category-hosting
+
+
+
+
+
+## [3.5.31](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-category-hosting@3.5.30...@aws-amplify/amplify-category-hosting@3.5.31) (2024-04-18)
+
+**Note:** Version bump only for package @aws-amplify/amplify-category-hosting
+
+
+
+
+
+## [3.5.30](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-category-hosting@3.5.29...@aws-amplify/amplify-category-hosting@3.5.30) (2024-04-15)
+
+**Note:** Version bump only for package @aws-amplify/amplify-category-hosting
+
+
+
+
+
+## [3.5.29](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-category-hosting@3.5.28...@aws-amplify/amplify-category-hosting@3.5.29) (2024-03-29)
+
+**Note:** Version bump only for package @aws-amplify/amplify-category-hosting
+
+
+
+
+
+## [3.5.28](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-category-hosting@3.5.27...@aws-amplify/amplify-category-hosting@3.5.28) (2024-03-06)
+
+**Note:** Version bump only for package @aws-amplify/amplify-category-hosting
+
+
+
+
+
 ## [3.5.27](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-category-hosting@3.5.26...@aws-amplify/amplify-category-hosting@3.5.27) (2023-12-11)
 
 **Note:** Version bump only for package @aws-amplify/amplify-category-hosting

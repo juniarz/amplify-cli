@@ -671,6 +671,18 @@ export class FeatureFlags {
         defaultValueForExistingProjects: false,
         defaultValueForNewProjects: true,
       },
+      {
+        name: 'subscriptionsInheritPrimaryAuth',
+        type: 'boolean',
+        defaultValueForExistingProjects: false,
+        defaultValueForNewProjects: false,
+      },
+      {
+        name: 'enableGen2Migration',
+        type: 'boolean',
+        defaultValueForExistingProjects: false,
+        defaultValueForNewProjects: false,
+      },
     ]);
 
     this.registerFlag('frontend-ios', [

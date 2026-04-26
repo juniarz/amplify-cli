@@ -2,7 +2,8 @@ import * as path from 'path';
 import * as fs from 'fs-extra';
 import * as inquirer from 'inquirer';
 import _ from 'lodash';
-import glob from 'glob';
+import type { GlobOptionsWithFileTypesFalse } from 'glob';
+import { globSync } from 'glob';
 import { coerce, lt } from 'semver';
 import { Context } from './domain/context';
 import { ConfirmQuestion } from 'inquirer';
@@ -11,11 +12,11 @@ import Resource from 'cloudform-types/types/resource';
 import Lambda from 'cloudform-types/types/lambda';
 
 // See https://docs.aws.amazon.com/lambda/latest/dg/lambda-nodejs.html.
-const previousLambdaRuntimeVersions = ['nodejs8.10', 'nodejs10.x', 'nodejs12.x'];
-// Note. It's safe to auto migrate existing lambdas above to nodejs16.x by replacing runtime
-// as they bundle AWS SDK v2. This mechanism isn't viable to upgrade to nodejs18.x
-// as that version bundles AWS SDK v3 which is not compatible.
-const lambdaRuntimeVersion = 'nodejs16.x';
+const previousLambdaRuntimeVersions = ['nodejs18.x'];
+// Note. It's safe to auto migrate existing lambdas above to nodejs22.x by replacing runtime
+// as they bundle AWS SDK v3. This mechanism isn't viable for version before nodejs18.x
+// as those versions bundles AWS SDK v2 which is not compatible.
+const lambdaRuntimeVersion = 'nodejs22.x';
 
 export async function checkProjectConfigVersion(context: Context): Promise<void> {
   const { constants } = context.amplify;
@@ -65,14 +66,14 @@ async function checkLambdaCustomResourceNodeVersion(context: Context, projectPat
   const filesToUpdate: string[] = [];
 
   if (fs.existsSync(backendDirPath)) {
-    const globOptions: glob.IOptions = {
+    const globOptions: GlobOptionsWithFileTypesFalse = {
       absolute: false,
       cwd: backendDirPath,
       follow: false,
       nodir: true,
     };
 
-    const templateFileNames = glob.sync('**/*template.{yaml,yml,json}', globOptions);
+    const templateFileNames = globSync('**/*template.{yaml,yml,json}', globOptions);
 
     for (const templateFileName of templateFileNames) {
       const absolutePath = path.join(backendDirPath, templateFileName);

@@ -26,7 +26,7 @@ const buildLocalInvoker = async (context: any) => {
     // Build localInvoker
     context.print.info('Local invoker binary was not found, building it...');
     executeCommand(['mod', 'tidy'], true, undefined, localInvokerDir);
-    executeCommand(['build', MAIN_SOURCE], true, undefined, localInvokerDir);
+    executeCommand(['build', '-o', 'bootstrap', MAIN_SOURCE], true, undefined, localInvokerDir);
   }
 
   return {
@@ -39,7 +39,7 @@ const startLambda = (request: InvocationRequest, portNumber: number, lambda: { e
 
   envVars['_LAMBDA_SERVER_PORT'] = portNumber.toString();
 
-  const lambdaProcess: ExecaChildProcess = execa.command(lambda.executable, {
+  const lambdaProcess: ExecaChildProcess = execa(lambda.executable, [], {
     env: envVars,
     extendEnv: false,
     cwd: lambda.cwd,

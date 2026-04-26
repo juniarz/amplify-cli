@@ -1,6 +1,8 @@
 import { $TSAny, $TSContext } from '@aws-amplify/amplify-cli-core';
-import { AwsSecrets, loadConfiguration } from '../configuration-manager';
-import aws from './aws.js';
+import { AwsSecretsV3, loadConfiguration } from '../configuration-manager';
+import { SNSClient, GetSMSSandboxAccountStatusCommand } from '@aws-sdk/client-sns';
+import { NodeHttpHandler } from '@smithy/node-http-handler';
+import { proxyAgent } from './aws-globals';
 
 // Currently SNS is used only by Cognito for sending SMS and  has the following SNS mapping
 // https://docs.aws.amazon.com/cognito/latest/developerguide/user-pool-settings-email-phone-verification.html
@@ -14,11 +16,11 @@ const COGNITO_SMS_REGION_MAPPING = {
 };
 export class SNS {
   private static instance: SNS;
-  private readonly sns: AWS.SNS;
+  private readonly sns: SNSClient;
 
   static async getInstance(context: $TSContext, options = {}): Promise<SNS> {
     if (!SNS.instance) {
-      let cred: AwsSecrets = {};
+      let cred: AwsSecretsV3 = {};
       try {
         cred = await loadConfiguration(context);
       } catch (e) {
@@ -36,11 +38,18 @@ export class SNS {
   }
 
   private constructor(context: $TSContext, cred: $TSAny, options = {}) {
-    this.sns = new aws.SNS({ ...cred, ...options });
+    this.sns = new SNSClient({
+      ...cred,
+      ...options,
+      requestHandler: new NodeHttpHandler({
+        httpAgent: proxyAgent(),
+        httpsAgent: proxyAgent(),
+      }),
+    });
   }
 
   public async isInSandboxMode(): Promise<boolean> {
-    const result = await this.sns.getSMSSandboxAccountStatus().promise();
+    const result = await this.sns.send(new GetSMSSandboxAccountStatusCommand({}));
     return result.IsInSandbox;
   }
 }

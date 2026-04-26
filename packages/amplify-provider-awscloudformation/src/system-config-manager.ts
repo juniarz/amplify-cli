@@ -1,14 +1,16 @@
 import { $TSAny, $TSContext, AmplifyError, JSONUtilities, pathManager, SecretFileMode, spinner } from '@aws-amplify/amplify-cli-core';
 
-import { STS, ProcessCredentials, CredentialProviderChain } from 'aws-sdk';
+import { STSClient, AssumeRoleCommand, AssumeRoleCommandInput } from '@aws-sdk/client-sts';
+import { fromProcess } from '@aws-sdk/credential-providers';
+import { NodeHttpHandler } from '@smithy/node-http-handler';
 import * as fs from 'fs-extra';
 import * as path from 'path';
 import * as ini from 'ini';
 import * as inquirer from 'inquirer';
-import { ProxyAgent } from 'proxy-agent';
 import * as constants from './constants';
 import { fileLogger } from './utils/aws-logger';
 import { AwsSdkConfig } from './utils/auth-types';
+import { proxyAgent } from './aws-utils/aws-globals';
 
 const logger = fileLogger('system-config-manager');
 
@@ -79,7 +81,6 @@ export const getProfiledAwsConfig = async (
   isRoleSourceProfile?: boolean,
 ): Promise<AwsSdkConfig> => {
   let awsConfigInfo: AwsSdkConfig;
-  const httpProxy = process.env.HTTP_PROXY || process.env.HTTPS_PROXY;
   const profileConfig = getProfileConfig(profileName);
   if (profileConfig) {
     logger('getProfiledAwsConfig.profileConfig', [profileConfig])();
@@ -92,20 +93,23 @@ export const getProfiledAwsConfig = async (
         ...roleCredentials,
       };
     } else if (profileConfig.credential_process) {
-      // need to force AWS_SDK_LOAD_CONFIG to a truthy value to force ProcessCredentials to prefer the credential process in ~/.aws/config instead of ~/.aws/credentials
+      // need to force AWS_SDK_LOAD_CONFIG to a truthy value to force credential process to prefer the credential process in ~/.aws/config instead of ~/.aws/credentials
       const sdkLoadConfigOriginal = process.env.AWS_SDK_LOAD_CONFIG;
       process.env.AWS_SDK_LOAD_CONFIG = '1';
-      const chain = new CredentialProviderChain();
-      const processProvider = () => new ProcessCredentials({ profile: profileName });
-      chain.providers.push(processProvider);
+      const credentials = await fromProcess({ profile: profileName })();
 
-      const credentials = await chain.resolvePromise();
       awsConfigInfo = {
+        credentials: {
+          accessKeyId: credentials.accessKeyId,
+          secretAccessKey: credentials.secretAccessKey,
+          sessionToken: credentials.sessionToken,
+          expiration: credentials.expiration,
+        },
         region: profileConfig.region,
-        accessKeyId: credentials.accessKeyId,
-        secretAccessKey: credentials.secretAccessKey,
-        sessionToken: credentials.sessionToken,
-        expiration: credentials.expireTime,
+        requestHandler: new NodeHttpHandler({
+          httpAgent: proxyAgent(),
+          httpsAgent: proxyAgent(),
+        }),
       };
       process.env.AWS_SDK_LOAD_CONFIG = sdkLoadConfigOriginal;
     } else {
@@ -113,7 +117,9 @@ export const getProfiledAwsConfig = async (
       const profileCredentials = getProfileCredentials(profileName);
       awsConfigInfo = {
         ...profileConfig,
-        ...profileCredentials,
+        credentials: {
+          ...profileCredentials,
+        },
       };
       validateCredentials(awsConfigInfo, profileName);
     }
@@ -122,15 +128,6 @@ export const getProfiledAwsConfig = async (
       message: `Profile configuration is missing for: ${profileName}`,
     });
   }
-
-  // HTTP_PROXY & HTTPS_PROXY env vars are read automatically by ProxyAgent, but we check to see if they are set before using the proxy
-  if (httpProxy) {
-    awsConfigInfo = {
-      ...awsConfigInfo,
-      httpOptions: { agent: new ProxyAgent() },
-    };
-  }
-
   return awsConfigInfo;
 };
 
@@ -156,8 +153,12 @@ const getRoleCredentials = async (context: $TSContext, profileName: string, prof
       mfaTokenCode = await getMfaTokenCode();
     }
     logger('getRoleCredentials.aws.STS', [sourceProfileAwsConfig])();
-    const sts = new STS(sourceProfileAwsConfig);
-    const assumeRoleRequest = {
+
+    const stsClient = new STSClient({
+      ...sourceProfileAwsConfig,
+    });
+
+    const assumeRoleRequest: AssumeRoleCommandInput = {
       RoleArn: profileConfig.role_arn,
       RoleSessionName: roleSessionName,
       DurationSeconds: profileConfig.duration_seconds,
@@ -168,13 +169,19 @@ const getRoleCredentials = async (context: $TSContext, profileName: string, prof
     const log = logger('getRoleCredentials.sts.assumeRole', [assumeRoleRequest]);
     try {
       log();
-      const roleData = await sts.assumeRole(assumeRoleRequest).promise();
-      roleCredentials = {
-        accessKeyId: roleData.Credentials.AccessKeyId,
-        secretAccessKey: roleData.Credentials.SecretAccessKey,
-        sessionToken: roleData.Credentials.SessionToken,
-        expiration: roleData.Credentials.Expiration,
-      };
+      const command = new AssumeRoleCommand(assumeRoleRequest);
+      const roleData = await stsClient.send(command);
+
+      if (roleData.Credentials) {
+        roleCredentials = {
+          credentials: {
+            accessKeyId: roleData.Credentials.AccessKeyId,
+            secretAccessKey: roleData.Credentials.SecretAccessKey,
+            sessionToken: roleData.Credentials.SessionToken,
+            expiration: roleData.Credentials.Expiration,
+          },
+        };
+      }
     } catch (ex) {
       log(ex);
     }
@@ -238,7 +245,11 @@ const getCachedRoleCredentials = (roleArn: string, sessionName: string): $TSAny 
       return undefined;
     }
   }
-  return roleCredentials;
+  return {
+    credentials: {
+      ...roleCredentials,
+    },
+  };
 };
 
 const validateCachedCredentials = (roleCredentials: $TSAny): boolean => {
@@ -339,10 +350,10 @@ export const getProfileCredentials = (profileName: string): $TSAny => {
 
 const validateCredentials = (credentials: $TSAny, profileName: string): void => {
   const missingKeys = [];
-  if (!credentials?.accessKeyId && !process.env.AWS_ACCESS_KEY_ID) {
+  if (!credentials?.credentials.accessKeyId && !process.env.AWS_ACCESS_KEY_ID) {
     missingKeys.push('aws_access_key_id');
   }
-  if (!credentials?.secretAccessKey && !process.env.AWS_SECRET_ACCESS_KEY) {
+  if (!credentials?.credentials.secretAccessKey && !process.env.AWS_SECRET_ACCESS_KEY) {
     missingKeys.push('aws_secret_access_key');
   }
   if (missingKeys.length > 0) {

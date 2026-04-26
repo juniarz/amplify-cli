@@ -3,6 +3,198 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.7.26](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-category-auth@3.7.25...@aws-amplify/amplify-category-auth@3.7.26) (2025-10-31)
+
+
+### Bug Fixes
+
+* upgrade `@aws-sdk/*` to latest ([#14306](https://github.com/aws-amplify/amplify-cli/issues/14306)) ([faca740](https://github.com/aws-amplify/amplify-cli/commit/faca7400e65374536e28f58119bb6a66c48aa4d7))
+
+
+
+
+
+## [3.7.25](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-category-auth@3.7.24...@aws-amplify/amplify-category-auth@3.7.25) (2025-10-22)
+
+
+### Bug Fixes
+
+* cli throws an error when `thirdPartyAuth` is enabled, but `authProvider` is not included ([762f2f2](https://github.com/aws-amplify/amplify-cli/commit/762f2f20c4e4199fdee5e8cec496afa72c4104f2))
+
+
+### Reverts
+
+* Revert "refactor: amplify-category-notifications aws sdk v3 migration (#14271)" (#14285) ([510560d](https://github.com/aws-amplify/amplify-cli/commit/510560decb0735a0e8633aadfa6c23fae376dfe1)), closes [#14271](https://github.com/aws-amplify/amplify-cli/issues/14271) [#14285](https://github.com/aws-amplify/amplify-cli/issues/14285)
+
+
+
+
+
+## [3.7.24](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-category-auth@3.7.23...@aws-amplify/amplify-category-auth@3.7.24) (2025-10-08)
+
+**Note:** Version bump only for package @aws-amplify/amplify-category-auth
+
+
+
+
+
+## [3.7.23](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-category-auth@3.7.22...@aws-amplify/amplify-category-auth@3.7.23) (2025-09-17)
+
+**Note:** Version bump only for package @aws-amplify/amplify-category-auth
+
+
+
+
+
+## [3.7.22](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-category-auth@3.7.21...@aws-amplify/amplify-category-auth@3.7.22) (2025-07-01)
+
+
+### Bug Fixes
+
+* pin CDK version again ([#14186](https://github.com/aws-amplify/amplify-cli/issues/14186)) ([ef7f5eb](https://github.com/aws-amplify/amplify-cli/commit/ef7f5ebe0136049865554c6ec0235abc9b816fea))
+* upgrade most packages that use `rimraf` and `glob` ([#14153](https://github.com/aws-amplify/amplify-cli/issues/14153)) ([c85ed14](https://github.com/aws-amplify/amplify-cli/commit/c85ed14b2fe61c09a026f7bb7c82857b5227dff2))
+
+
+
+
+
+## [3.7.21](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-category-auth@3.7.20...@aws-amplify/amplify-category-auth@3.7.21) (2025-04-17)
+
+**Note:** Version bump only for package @aws-amplify/amplify-category-auth
+
+
+
+
+
+## [3.7.20](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-category-auth@3.7.19...@aws-amplify/amplify-category-auth@3.7.20) (2025-02-25)
+
+**Note:** Version bump only for package @aws-amplify/amplify-category-auth
+
+
+
+
+
+## [3.7.19](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-category-auth@3.7.18...@aws-amplify/amplify-category-auth@3.7.19) (2025-02-20)
+
+**Note:** Version bump only for package @aws-amplify/amplify-category-auth
+
+
+
+
+
+## [3.7.18](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-category-auth@3.7.17...@aws-amplify/amplify-category-auth@3.7.18) (2025-02-07)
+
+**Note:** Version bump only for package @aws-amplify/amplify-category-auth
+
+
+
+
+
+## [3.7.17](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-category-auth@3.7.16...@aws-amplify/amplify-category-auth@3.7.17) (2025-01-30)
+
+**Note:** Version bump only for package @aws-amplify/amplify-category-auth
+
+
+
+
+
+## [3.7.16](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-category-auth@3.7.15...@aws-amplify/amplify-category-auth@3.7.16) (2024-11-18)
+
+**Note:** Version bump only for package @aws-amplify/amplify-category-auth
+
+
+
+
+
+## [3.7.15](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-category-auth@3.7.14...@aws-amplify/amplify-category-auth@3.7.15) (2024-08-02)
+
+**Note:** Version bump only for package @aws-amplify/amplify-category-auth
+
+
+
+
+
+## [3.7.14](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-category-auth@3.7.13...@aws-amplify/amplify-category-auth@3.7.14) (2024-06-27)
+
+**Note:** Version bump only for package @aws-amplify/amplify-category-auth
+
+
+
+
+
+## [3.7.13](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-category-auth@3.7.12...@aws-amplify/amplify-category-auth@3.7.13) (2024-06-20)
+
+**Note:** Version bump only for package @aws-amplify/amplify-category-auth
+
+
+
+
+
+## [3.7.12](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-category-auth@3.7.11...@aws-amplify/amplify-category-auth@3.7.12) (2024-06-06)
+
+**Note:** Version bump only for package @aws-amplify/amplify-category-auth
+
+
+
+
+
+## [3.7.11](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-category-auth@3.7.10...@aws-amplify/amplify-category-auth@3.7.11) (2024-05-24)
+
+**Note:** Version bump only for package @aws-amplify/amplify-category-auth
+
+
+
+
+
+## [3.7.10](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-category-auth@3.7.9...@aws-amplify/amplify-category-auth@3.7.10) (2024-05-07)
+
+
+### Bug Fixes
+
+* **amplify-category-auth:** added pagination for listGroups api action ([#13723](https://github.com/aws-amplify/amplify-cli/issues/13723)) ([0d52c47](https://github.com/aws-amplify/amplify-cli/commit/0d52c478475e25f53d7693f79902b21dc4741942))
+
+
+
+
+
+## [3.7.9](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-category-auth@3.7.8...@aws-amplify/amplify-category-auth@3.7.9) (2024-04-18)
+
+**Note:** Version bump only for package @aws-amplify/amplify-category-auth
+
+
+
+
+
+## [3.7.8](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-category-auth@3.7.7...@aws-amplify/amplify-category-auth@3.7.8) (2024-04-15)
+
+
+### Bug Fixes
+
+* upgrade Go runtime and fix e2e ([#13671](https://github.com/aws-amplify/amplify-cli/issues/13671)) ([395f717](https://github.com/aws-amplify/amplify-cli/commit/395f717cf52e7beef76f00ee08d37877138b0c30))
+
+
+
+
+
+## [3.7.7](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-category-auth@3.7.6...@aws-amplify/amplify-category-auth@3.7.7) (2024-03-29)
+
+**Note:** Version bump only for package @aws-amplify/amplify-category-auth
+
+
+
+
+
+## [3.7.6](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-category-auth@3.7.5...@aws-amplify/amplify-category-auth@3.7.6) (2024-03-06)
+
+
+### Bug Fixes
+
+* limit query parameter parsing in auth admin api ([#13512](https://github.com/aws-amplify/amplify-cli/issues/13512)) ([2480681](https://github.com/aws-amplify/amplify-cli/commit/24806814ce2275fe7d70e5484c3c485023b8041a))
+
+
+
+
+
 ## [3.7.5](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-category-auth@3.7.4...@aws-amplify/amplify-category-auth@3.7.5) (2023-12-11)
 
 **Note:** Version bump only for package @aws-amplify/amplify-category-auth

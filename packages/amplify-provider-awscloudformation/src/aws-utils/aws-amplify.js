@@ -1,12 +1,12 @@
-const aws = require('aws-sdk');
-const { ProxyAgent } = require('proxy-agent');
+const { AmplifyClient } = require('@aws-sdk/client-amplify');
+const { NodeHttpHandler } = require('@smithy/node-http-handler');
 const configurationManager = require('../configuration-manager');
 const { regions: amplifyServiceRegions } = require('../aws-regions');
+const { proxyAgent } = require('./aws-globals');
 
 async function getConfiguredAmplifyClient(context, options = {}) {
   let cred = {};
   let defaultOptions = {};
-  const httpProxy = process.env.HTTP_PROXY || process.env.HTTPS_PROXY;
   const envVarEndpoint = process.env.AWS_AMPLIFY_ENDPOINT;
 
   try {
@@ -21,25 +21,25 @@ async function getConfiguredAmplifyClient(context, options = {}) {
     };
   }
 
-  if (httpProxy) {
-    aws.config.update({
-      httpOptions: {
-        agent: new ProxyAgent(),
-      },
-    });
-  }
-
-  const config = { ...cred, ...defaultOptions, ...options };
+  const config = {
+    ...cred,
+    ...defaultOptions,
+    ...options,
+    requestHandler: new NodeHttpHandler({
+      httpAgent: proxyAgent(),
+      httpsAgent: proxyAgent(),
+    }),
+  };
 
   // this is the "project" config level case, creds and region are explicitly set or retrieved from a profile
   if (config.region) {
     if (amplifyServiceRegions.includes(config.region)) {
-      return new aws.Amplify(config);
+      return new AmplifyClient(config);
     }
     return undefined;
   }
   // this is the "general" config level case, aws sdk will resolve creds and region from env variables etc.
-  return new aws.Amplify(config);
+  return new AmplifyClient(config);
 }
 
 function printAuthErrorMessage(context) {

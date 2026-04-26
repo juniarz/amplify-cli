@@ -11,14 +11,14 @@ on:
       os:
         required: false
         type: string
-        default: '["macos-latest-xl", "ubuntu-latest", "amplify-cli_windows-latest_8-core"]'
+        default: '["macos-latest-xlarge", "ubuntu-latest", "amplify-cli_windows-latest_8-core"]'
       versions:
         required: false
         type: string
         default: '["rc", "latest"]'
 
 env:
-  NODE_OPTIONS: --max-old-space-size=8096
+  NODE_OPTIONS: --max-old-space-size=8096 --experimental-global-webcrypto
   IS_AMPLIFY_CLI_SMOKE_TEST_RUN: true
 
 jobs:
@@ -36,6 +36,18 @@ jobs:
         with:
           persist-credentials: false
 
+      - name: Install Python
+        uses: actions/setup-python@65d7f2d534ac1bc67fcd62888c5f4f3d2cb2b236 # v4.7.1
+        with:
+          python-version: '3.11'
+
+      - uses: actions/setup-node@60edb5dd545a775178f52524783378180af0d1f8 # version 4.0.2
+        if: runner.os == 'Windows'
+        with:
+          # Pin node to version before 18.20.2 due to https://github.com/nodejs/node/issues/52554
+          # Amplify App tries to spawn npm.cmd here https://github.com/aws-amplify/amplify-cli/blob/9571383521e6536ecf6568876609654393b27abb/packages/amplify-app/src/index.js#L88-L93
+          node-version: 18.20.0
+
       - name: Install Amplify CLI
         uses: ./.github/actions/install-cli
         with:
@@ -45,3 +57,4 @@ jobs:
         uses: ./.github/actions/run-smoke-tests
         with:
           role-to-assume: ${{ secrets.SMOKE_TESTS_ROLE_ARN }}
+          cli-version: ${{ matrix.cli-version }}

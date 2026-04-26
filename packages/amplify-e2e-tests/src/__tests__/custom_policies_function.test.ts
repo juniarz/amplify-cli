@@ -53,7 +53,7 @@ it('should init and deploy storage DynamoDB + Lambda trigger, attach custom poli
   );
 
   const meta = getProjectMeta(projRoot);
-  const { Region: region } = meta?.providers?.awscloudformation;
+  const region = meta?.providers?.awscloudformation.Region ?? undefined;
 
   // Put SSM parameter
   const ssmClient = new SSMClient({ region });
@@ -88,7 +88,7 @@ it('should init and deploy storage DynamoDB + Lambda trigger, attach custom poli
 
   // check that the lambda response includes the secret value
   const response = await invokeFunction(`${funcName}-integtest`, JSON.stringify(lambdaEvent), region);
-  expect(JSON.parse(response.Payload.toString())?.Value).toEqual('testCustomPoliciesValue');
+  expect(JSON.parse(response.Payload.transformToString())?.Value).toEqual('testCustomPoliciesValue');
 });
 
 type CustomIAMPolicy = {

@@ -8,7 +8,6 @@ const constants = require('./constants');
 const configManager = require('./configuration-manager');
 const setupNewUser = require('./setup-new-user');
 const { displayHelpfulURLs } = require('./display-helpful-urls');
-const aws = require('./aws-utils/aws');
 const { getLexRegionMapping } = require('./aws-utils/aws-lex');
 const amplifyService = require('./aws-utils/aws-amplify');
 const consoleCommand = require('./console');
@@ -56,12 +55,14 @@ import { getApiKeyConfig } from './utils/api-key-helpers';
 import { deleteEnvironmentParametersFromService } from './utils/ssm-utils/delete-ssm-parameters';
 export { deleteEnvironmentParametersFromService } from './utils/ssm-utils/delete-ssm-parameters';
 import { getEnvParametersUploadHandler, getEnvParametersDownloadHandler } from './utils/ssm-utils/env-parameter-ssm-helpers';
+import { proxyAgent } from './aws-utils/aws-globals';
 export {
   getEnvParametersUploadHandler,
   getEnvParametersDownloadHandler,
   DownloadHandler,
   PrimitiveRecord,
 } from './utils/ssm-utils/env-parameter-ssm-helpers';
+export { AwsSdkConfig } from './utils/auth-types';
 
 function init(context) {
   return initializer.run(context);
@@ -101,15 +102,23 @@ function configure(context) {
   return configManager.configure(context);
 }
 
-async function getConfiguredAWSClient(context, category, action) {
-  await aws.configureWithCreds(context);
+async function getConfiguredAWSClientConfig(context, category, action) {
+  const credsConfig = await loadConfiguration(context);
   category = category || 'missing';
   action = action || ['missing'];
   const userAgentAction = `${category}:${action[0]}`;
-  aws.config.update({
+  if (credsConfig.credentials && credsConfig.credentials.expiration && typeof credsConfig.credentials.expiration === 'string') {
+    credsConfig.credentials.expiration = new Date(credsConfig.credentials.expiration);
+  }
+  const config = {
+    credentials: credsConfig.credentials || credsConfig,
     customUserAgent: formUserAgentParam(context, userAgentAction),
-  });
-  return aws;
+    httpOptions: {
+      agent: proxyAgent(),
+    },
+    region: credsConfig.region,
+  };
+  return config;
 }
 
 function getConfiguredAmplifyClient(context, category, action, options = {}) {
@@ -168,7 +177,7 @@ module.exports = {
   storeCurrentCloudBackend,
   providerUtils,
   setupNewUser,
-  getConfiguredAWSClient,
+  getConfiguredAWSClientConfig,
   getLexRegionMapping,
   getConfiguredAmplifyClient,
   showHelpfulLinks,

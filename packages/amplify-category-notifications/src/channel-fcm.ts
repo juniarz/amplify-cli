@@ -3,6 +3,9 @@ import { printer, prompter } from '@aws-amplify/amplify-prompts';
 import ora from 'ora';
 import { ChannelAction, ChannelConfigDeploymentType, IChannelAPIResponse } from './channel-types';
 import { buildPinpointChannelResponseSuccess } from './pinpoint-helper';
+import { validateFilePath } from './validate-filepath';
+import fs from 'fs-extra';
+import { UpdateGcmChannelCommand, GetGcmChannelCommand } from '@aws-sdk/client-pinpoint';
 
 const channelName = 'FCM';
 const spinner = ora('');
@@ -42,12 +45,11 @@ export const enable = async (context: $TSContext, successMessage: string | undef
   if (context.exeInfo.pinpointInputParams?.[channelName]) {
     answers = validateInputParams(context.exeInfo.pinpointInputParams[channelName]);
   } else {
-    let channelOutput: $TSAny = {};
-    if (context.exeInfo.serviceMeta.output[channelName]) {
-      channelOutput = context.exeInfo.serviceMeta.output[channelName];
-    }
     answers = {
-      ApiKey: await prompter.input('Server Key', { initial: channelOutput.ApiKey, transform: (input) => input.trim() }),
+      ServiceJson: await fs.readFile(
+        await prompter.input('The service account file path (.json): ', { validate: validateFilePath }),
+        'utf8',
+      ),
     };
   }
 
@@ -55,13 +57,14 @@ export const enable = async (context: $TSContext, successMessage: string | undef
     ApplicationId: context.exeInfo.serviceMeta.output.Id,
     GCMChannelRequest: {
       ...answers,
+      DefaultAuthenticationMethod: 'TOKEN',
       Enabled: true,
     },
   };
 
   spinner.start('Enabling FCM channel.');
   try {
-    const data = await context.exeInfo.pinpointClient.updateGcmChannel(params).promise();
+    const data = await context.exeInfo.pinpointClient.send(new UpdateGcmChannelCommand(params));
     spinner.succeed(successMessage ?? `The ${channelName} channel has been successfully enabled.`);
     context.exeInfo.serviceMeta.output[channelName] = data.GCMChannelResponse;
     return buildPinpointChannelResponseSuccess(ChannelAction.ENABLE, deploymentType, channelName, data.GCMChannelResponse);
@@ -78,10 +81,10 @@ export const enable = async (context: $TSContext, successMessage: string | undef
 };
 
 const validateInputParams = (channelInput: $TSAny): $TSAny => {
-  if (!channelInput.ApiKey) {
+  if (!channelInput.ServiceJson) {
     throw new AmplifyError('UserInputError', {
-      message: 'Server Key is missing for the FCM channel',
-      resolution: 'Server Key for the FCM channel',
+      message: 'ServiceJson is missing for the FCM channel',
+      resolution: 'Provide the JSON from your Firebase service account json file',
     });
   }
   return channelInput;
@@ -97,25 +100,25 @@ export const disable = async (context: $TSContext): Promise<$TSAny> => {
   if (context.exeInfo.pinpointInputParams?.[channelName]) {
     answers = validateInputParams(context.exeInfo.pinpointInputParams[channelName]);
   } else {
-    let channelOutput: $TSAny = {};
-    if (context.exeInfo.serviceMeta.output[channelName]) {
-      channelOutput = context.exeInfo.serviceMeta.output[channelName];
-    }
     answers = {
-      ApiKey: await prompter.input('Server Key', { initial: channelOutput.ApiKey, transform: (input) => input.trim() }),
+      ServiceJson: await fs.readFile(
+        await prompter.input('The service account file path (.json): ', { validate: validateFilePath }),
+        'utf8',
+      ),
     };
   }
   const params = {
     ApplicationId: context.exeInfo.serviceMeta.output.Id,
     GCMChannelRequest: {
       ...answers,
+      DefaultAuthenticationMethod: 'TOKEN',
       Enabled: false,
     },
   };
 
   spinner.start('Disabling FCM channel.');
   try {
-    const data = await context.exeInfo.pinpointClient.updateGcmChannel(params).promise();
+    const data = await context.exeInfo.pinpointClient.send(new UpdateGcmChannelCommand(params));
     spinner.succeed(`The ${channelName} channel has been disabled.`);
     context.exeInfo.serviceMeta.output[channelName] = data.GCMChannelResponse;
     return buildPinpointChannelResponseSuccess(ChannelAction.DISABLE, deploymentType, channelName, data.GCMChannelResponse);
@@ -144,14 +147,14 @@ export const pull = async (context: $TSContext, pinpointApp: $TSAny): Promise<$T
 
   spinner.start(`Retrieving channel information for ${channelName}.`);
   try {
-    const data = await context.exeInfo.pinpointClient.getGcmChannel(params).promise();
+    const data = await context.exeInfo.pinpointClient.send(new GetGcmChannelCommand(params));
     spinner.succeed(`Successfully retrieved channel information for ${channelName}.`);
     // eslint-disable-next-line no-param-reassign
     pinpointApp[channelName] = data.GCMChannelResponse;
     return buildPinpointChannelResponseSuccess(ChannelAction.PULL, deploymentType, channelName, data.GCMChannelResponse);
   } catch (err) {
     spinner.stop();
-    if (err.code !== 'NotFoundException') {
+    if (err.name !== 'NotFoundException') {
       throw new AmplifyFault(
         'NotificationsChannelFCMFault',
         {

@@ -3,6 +3,153 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.1.37](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-category-interactions@5.1.36...@aws-amplify/amplify-category-interactions@5.1.37) (2025-10-31)
+
+
+### Reverts
+
+* Revert "refactor: amplify-category-notifications aws sdk v3 migration (#14271)" (#14285) ([510560d](https://github.com/aws-amplify/amplify-cli/commit/510560decb0735a0e8633aadfa6c23fae376dfe1)), closes [#14271](https://github.com/aws-amplify/amplify-cli/issues/14271) [#14285](https://github.com/aws-amplify/amplify-cli/issues/14285)
+
+
+
+
+
+## [5.1.36](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-category-interactions@5.1.35...@aws-amplify/amplify-category-interactions@5.1.36) (2025-10-08)
+
+**Note:** Version bump only for package @aws-amplify/amplify-category-interactions
+
+
+
+
+
+## [5.1.35](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-category-interactions@5.1.34...@aws-amplify/amplify-category-interactions@5.1.35) (2025-07-01)
+
+**Note:** Version bump only for package @aws-amplify/amplify-category-interactions
+
+
+
+
+
+## [5.1.34](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-category-interactions@5.1.33...@aws-amplify/amplify-category-interactions@5.1.34) (2025-04-17)
+
+**Note:** Version bump only for package @aws-amplify/amplify-category-interactions
+
+
+
+
+
+## [5.1.33](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-category-interactions@5.1.32...@aws-amplify/amplify-category-interactions@5.1.33) (2025-02-25)
+
+**Note:** Version bump only for package @aws-amplify/amplify-category-interactions
+
+
+
+
+
+## [5.1.32](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-category-interactions@5.1.31...@aws-amplify/amplify-category-interactions@5.1.32) (2025-02-20)
+
+**Note:** Version bump only for package @aws-amplify/amplify-category-interactions
+
+
+
+
+
+## [5.1.31](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-category-interactions@5.1.30...@aws-amplify/amplify-category-interactions@5.1.31) (2025-02-07)
+
+**Note:** Version bump only for package @aws-amplify/amplify-category-interactions
+
+
+
+
+
+## [5.1.30](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-category-interactions@5.1.29...@aws-amplify/amplify-category-interactions@5.1.30) (2025-01-30)
+
+**Note:** Version bump only for package @aws-amplify/amplify-category-interactions
+
+
+
+
+
+## [5.1.29](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-category-interactions@5.1.28...@aws-amplify/amplify-category-interactions@5.1.29) (2024-08-02)
+
+**Note:** Version bump only for package @aws-amplify/amplify-category-interactions
+
+
+
+
+
+## [5.1.28](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-category-interactions@5.1.27...@aws-amplify/amplify-category-interactions@5.1.28) (2024-06-27)
+
+**Note:** Version bump only for package @aws-amplify/amplify-category-interactions
+
+
+
+
+
+## [5.1.27](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-category-interactions@5.1.26...@aws-amplify/amplify-category-interactions@5.1.27) (2024-06-20)
+
+**Note:** Version bump only for package @aws-amplify/amplify-category-interactions
+
+
+
+
+
+## [5.1.26](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-category-interactions@5.1.25...@aws-amplify/amplify-category-interactions@5.1.26) (2024-06-06)
+
+**Note:** Version bump only for package @aws-amplify/amplify-category-interactions
+
+
+
+
+
+## [5.1.25](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-category-interactions@5.1.24...@aws-amplify/amplify-category-interactions@5.1.25) (2024-05-24)
+
+**Note:** Version bump only for package @aws-amplify/amplify-category-interactions
+
+
+
+
+
+## [5.1.24](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-category-interactions@5.1.23...@aws-amplify/amplify-category-interactions@5.1.24) (2024-05-07)
+
+**Note:** Version bump only for package @aws-amplify/amplify-category-interactions
+
+
+
+
+
+## [5.1.23](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-category-interactions@5.1.22...@aws-amplify/amplify-category-interactions@5.1.23) (2024-04-18)
+
+**Note:** Version bump only for package @aws-amplify/amplify-category-interactions
+
+
+
+
+
+## [5.1.22](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-category-interactions@5.1.21...@aws-amplify/amplify-category-interactions@5.1.22) (2024-04-15)
+
+**Note:** Version bump only for package @aws-amplify/amplify-category-interactions
+
+
+
+
+
+## [5.1.21](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-category-interactions@5.1.20...@aws-amplify/amplify-category-interactions@5.1.21) (2024-03-29)
+
+**Note:** Version bump only for package @aws-amplify/amplify-category-interactions
+
+
+
+
+
+## [5.1.20](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-category-interactions@5.1.19...@aws-amplify/amplify-category-interactions@5.1.20) (2024-03-06)
+
+**Note:** Version bump only for package @aws-amplify/amplify-category-interactions
+
+
+
+
+
 ## [5.1.19](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-category-interactions@5.1.18...@aws-amplify/amplify-category-interactions@5.1.19) (2023-12-11)
 
 **Note:** Version bump only for package @aws-amplify/amplify-category-interactions

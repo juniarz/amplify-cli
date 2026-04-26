@@ -3,6 +3,142 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.10.25](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-frontend-javascript@3.10.24...@aws-amplify/amplify-frontend-javascript@3.10.25) (2025-10-31)
+
+**Note:** Version bump only for package @aws-amplify/amplify-frontend-javascript
+
+
+
+
+
+## [3.10.24](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-frontend-javascript@3.10.23...@aws-amplify/amplify-frontend-javascript@3.10.24) (2025-10-08)
+
+**Note:** Version bump only for package @aws-amplify/amplify-frontend-javascript
+
+
+
+
+
+## [3.10.23](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-frontend-javascript@3.10.22...@aws-amplify/amplify-frontend-javascript@3.10.23) (2025-07-01)
+
+**Note:** Version bump only for package @aws-amplify/amplify-frontend-javascript
+
+
+
+
+
+## [3.10.22](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-frontend-javascript@3.10.21...@aws-amplify/amplify-frontend-javascript@3.10.22) (2025-04-17)
+
+**Note:** Version bump only for package @aws-amplify/amplify-frontend-javascript
+
+
+
+
+
+## [3.10.21](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-frontend-javascript@3.10.20...@aws-amplify/amplify-frontend-javascript@3.10.21) (2025-02-20)
+
+**Note:** Version bump only for package @aws-amplify/amplify-frontend-javascript
+
+
+
+
+
+## [3.10.20](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-frontend-javascript@3.10.19...@aws-amplify/amplify-frontend-javascript@3.10.20) (2025-02-07)
+
+**Note:** Version bump only for package @aws-amplify/amplify-frontend-javascript
+
+
+
+
+
+## [3.10.19](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-frontend-javascript@3.10.18...@aws-amplify/amplify-frontend-javascript@3.10.19) (2025-01-30)
+
+**Note:** Version bump only for package @aws-amplify/amplify-frontend-javascript
+
+
+
+
+
+## [3.10.18](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-frontend-javascript@3.10.17...@aws-amplify/amplify-frontend-javascript@3.10.18) (2024-08-02)
+
+**Note:** Version bump only for package @aws-amplify/amplify-frontend-javascript
+
+
+
+
+
+## [3.10.17](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-frontend-javascript@3.10.16...@aws-amplify/amplify-frontend-javascript@3.10.17) (2024-06-27)
+
+**Note:** Version bump only for package @aws-amplify/amplify-frontend-javascript
+
+
+
+
+
+## [3.10.16](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-frontend-javascript@3.10.15...@aws-amplify/amplify-frontend-javascript@3.10.16) (2024-06-20)
+
+**Note:** Version bump only for package @aws-amplify/amplify-frontend-javascript
+
+
+
+
+
+## [3.10.15](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-frontend-javascript@3.10.14...@aws-amplify/amplify-frontend-javascript@3.10.15) (2024-06-06)
+
+**Note:** Version bump only for package @aws-amplify/amplify-frontend-javascript
+
+
+
+
+
+## [3.10.14](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-frontend-javascript@3.10.13...@aws-amplify/amplify-frontend-javascript@3.10.14) (2024-05-24)
+
+**Note:** Version bump only for package @aws-amplify/amplify-frontend-javascript
+
+
+
+
+
+## [3.10.13](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-frontend-javascript@3.10.12...@aws-amplify/amplify-frontend-javascript@3.10.13) (2024-05-07)
+
+**Note:** Version bump only for package @aws-amplify/amplify-frontend-javascript
+
+
+
+
+
+## [3.10.12](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-frontend-javascript@3.10.11...@aws-amplify/amplify-frontend-javascript@3.10.12) (2024-04-18)
+
+**Note:** Version bump only for package @aws-amplify/amplify-frontend-javascript
+
+
+
+
+
+## [3.10.11](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-frontend-javascript@3.10.10...@aws-amplify/amplify-frontend-javascript@3.10.11) (2024-04-15)
+
+**Note:** Version bump only for package @aws-amplify/amplify-frontend-javascript
+
+
+
+
+
+## [3.10.10](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-frontend-javascript@3.10.9...@aws-amplify/amplify-frontend-javascript@3.10.10) (2024-03-29)
+
+**Note:** Version bump only for package @aws-amplify/amplify-frontend-javascript
+
+
+
+
+
+## [3.10.9](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-frontend-javascript@3.10.8...@aws-amplify/amplify-frontend-javascript@3.10.9) (2024-03-06)
+
+**Note:** Version bump only for package @aws-amplify/amplify-frontend-javascript
+
+
+
+
+
 ## [3.10.8](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-frontend-javascript@3.10.7...@aws-amplify/amplify-frontend-javascript@3.10.8) (2023-12-11)
 
 **Note:** Version bump only for package @aws-amplify/amplify-frontend-javascript

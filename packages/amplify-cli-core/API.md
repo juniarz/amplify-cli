@@ -821,6 +821,9 @@ export class ExportPathValidationError extends AmplifyError {
 }
 
 // @public (undocumented)
+export const extract: any;
+
+// @public (undocumented)
 export function fancy(message?: string): void;
 
 // @public (undocumented)
@@ -1488,13 +1491,15 @@ export interface PackageManager {
     // (undocumented)
     readonly executable: string;
     // (undocumented)
-    getInstallArgs: (buildType: BuildType) => string[];
+    getInstallArgs: (buildType: BuildType, resourceDir?: string) => string[];
     // (undocumented)
     getRunScriptArgs: (scriptName: string) => string[];
     // (undocumented)
     readonly lockFile: string;
     // (undocumented)
     readonly packageManager: PackageManagerType;
+    // (undocumented)
+    readonly runner: string;
     // (undocumented)
     version?: SemVer;
 }

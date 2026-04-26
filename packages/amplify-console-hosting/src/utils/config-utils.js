@@ -2,13 +2,14 @@
 const fs = require('fs-extra');
 const path = require('path');
 const { pathManager, PathConstants, stateManager } = require('@aws-amplify/amplify-cli-core');
-const glob = require('glob');
+const { globSync } = require('glob');
 const constants = require('../constants/plugin-constants');
 const utils = require('../utils/amplify-context-utils');
 const clientFactory = require('../utils/client-factory');
 const consolePathManager = require('../utils/path-manager');
 const buildUtils = require('./build-utils');
 const { ensureEnvParamManager } = require('@aws-amplify/amplify-environment-parameters');
+const { PutObjectCommand } = require('@aws-sdk/client-s3');
 
 function initCFNTemplate(context, templateFilePath) {
   const templateContent = context.amplify.readJsonFile(templateFilePath);
@@ -153,7 +154,7 @@ async function storeCurrentCloudBackend(context) {
 
   try {
     const zipFilePath = path.normalize(path.join(tempDir, zipFilename));
-    const cliJSONFiles = glob.sync(PathConstants.CLIJSONFileNameGlob, {
+    const cliJSONFiles = globSync(PathConstants.CLIJSONFileNameGlob, {
       cwd: pathManager.getAmplifyDirPath(),
       absolute: true,
     });
@@ -176,7 +177,7 @@ async function uploadFile(s3, filePath, key) {
     };
     const projectBucket = stateManager.getMeta().providers[constants.PROVIDER].DeploymentBucketName;
     s3Params.Bucket = projectBucket;
-    await s3.putObject(s3Params).promise();
+    await s3.send(new PutObjectCommand(s3Params));
     return projectBucket;
   }
 }

@@ -21,7 +21,7 @@ batch:
     - identifier: build_windows
       buildspec: codebuild_specs/build_windows.yml
       env:
-        type: WINDOWS_SERVER_2019_CONTAINER
+        type: WINDOWS_SERVER_2022_CONTAINER
         compute-type: BUILD_GENERAL1_LARGE
         image: $WINDOWS_IMAGE_2019
     - identifier: test
@@ -58,36 +58,54 @@ batch:
         - build_linux
     - identifier: publish_to_local_registry
       buildspec: codebuild_specs/publish_to_local_registry.yml
+      depend-on:
+        - build_linux
       env:
         compute-type: BUILD_GENERAL1_LARGE
     - identifier: build_pkg_binaries_arm
       buildspec: codebuild_specs/build_pkg_binaries_arm.yml
+      depend-on:
+        - publish_to_local_registry
       env:
         compute-type: BUILD_GENERAL1_LARGE
     - identifier: build_pkg_binaries_linux
       buildspec: codebuild_specs/build_pkg_binaries_linux.yml
+      depend-on:
+        - publish_to_local_registry
       env:
         compute-type: BUILD_GENERAL1_LARGE
     - identifier: build_pkg_binaries_macos
       buildspec: codebuild_specs/build_pkg_binaries_macos.yml
+      depend-on:
+        - publish_to_local_registry
       env:
         compute-type: BUILD_GENERAL1_LARGE
     - identifier: build_pkg_binaries_win
       buildspec: codebuild_specs/build_pkg_binaries_win.yml
+      depend-on:
+        - publish_to_local_registry
       env:
         compute-type: BUILD_GENERAL1_LARGE
     - identifier: upb
       buildspec: codebuild_specs/upload_pkg_binaries.yml
+      depend-on:
+        - build_pkg_binaries_arm
+        - build_pkg_binaries_linux
+        - build_pkg_binaries_macos
+        - build_pkg_binaries_win
       env:
         compute-type: BUILD_GENERAL1_LARGE
     - identifier: verify_versions_match
       buildspec: codebuild_specs/verify_versions_match.yml
       depend-on:
-        - build_linux
+        - publish_to_local_registry
     - identifier: verify_pkg_cli
       buildspec: codebuild_specs/verify_pkg_cli.yml
       depend-on:
-        - build_linux
+        - build_pkg_binaries_arm
+        - build_pkg_binaries_linux
+        - build_pkg_binaries_macos
+        - build_pkg_binaries_win
       env:
         compute-type: BUILD_GENERAL1_LARGE
     - identifier: run_e2e_tests_linux
@@ -121,7 +139,7 @@ batch:
     - identifier: run_e2e_tests_windows
       buildspec: codebuild_specs/run_e2e_tests_windows.yml
       env:
-        type: WINDOWS_SERVER_2019_CONTAINER
+        type: WINDOWS_SERVER_2022_CONTAINER
         compute-type: BUILD_GENERAL1_LARGE
         image: $WINDOWS_IMAGE_2019
         variables:
@@ -152,18 +170,6 @@ batch:
       buildspec: codebuild_specs/amplify_console_integration_tests.yml
       env:
         compute-type: BUILD_GENERAL1_LARGE
-      depend-on:
-        - upb
-    - identifier: amplify_migration_tests_non_multi_env_layers
-      buildspec: codebuild_specs/amplify_migration_tests_non_multi_env_layers.yml
-      env:
-        compute-type: BUILD_GENERAL1_MEDIUM
-      depend-on:
-        - upb
-    - identifier: amplify_migration_tests_multi_env_layers
-      buildspec: codebuild_specs/amplify_migration_tests_multi_env_layers.yml
-      env:
-        compute-type: BUILD_GENERAL1_MEDIUM
       depend-on:
         - upb
     - identifier: aggregate_e2e_reports

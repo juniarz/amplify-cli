@@ -31,12 +31,17 @@ export async function initWithoutCredentialFileAndNoNewUserSetup(projRoot) {
     }
     await initWorkflow(projRoot, settings);
   } finally {
+    // reset credentials and config files
     if (fs.existsSync(configFilePathHide)) {
       fs.renameSync(configFilePathHide, configFilePath);
     }
     if (fs.existsSync(credentialsFilePathHide)) {
       fs.renameSync(credentialsFilePathHide, credentialsFilePath);
     }
+    process.env.AWS_ACCESS_KEY_ID = settings.accessKeyId;
+    process.env.AWS_SECRET_ACCESS_KEY = settings.secretAccessKey;
+    process.env.AWS_DEFAULT_REGION = settings.region;
+    process.env.AWS_REGION = settings.region;
   }
 }
 
@@ -51,6 +56,10 @@ async function initWorkflow(cwd: string, settings: { accessKeyId: string; secret
         CLI_DEV_INTERNAL_DISABLE_AMPLIFY_APP_CREATION: '1',
       },
     })
+      .wait('Do you want to continue with Amplify Gen 1?')
+      .sendYes()
+      .wait('Why would you like to use Amplify Gen 1?')
+      .sendCarriageReturn()
       .wait('Enter a name for the project')
       .sendCarriageReturn()
       .wait('Initialize the project with the above configuration?')

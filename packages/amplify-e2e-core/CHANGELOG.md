@@ -3,6 +3,218 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.7.10](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-e2e-core@5.7.9...@aws-amplify/amplify-e2e-core@5.7.10) (2026-01-22)
+
+**Note:** Version bump only for package @aws-amplify/amplify-e2e-core
+
+
+
+
+
+## [5.7.9](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-e2e-core@5.7.8...@aws-amplify/amplify-e2e-core@5.7.9) (2025-11-20)
+
+**Note:** Version bump only for package @aws-amplify/amplify-e2e-core
+
+
+
+
+
+## [5.7.8](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-e2e-core@5.7.7...@aws-amplify/amplify-e2e-core@5.7.8) (2025-11-03)
+
+
+### Bug Fixes
+
+* role assumption through profiles not working properly in certain situations ([#14315](https://github.com/aws-amplify/amplify-cli/issues/14315)) ([04f7bcf](https://github.com/aws-amplify/amplify-cli/commit/04f7bcfc2467b84e111b7a2b687bd34d3a23d16e))
+
+
+
+
+
+## [5.7.7](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-e2e-core@5.7.6...@aws-amplify/amplify-e2e-core@5.7.7) (2025-10-31)
+
+
+### Bug Fixes
+
+* upgrade `@aws-sdk/*` to latest ([#14306](https://github.com/aws-amplify/amplify-cli/issues/14306)) ([faca740](https://github.com/aws-amplify/amplify-cli/commit/faca7400e65374536e28f58119bb6a66c48aa4d7))
+
+
+### Reverts
+
+* Revert "refactor: amplify-category-notifications aws sdk v3 migration (#14271)" (#14285) ([510560d](https://github.com/aws-amplify/amplify-cli/commit/510560decb0735a0e8633aadfa6c23fae376dfe1)), closes [#14271](https://github.com/aws-amplify/amplify-cli/issues/14271) [#14285](https://github.com/aws-amplify/amplify-cli/issues/14285)
+
+
+
+
+
+## [5.7.6](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-e2e-core@5.7.5...@aws-amplify/amplify-e2e-core@5.7.6) (2025-10-08)
+
+**Note:** Version bump only for package @aws-amplify/amplify-e2e-core
+
+
+
+
+
+## [5.7.5](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-e2e-core@5.7.4...@aws-amplify/amplify-e2e-core@5.7.5) (2025-07-01)
+
+
+### Bug Fixes
+
+* upgrade most packages that use `rimraf` and `glob` ([#14153](https://github.com/aws-amplify/amplify-cli/issues/14153)) ([c85ed14](https://github.com/aws-amplify/amplify-cli/commit/c85ed14b2fe61c09a026f7bb7c82857b5227dff2))
+
+
+
+
+
+## [5.7.4](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-e2e-core@5.7.3...@aws-amplify/amplify-e2e-core@5.7.4) (2025-04-17)
+
+**Note:** Version bump only for package @aws-amplify/amplify-e2e-core
+
+
+
+
+
+## [5.7.3](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-e2e-core@5.7.2...@aws-amplify/amplify-e2e-core@5.7.3) (2025-02-20)
+
+**Note:** Version bump only for package @aws-amplify/amplify-e2e-core
+
+
+
+
+
+## [5.7.2](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-e2e-core@5.7.1...@aws-amplify/amplify-e2e-core@5.7.2) (2025-02-07)
+
+**Note:** Version bump only for package @aws-amplify/amplify-e2e-core
+
+
+
+
+
+## [5.7.1](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-e2e-core@5.7.0...@aws-amplify/amplify-e2e-core@5.7.1) (2025-01-30)
+
+**Note:** Version bump only for package @aws-amplify/amplify-e2e-core
+
+
+
+
+
+# [5.7.0](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-e2e-core@5.6.1...@aws-amplify/amplify-e2e-core@5.7.0) (2025-01-02)
+
+
+### Features
+
+* lambda dotnet 8 support ([#14026](https://github.com/aws-amplify/amplify-cli/issues/14026)) ([540bfe1](https://github.com/aws-amplify/amplify-cli/commit/540bfe1187907609c3c813e1208c12b6a2a6ac6c))
+
+
+
+
+
+## [5.6.1](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-e2e-core@5.6.0...@aws-amplify/amplify-e2e-core@5.6.1) (2024-11-18)
+
+**Note:** Version bump only for package @aws-amplify/amplify-e2e-core
+
+
+
+
+
+# [5.6.0](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-e2e-core@5.5.10...@aws-amplify/amplify-e2e-core@5.6.0) (2024-10-05)
+
+
+### Features
+
+* add init prompts for Gen2 ([#13849](https://github.com/aws-amplify/amplify-cli/issues/13849)) ([7ab8fae](https://github.com/aws-amplify/amplify-cli/commit/7ab8faef1e2ce0c15db783d236aeee9d312ec135))
+
+
+
+
+
+## [5.5.10](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-e2e-core@5.5.9...@aws-amplify/amplify-e2e-core@5.5.10) (2024-08-02)
+
+**Note:** Version bump only for package @aws-amplify/amplify-e2e-core
+
+
+
+
+
+## [5.5.9](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-e2e-core@5.5.8...@aws-amplify/amplify-e2e-core@5.5.9) (2024-06-27)
+
+**Note:** Version bump only for package @aws-amplify/amplify-e2e-core
+
+
+
+
+
+## [5.5.8](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-e2e-core@5.5.7...@aws-amplify/amplify-e2e-core@5.5.8) (2024-06-20)
+
+**Note:** Version bump only for package @aws-amplify/amplify-e2e-core
+
+
+
+
+
+## [5.5.7](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-e2e-core@5.5.6...@aws-amplify/amplify-e2e-core@5.5.7) (2024-06-06)
+
+**Note:** Version bump only for package @aws-amplify/amplify-e2e-core
+
+
+
+
+
+## [5.5.6](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-e2e-core@5.5.5...@aws-amplify/amplify-e2e-core@5.5.6) (2024-05-24)
+
+**Note:** Version bump only for package @aws-amplify/amplify-e2e-core
+
+
+
+
+
+## [5.5.5](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-e2e-core@5.5.4...@aws-amplify/amplify-e2e-core@5.5.5) (2024-05-07)
+
+**Note:** Version bump only for package @aws-amplify/amplify-e2e-core
+
+
+
+
+
+## [5.5.4](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-e2e-core@5.5.3...@aws-amplify/amplify-e2e-core@5.5.4) (2024-04-18)
+
+**Note:** Version bump only for package @aws-amplify/amplify-e2e-core
+
+
+
+
+
+## [5.5.3](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-e2e-core@5.5.2...@aws-amplify/amplify-e2e-core@5.5.3) (2024-04-15)
+
+**Note:** Version bump only for package @aws-amplify/amplify-e2e-core
+
+
+
+
+
+## [5.5.2](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-e2e-core@5.5.1...@aws-amplify/amplify-e2e-core@5.5.2) (2024-03-29)
+
+**Note:** Version bump only for package @aws-amplify/amplify-e2e-core
+
+
+
+
+
+## [5.5.1](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-e2e-core@5.5.0...@aws-amplify/amplify-e2e-core@5.5.1) (2024-03-06)
+
+
+### Bug Fixes
+
+* limit query parameter parsing in auth admin api ([#13512](https://github.com/aws-amplify/amplify-cli/issues/13512)) ([2480681](https://github.com/aws-amplify/amplify-cli/commit/24806814ce2275fe7d70e5484c3c485023b8041a))
+
+
+### Reverts
+
+* Revert "chore: bump data package versions (#13486)" (#13487) ([3280d40](https://github.com/aws-amplify/amplify-cli/commit/3280d40a5ab50c675b0e2b8050ad35a69c83cdc2)), closes [#13486](https://github.com/aws-amplify/amplify-cli/issues/13486) [#13487](https://github.com/aws-amplify/amplify-cli/issues/13487)
+
+
+
+
+
 # [5.5.0](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-e2e-core@5.4.4...@aws-amplify/amplify-e2e-core@5.5.0) (2023-12-11)
 
 

@@ -3,6 +3,153 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.7.23](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-opensearch-simulator@1.7.22...@aws-amplify/amplify-opensearch-simulator@1.7.23) (2025-10-31)
+
+**Note:** Version bump only for package @aws-amplify/amplify-opensearch-simulator
+
+
+
+
+
+## [1.7.22](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-opensearch-simulator@1.7.21...@aws-amplify/amplify-opensearch-simulator@1.7.22) (2025-10-22)
+
+
+### Reverts
+
+* Revert "refactor: amplify-category-notifications aws sdk v3 migration (#14271)" (#14285) ([510560d](https://github.com/aws-amplify/amplify-cli/commit/510560decb0735a0e8633aadfa6c23fae376dfe1)), closes [#14271](https://github.com/aws-amplify/amplify-cli/issues/14271) [#14285](https://github.com/aws-amplify/amplify-cli/issues/14285)
+
+
+
+
+
+## [1.7.21](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-opensearch-simulator@1.7.20...@aws-amplify/amplify-opensearch-simulator@1.7.21) (2025-10-08)
+
+**Note:** Version bump only for package @aws-amplify/amplify-opensearch-simulator
+
+
+
+
+
+## [1.7.20](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-opensearch-simulator@1.7.19...@aws-amplify/amplify-opensearch-simulator@1.7.20) (2025-07-01)
+
+**Note:** Version bump only for package @aws-amplify/amplify-opensearch-simulator
+
+
+
+
+
+## [1.7.19](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-opensearch-simulator@1.7.18...@aws-amplify/amplify-opensearch-simulator@1.7.19) (2025-04-17)
+
+**Note:** Version bump only for package @aws-amplify/amplify-opensearch-simulator
+
+
+
+
+
+## [1.7.18](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-opensearch-simulator@1.7.17...@aws-amplify/amplify-opensearch-simulator@1.7.18) (2025-02-20)
+
+**Note:** Version bump only for package @aws-amplify/amplify-opensearch-simulator
+
+
+
+
+
+## [1.7.17](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-opensearch-simulator@1.7.16...@aws-amplify/amplify-opensearch-simulator@1.7.17) (2025-02-07)
+
+**Note:** Version bump only for package @aws-amplify/amplify-opensearch-simulator
+
+
+
+
+
+## [1.7.16](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-opensearch-simulator@1.7.15...@aws-amplify/amplify-opensearch-simulator@1.7.16) (2025-01-30)
+
+**Note:** Version bump only for package @aws-amplify/amplify-opensearch-simulator
+
+
+
+
+
+## [1.7.15](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-opensearch-simulator@1.7.14...@aws-amplify/amplify-opensearch-simulator@1.7.15) (2024-08-02)
+
+**Note:** Version bump only for package @aws-amplify/amplify-opensearch-simulator
+
+
+
+
+
+## [1.7.14](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-opensearch-simulator@1.7.13...@aws-amplify/amplify-opensearch-simulator@1.7.14) (2024-06-27)
+
+**Note:** Version bump only for package @aws-amplify/amplify-opensearch-simulator
+
+
+
+
+
+## [1.7.13](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-opensearch-simulator@1.7.12...@aws-amplify/amplify-opensearch-simulator@1.7.13) (2024-06-20)
+
+**Note:** Version bump only for package @aws-amplify/amplify-opensearch-simulator
+
+
+
+
+
+## [1.7.12](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-opensearch-simulator@1.7.11...@aws-amplify/amplify-opensearch-simulator@1.7.12) (2024-06-06)
+
+**Note:** Version bump only for package @aws-amplify/amplify-opensearch-simulator
+
+
+
+
+
+## [1.7.11](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-opensearch-simulator@1.7.10...@aws-amplify/amplify-opensearch-simulator@1.7.11) (2024-05-24)
+
+**Note:** Version bump only for package @aws-amplify/amplify-opensearch-simulator
+
+
+
+
+
+## [1.7.10](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-opensearch-simulator@1.7.9...@aws-amplify/amplify-opensearch-simulator@1.7.10) (2024-05-07)
+
+**Note:** Version bump only for package @aws-amplify/amplify-opensearch-simulator
+
+
+
+
+
+## [1.7.9](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-opensearch-simulator@1.7.8...@aws-amplify/amplify-opensearch-simulator@1.7.9) (2024-04-18)
+
+**Note:** Version bump only for package @aws-amplify/amplify-opensearch-simulator
+
+
+
+
+
+## [1.7.8](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-opensearch-simulator@1.7.7...@aws-amplify/amplify-opensearch-simulator@1.7.8) (2024-04-15)
+
+**Note:** Version bump only for package @aws-amplify/amplify-opensearch-simulator
+
+
+
+
+
+## [1.7.7](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-opensearch-simulator@1.7.6...@aws-amplify/amplify-opensearch-simulator@1.7.7) (2024-03-29)
+
+**Note:** Version bump only for package @aws-amplify/amplify-opensearch-simulator
+
+
+
+
+
+## [1.7.6](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-opensearch-simulator@1.7.5...@aws-amplify/amplify-opensearch-simulator@1.7.6) (2024-03-06)
+
+**Note:** Version bump only for package @aws-amplify/amplify-opensearch-simulator
+
+
+
+
+
 ## [1.7.5](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-opensearch-simulator@1.7.4...@aws-amplify/amplify-opensearch-simulator@1.7.5) (2023-12-11)
 
 **Note:** Version bump only for package @aws-amplify/amplify-opensearch-simulator

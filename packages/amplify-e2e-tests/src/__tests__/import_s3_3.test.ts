@@ -1,4 +1,4 @@
-import * as aws from 'aws-sdk';
+import { S3Client, CreateBucketCommand, GetBucketLocationCommand, DeleteBucketCommand } from '@aws-sdk/client-s3';
 import {
   addAuthWithDefault,
   amplifyPushAuth,
@@ -19,8 +19,6 @@ import {
   getS3ResourceName,
 } from '../import-helpers';
 
-const profileName = 'amplify-integ-test-user';
-
 describe('headless s3 import', () => {
   const projectPrefix = 'sssheadimp';
   const bucketPrefix = 'sss-headless-import-test';
@@ -38,29 +36,27 @@ describe('headless s3 import', () => {
     const shortId = getShortId();
     bucketNameToImport = `${bucketPrefix}${shortId}`;
 
-    const credentials = new aws.SharedIniFileCredentials({ profile: profileName });
-    aws.config.credentials = credentials;
+    // setting default region for S3 Client
+    const s3 = new S3Client({ region: 'us-east-1' });
 
-    const s3 = new aws.S3();
-
-    await s3
-      .createBucket({
+    await s3.send(
+      new CreateBucketCommand({
         Bucket: bucketNameToImport,
-      })
-      .promise();
+      }),
+    );
 
-    const locationResponse = await s3
-      .getBucketLocation({
+    const locationResponse = await s3.send(
+      new GetBucketLocationCommand({
         Bucket: bucketNameToImport,
-      })
-      .promise();
+      }),
+    );
 
     // For us-east-1 buckets the LocationConstraint is always emtpy, we have to return a
     // region in every case.
     // https://docs.aws.amazon.com/AmazonS3/latest/API/API_GetBucketLocation.html
     if (
       locationResponse.LocationConstraint === undefined ||
-      locationResponse.LocationConstraint === '' ||
+      locationResponse.LocationConstraint.toString() === '' ||
       locationResponse.LocationConstraint === null
     ) {
       bucketLocation = 'us-east-1';
@@ -70,14 +66,14 @@ describe('headless s3 import', () => {
   });
 
   afterAll(async () => {
-    // Delete bucket
-    const s3 = new aws.S3();
+    // Delete bucket- in SDK V3, buckets are very picky about the region their client is in
+    const s3 = new S3Client({ region: bucketLocation || 'us-east-1' });
 
-    await s3
-      .deleteBucket({
+    await s3.send(
+      new DeleteBucketCommand({
         Bucket: bucketNameToImport,
-      })
-      .promise();
+      }),
+    );
   });
 
   beforeEach(async () => {

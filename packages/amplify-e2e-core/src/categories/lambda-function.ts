@@ -1,18 +1,18 @@
 import { nspawn as spawn, ExecutionContext, KEY_DOWN_ARROW, getCLIPath, getProjectMeta, getBackendAmplifyMeta, invokeFunction } from '..';
-import { Lambda } from 'aws-sdk';
+import { InvokeCommandOutput } from '@aws-sdk/client-lambda';
 import { singleSelect, multiSelect, moveUp, moveDown } from '../utils/selectors';
-import * as glob from 'glob';
+import { globSync } from 'glob';
 import * as path from 'path';
 import _ from 'lodash';
 import { loadFeatureFlags } from '../utils/feature-flags';
 type FunctionActions = 'create' | 'update';
 
-type FunctionRuntimes = 'dotnet6' | 'go' | 'java' | 'nodejs' | 'python';
+type FunctionRuntimes = 'dotnet8' | 'go' | 'java' | 'nodejs' | 'python';
 
 type FunctionCallback = (chain: any, cwd: string, settings: any) => any;
 
 // runtimeChoices are shared between tests
-export const runtimeChoices = ['.NET 6', 'Go', 'Java', 'NodeJS', 'Python'];
+export const runtimeChoices = ['.NET 8', 'Go', 'Java', 'NodeJS', 'Python'];
 
 // templateChoices is per runtime
 const dotNetTemplateChoices = [
@@ -636,10 +636,7 @@ export const functionMockAssert = (
   });
 };
 
-export const functionCloudInvoke = async (
-  cwd: string,
-  settings: { funcName: string; payload: string },
-): Promise<Lambda.InvocationResponse> => {
+export const functionCloudInvoke = async (cwd: string, settings: { funcName: string; payload: string }): Promise<InvokeCommandOutput> => {
   const meta = getProjectMeta(cwd);
   const lookupName = settings.funcName;
   expect(meta.function[lookupName]).toBeDefined();
@@ -647,15 +644,15 @@ export const functionCloudInvoke = async (
   expect(functionName).toBeDefined();
   expect(region).toBeDefined();
   const result = await invokeFunction(functionName, settings.payload, region);
-  if (!result.$response.data) {
-    throw new Error('No data in lambda response');
+  if (!result.Payload) {
+    throw new Error('No payload in lambda response');
   }
-  return result.$response.data as Lambda.InvocationResponse;
+  return result;
 };
 
 const getTemplateChoices = (runtime: FunctionRuntimes) => {
   switch (runtime) {
-    case 'dotnet6':
+    case 'dotnet8':
       return dotNetTemplateChoices;
     case 'go':
       return goTemplateChoices;
@@ -672,8 +669,8 @@ const getTemplateChoices = (runtime: FunctionRuntimes) => {
 
 const getRuntimeDisplayName = (runtime: FunctionRuntimes) => {
   switch (runtime) {
-    case 'dotnet6':
-      return '.NET 6';
+    case 'dotnet8':
+      return '.NET 8';
     case 'go':
       return 'Go';
     case 'java':
@@ -689,7 +686,7 @@ const getRuntimeDisplayName = (runtime: FunctionRuntimes) => {
 
 export function validateNodeModulesDirRemoval(projRoot) {
   const functionDir = path.join(projRoot, 'amplify', '#current-cloud-backend', 'function');
-  const nodeModulesDirs = glob.sync('**/node_modules', {
+  const nodeModulesDirs = globSync('**/node_modules', {
     cwd: functionDir,
     absolute: true,
   });

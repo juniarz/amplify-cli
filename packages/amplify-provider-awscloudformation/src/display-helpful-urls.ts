@@ -245,15 +245,15 @@ export const showSMSSandboxWarning = async (context): Promise<void> => {
       printer.warn(productionModeInfo);
     }
   } catch (e) {
-    if (e.code === 'AuthorizationError') {
+    if (e.name === 'AuthorizationError') {
       if (smsSandBoxMissingPermissionWarning) {
         printer.warn(smsSandBoxMissingPermissionWarning);
       }
     } else if (e instanceof TypeError) {
       printer.warn(cliUpdateWarning);
-    } else if (e.code === 'ResourceNotFound') {
+    } else if (e.name === 'ResourceNotFound') {
       // API is not public yet. Ignore it for now. This error should not occur as `COGNITO_SMS_SANDBOX_UPDATE_WARNING` will not be set
-    } else if (e.code === 'UnknownEndpoint') {
+    } else if (e.name === 'UnknownEndpoint') {
       // Network error. Sandbox status is for informational purpose and should not stop deployment
       log(e);
     } else {
@@ -261,7 +261,7 @@ export const showSMSSandboxWarning = async (context): Promise<void> => {
         'SnsSandboxModeCheckFault',
         {
           message: e.message,
-          code: e.code,
+          code: e.name,
         },
         e,
       );
@@ -271,7 +271,7 @@ export const showSMSSandboxWarning = async (context): Promise<void> => {
 
 const showGraphQLTransformerMigrationMessage = (): void => {
   const hasGraphqlApi = !!Object.entries(stateManager.getMeta().api || {})
-    .filter(([__, apiResource]) => (apiResource as $TSAny).service === 'AppSync')
+    .filter(([, apiResource]) => (apiResource as $TSAny).service === 'AppSync')
     .map(([name]) => name).length;
   const suppressMessage = FeatureFlags.getBoolean('graphqltransformer.suppressSchemaMigrationPrompt');
   const usingV2 = FeatureFlags.getNumber('graphqltransformer.transformerVersion') === 2;
@@ -293,7 +293,7 @@ export const showGraphQLTransformerVersion = async (context): Promise<void> => {
   const meta = stateManager.getMeta();
   const apiObject = (meta && meta.api) || {};
   const hasGraphqlApi = !!Object.entries(apiObject)
-    .filter(([__, apiResource]) => (apiResource as $TSAny).service === 'AppSync')
+    .filter(([, apiResource]) => (apiResource as $TSAny).service === 'AppSync')
     .map(([name]) => name).length;
 
   if (!hasGraphqlApi) {

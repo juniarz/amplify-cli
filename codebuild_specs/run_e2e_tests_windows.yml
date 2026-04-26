@@ -2,7 +2,6 @@ version: 0.2
 env:
   shell: powershell.exe
   variables:
-    CLI_REGION: us-east-1
     TEST_SUITE: src/__tests__/auth_2a.test.ts|src/__tests__/auth_2b.test.ts|src/__tests__/auth_2d.test.ts|src/__tests__/auth_2f.test.ts
     CI: true
     CIRCLECI: true
@@ -26,7 +25,6 @@ env:
 phases:
   build:
     commands:
-      - choco install -fy jq
       - git config --global core.longpaths true
       - bash ./codebuild_specs/scripts-windows/load-e2e-cache.sh
       - bash ./codebuild_specs/scripts-windows/rename-packaged-cli.sh

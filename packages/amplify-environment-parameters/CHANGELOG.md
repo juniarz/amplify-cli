@@ -3,6 +3,153 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.9.23](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-environment-parameters@1.9.22...@aws-amplify/amplify-environment-parameters@1.9.23) (2025-10-31)
+
+**Note:** Version bump only for package @aws-amplify/amplify-environment-parameters
+
+
+
+
+
+## [1.9.22](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-environment-parameters@1.9.21...@aws-amplify/amplify-environment-parameters@1.9.22) (2025-10-22)
+
+
+### Reverts
+
+* Revert "refactor: amplify-category-notifications aws sdk v3 migration (#14271)" (#14285) ([510560d](https://github.com/aws-amplify/amplify-cli/commit/510560decb0735a0e8633aadfa6c23fae376dfe1)), closes [#14271](https://github.com/aws-amplify/amplify-cli/issues/14271) [#14285](https://github.com/aws-amplify/amplify-cli/issues/14285)
+
+
+
+
+
+## [1.9.21](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-environment-parameters@1.9.20...@aws-amplify/amplify-environment-parameters@1.9.21) (2025-10-08)
+
+**Note:** Version bump only for package @aws-amplify/amplify-environment-parameters
+
+
+
+
+
+## [1.9.20](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-environment-parameters@1.9.19...@aws-amplify/amplify-environment-parameters@1.9.20) (2025-07-01)
+
+**Note:** Version bump only for package @aws-amplify/amplify-environment-parameters
+
+
+
+
+
+## [1.9.19](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-environment-parameters@1.9.18...@aws-amplify/amplify-environment-parameters@1.9.19) (2025-04-17)
+
+**Note:** Version bump only for package @aws-amplify/amplify-environment-parameters
+
+
+
+
+
+## [1.9.18](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-environment-parameters@1.9.17...@aws-amplify/amplify-environment-parameters@1.9.18) (2025-02-20)
+
+**Note:** Version bump only for package @aws-amplify/amplify-environment-parameters
+
+
+
+
+
+## [1.9.17](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-environment-parameters@1.9.16...@aws-amplify/amplify-environment-parameters@1.9.17) (2025-02-07)
+
+**Note:** Version bump only for package @aws-amplify/amplify-environment-parameters
+
+
+
+
+
+## [1.9.16](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-environment-parameters@1.9.15...@aws-amplify/amplify-environment-parameters@1.9.16) (2025-01-30)
+
+**Note:** Version bump only for package @aws-amplify/amplify-environment-parameters
+
+
+
+
+
+## [1.9.15](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-environment-parameters@1.9.14...@aws-amplify/amplify-environment-parameters@1.9.15) (2024-08-02)
+
+**Note:** Version bump only for package @aws-amplify/amplify-environment-parameters
+
+
+
+
+
+## [1.9.14](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-environment-parameters@1.9.13...@aws-amplify/amplify-environment-parameters@1.9.14) (2024-06-27)
+
+**Note:** Version bump only for package @aws-amplify/amplify-environment-parameters
+
+
+
+
+
+## [1.9.13](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-environment-parameters@1.9.12...@aws-amplify/amplify-environment-parameters@1.9.13) (2024-06-20)
+
+**Note:** Version bump only for package @aws-amplify/amplify-environment-parameters
+
+
+
+
+
+## [1.9.12](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-environment-parameters@1.9.11...@aws-amplify/amplify-environment-parameters@1.9.12) (2024-06-06)
+
+**Note:** Version bump only for package @aws-amplify/amplify-environment-parameters
+
+
+
+
+
+## [1.9.11](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-environment-parameters@1.9.10...@aws-amplify/amplify-environment-parameters@1.9.11) (2024-05-24)
+
+**Note:** Version bump only for package @aws-amplify/amplify-environment-parameters
+
+
+
+
+
+## [1.9.10](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-environment-parameters@1.9.9...@aws-amplify/amplify-environment-parameters@1.9.10) (2024-05-07)
+
+**Note:** Version bump only for package @aws-amplify/amplify-environment-parameters
+
+
+
+
+
+## [1.9.9](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-environment-parameters@1.9.8...@aws-amplify/amplify-environment-parameters@1.9.9) (2024-04-18)
+
+**Note:** Version bump only for package @aws-amplify/amplify-environment-parameters
+
+
+
+
+
+## [1.9.8](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-environment-parameters@1.9.7...@aws-amplify/amplify-environment-parameters@1.9.8) (2024-04-15)
+
+**Note:** Version bump only for package @aws-amplify/amplify-environment-parameters
+
+
+
+
+
+## [1.9.7](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-environment-parameters@1.9.6...@aws-amplify/amplify-environment-parameters@1.9.7) (2024-03-29)
+
+**Note:** Version bump only for package @aws-amplify/amplify-environment-parameters
+
+
+
+
+
+## [1.9.6](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-environment-parameters@1.9.5...@aws-amplify/amplify-environment-parameters@1.9.6) (2024-03-06)
+
+**Note:** Version bump only for package @aws-amplify/amplify-environment-parameters
+
+
+
+
+
 ## [1.9.5](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-environment-parameters@1.9.4...@aws-amplify/amplify-environment-parameters@1.9.5) (2023-12-11)
 
 **Note:** Version bump only for package @aws-amplify/amplify-environment-parameters

@@ -3,6 +3,188 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [4.4.4](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-cli-core@4.4.3...@aws-amplify/amplify-cli-core@4.4.4) (2025-10-31)
+
+
+### Bug Fixes
+
+* upgrade `@aws-sdk/*` to latest ([#14306](https://github.com/aws-amplify/amplify-cli/issues/14306)) ([faca740](https://github.com/aws-amplify/amplify-cli/commit/faca7400e65374536e28f58119bb6a66c48aa4d7))
+
+
+### Reverts
+
+* Revert "refactor: amplify-category-notifications aws sdk v3 migration (#14271)" (#14285) ([510560d](https://github.com/aws-amplify/amplify-cli/commit/510560decb0735a0e8633aadfa6c23fae376dfe1)), closes [#14271](https://github.com/aws-amplify/amplify-cli/issues/14271) [#14285](https://github.com/aws-amplify/amplify-cli/issues/14285)
+
+
+
+
+
+## [4.4.3](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-cli-core@4.4.2...@aws-amplify/amplify-cli-core@4.4.3) (2025-10-08)
+
+**Note:** Version bump only for package @aws-amplify/amplify-cli-core
+
+
+
+
+
+## [4.4.2](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-cli-core@4.4.1...@aws-amplify/amplify-cli-core@4.4.2) (2025-07-01)
+
+
+### Bug Fixes
+
+* pin CDK version again ([#14186](https://github.com/aws-amplify/amplify-cli/issues/14186)) ([ef7f5eb](https://github.com/aws-amplify/amplify-cli/commit/ef7f5ebe0136049865554c6ec0235abc9b816fea))
+* upgrade most packages that use `rimraf` and `glob` ([#14153](https://github.com/aws-amplify/amplify-cli/issues/14153)) ([c85ed14](https://github.com/aws-amplify/amplify-cli/commit/c85ed14b2fe61c09a026f7bb7c82857b5227dff2))
+
+
+
+
+
+## [4.4.1](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-cli-core@4.4.0...@aws-amplify/amplify-cli-core@4.4.1) (2025-04-17)
+
+**Note:** Version bump only for package @aws-amplify/amplify-cli-core
+
+
+
+
+
+# [4.4.0](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-cli-core@4.3.12...@aws-amplify/amplify-cli-core@4.4.0) (2025-02-20)
+
+
+### Features
+
+* add enableGen2Migration feature flag ([90d68c5](https://github.com/aws-amplify/amplify-cli/commit/90d68c5bee8866b74b92a11ce5af54f48e247d55))
+
+
+
+
+
+## [4.3.12](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-cli-core@4.3.11...@aws-amplify/amplify-cli-core@4.3.12) (2025-02-07)
+
+
+### Bug Fixes
+
+* **amplify-cli-core:** use build script for overrides ([#13858](https://github.com/aws-amplify/amplify-cli/issues/13858)) ([30c9f0c](https://github.com/aws-amplify/amplify-cli/commit/30c9f0ce2935c3b3871baa2bb01007638b3ffcc9)), closes [#11854](https://github.com/aws-amplify/amplify-cli/issues/11854) [#11889](https://github.com/aws-amplify/amplify-cli/issues/11889)
+* **amplify-cli-core:** use build script properly for overrides ([#14093](https://github.com/aws-amplify/amplify-cli/issues/14093)) ([aab715d](https://github.com/aws-amplify/amplify-cli/commit/aab715db07578b7790498b9ad791db7d3a0b4d5c)), closes [#11854](https://github.com/aws-amplify/amplify-cli/issues/11854) [#13858](https://github.com/aws-amplify/amplify-cli/issues/13858) [#11889](https://github.com/aws-amplify/amplify-cli/issues/11889) [#11889](https://github.com/aws-amplify/amplify-cli/issues/11889) [#11889](https://github.com/aws-amplify/amplify-cli/issues/11889)
+
+
+### Reverts
+
+* Revert "fix(amplify-cli-core): use build script for overrides (#13858)" (#14092) ([4d368b3](https://github.com/aws-amplify/amplify-cli/commit/4d368b3d587616b7cba3164b701c370429c66ae2)), closes [#13858](https://github.com/aws-amplify/amplify-cli/issues/13858) [#14092](https://github.com/aws-amplify/amplify-cli/issues/14092)
+
+
+
+
+
+## [4.3.11](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-cli-core@4.3.10...@aws-amplify/amplify-cli-core@4.3.11) (2025-01-30)
+
+**Note:** Version bump only for package @aws-amplify/amplify-cli-core
+
+
+
+
+
+## [4.3.10](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-cli-core@4.3.9...@aws-amplify/amplify-cli-core@4.3.10) (2024-08-02)
+
+**Note:** Version bump only for package @aws-amplify/amplify-cli-core
+
+
+
+
+
+## [4.3.9](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-cli-core@4.3.8...@aws-amplify/amplify-cli-core@4.3.9) (2024-06-27)
+
+**Note:** Version bump only for package @aws-amplify/amplify-cli-core
+
+
+
+
+
+## [4.3.8](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-cli-core@4.3.7...@aws-amplify/amplify-cli-core@4.3.8) (2024-06-20)
+
+
+### Bug Fixes
+
+* **cli:** add feature flag to control subscription field redaction behavior ([#13827](https://github.com/aws-amplify/amplify-cli/issues/13827)) ([4f9aadb](https://github.com/aws-amplify/amplify-cli/commit/4f9aadbd33a9adfa6c93f39d55ccbe0b13285965))
+
+
+
+
+
+## [4.3.7](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-cli-core@4.3.6...@aws-amplify/amplify-cli-core@4.3.7) (2024-06-06)
+
+
+### Bug Fixes
+
+* skip types in current cloud backend ([#13803](https://github.com/aws-amplify/amplify-cli/issues/13803)) ([81ce57a](https://github.com/aws-amplify/amplify-cli/commit/81ce57afdfe73ce951143e6b20607bb3c77b43ae))
+
+
+
+
+
+## [4.3.6](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-cli-core@4.3.5...@aws-amplify/amplify-cli-core@4.3.6) (2024-05-24)
+
+
+### Bug Fixes
+
+* do not create read stream for zip entries that are not being extracted ([883b23b](https://github.com/aws-amplify/amplify-cli/commit/883b23b6cd22a3c59296ca04f4d7f088ebb2d0a9))
+* don't create symlinks after extracting zip ([#13791](https://github.com/aws-amplify/amplify-cli/issues/13791)) ([08f358d](https://github.com/aws-amplify/amplify-cli/commit/08f358da33163fa70930ae6ef900e1d018672ef1))
+
+
+
+
+
+## [4.3.5](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-cli-core@4.3.4...@aws-amplify/amplify-cli-core@4.3.5) (2024-05-07)
+
+**Note:** Version bump only for package @aws-amplify/amplify-cli-core
+
+
+
+
+
+## [4.3.4](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-cli-core@4.3.3...@aws-amplify/amplify-cli-core@4.3.4) (2024-04-18)
+
+**Note:** Version bump only for package @aws-amplify/amplify-cli-core
+
+
+
+
+
+## [4.3.3](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-cli-core@4.3.2...@aws-amplify/amplify-cli-core@4.3.3) (2024-04-15)
+
+
+### Bug Fixes
+
+* **amplify-cli-core:** gracefully handle execa race condition ([#13692](https://github.com/aws-amplify/amplify-cli/issues/13692)) ([dcafcb2](https://github.com/aws-amplify/amplify-cli/commit/dcafcb2d8bdaf7af37afa305afb10396a840825b))
+* yarn modern install workspace ([#13197](https://github.com/aws-amplify/amplify-cli/issues/13197)) ([3ca4aa9](https://github.com/aws-amplify/amplify-cli/commit/3ca4aa99457e54a89805f86e56b475aaef531d7e))
+
+
+
+
+
+## [4.3.2](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-cli-core@4.3.1...@aws-amplify/amplify-cli-core@4.3.2) (2024-03-29)
+
+**Note:** Version bump only for package @aws-amplify/amplify-cli-core
+
+
+
+
+
+## [4.3.1](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-cli-core@4.3.0...@aws-amplify/amplify-cli-core@4.3.1) (2024-03-06)
+
+
+### Bug Fixes
+
+* dependabot alert for lodash.set ([#13558](https://github.com/aws-amplify/amplify-cli/issues/13558)) ([c7f9bbe](https://github.com/aws-amplify/amplify-cli/commit/c7f9bbeb4943280bdda10304ce4e17622c5ec9c7))
+
+
+### Reverts
+
+* Revert "chore: bump data package versions (#13486)" (#13487) ([3280d40](https://github.com/aws-amplify/amplify-cli/commit/3280d40a5ab50c675b0e2b8050ad35a69c83cdc2)), closes [#13486](https://github.com/aws-amplify/amplify-cli/issues/13486) [#13487](https://github.com/aws-amplify/amplify-cli/issues/13487)
+
+
+
+
+
 # [4.3.0](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-cli-core@4.2.13...@aws-amplify/amplify-cli-core@4.3.0) (2023-12-11)
 
 

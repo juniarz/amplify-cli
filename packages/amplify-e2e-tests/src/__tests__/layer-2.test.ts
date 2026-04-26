@@ -1,6 +1,6 @@
 import * as fs from 'fs-extra';
 import * as path from 'path';
-import * as rimraf from 'rimraf';
+import { rimrafSync } from 'rimraf';
 import {
   addFunction,
   addLayer,
@@ -233,7 +233,7 @@ describe('amplify add lambda layer with changes', () => {
 
     const payload = '{}';
     let response = await functionCloudInvoke(projRoot, { funcName: functionName, payload });
-    expect(JSON.parse(JSON.parse(response.Payload.toString()).body)).toEqual(helloWorldUpperCaseOutput);
+    expect(JSON.parse(JSON.parse(response.Payload.transformToString()).body)).toEqual(helloWorldUpperCaseOutput);
 
     // 2. Step
     // - Update casing.js in layer
@@ -266,7 +266,7 @@ describe('amplify add lambda layer with changes', () => {
 
     response = await functionCloudInvoke(projRoot, { funcName: functionName, payload });
 
-    expect(JSON.parse(JSON.parse(response.Payload.toString()).body)).toEqual(helloWorldUpperCaseOutput);
+    expect(JSON.parse(JSON.parse(response.Payload.transformToString()).body)).toEqual(helloWorldUpperCaseOutput);
 
     // 3. Step
     // - Update function to use latest version of the layer
@@ -296,7 +296,7 @@ describe('amplify add lambda layer with changes', () => {
 
     response = await functionCloudInvoke(projRoot, { funcName: functionName, payload });
 
-    expect(JSON.parse(JSON.parse(response.Payload.toString()).body)).toEqual(helloWorldTitleCaseOutput);
+    expect(JSON.parse(JSON.parse(response.Payload.transformToString()).body)).toEqual(helloWorldTitleCaseOutput);
   });
 
   /*
@@ -346,7 +346,7 @@ describe('amplify add lambda layer with changes', () => {
       getLayerDirectoryName({ projName: settings.projName, layerName: settings.layerName }),
     );
 
-    rimraf.sync(path.join(layerPath, 'lib', 'nodejs', 'node_modules'));
+    rimrafSync(path.join(layerPath, 'lib', 'nodejs', 'node_modules'));
 
     await amplifyStatus(projRoot, 'No Change');
 
@@ -415,7 +415,7 @@ describe('amplify add lambda layer with changes', () => {
       getLayerDirectoryName({ projName: settings.projName, layerName: settings.layerName }),
     );
 
-    rimraf.sync(path.join(layerPath, 'lib', 'python', 'lib'));
+    rimrafSync(path.join(layerPath, 'lib', 'python', 'lib'));
 
     await amplifyStatus(projRoot, 'No Change');
 

@@ -10,7 +10,7 @@ import * as which from 'which';
 import execa from 'execa';
 import archiver from 'archiver';
 import fs from 'fs-extra';
-import glob from 'glob';
+import { globSync } from 'glob';
 import path from 'path';
 import { SemVer, coerce, gte, lt } from 'semver';
 import { BIN_LOCAL, BIN, SRC, MAIN_BINARY, DIST, MAIN_BINARY_WIN } from './constants';
@@ -47,7 +47,7 @@ export const executeCommand = (
 
 const isBuildStale = (resourceDir: string, lastBuildTimeStamp: Date, outDir: string) => {
   // If output directory does not exists or empty, rebuild required
-  if (!fs.existsSync(outDir) || glob.sync(`${outDir}/**`).length == 0) {
+  if (!fs.existsSync(outDir) || globSync(`${outDir}/**`).length == 0) {
     return true;
   }
 
@@ -59,9 +59,9 @@ const isBuildStale = (resourceDir: string, lastBuildTimeStamp: Date, outDir: str
     return true;
   }
 
-  const fileUpdatedAfterLastBuild = glob
-    .sync(`${resourceDir}/${SRC}/**`)
-    .find((file) => new Date(fs.statSync(file).mtime) > lastBuildTimeStamp);
+  const fileUpdatedAfterLastBuild = globSync(`${resourceDir}/${SRC}/**`).find(
+    (file) => new Date(fs.statSync(file).mtime) > lastBuildTimeStamp,
+  );
 
   return !!fileUpdatedAfterLastBuild;
 };
@@ -73,8 +73,6 @@ export const buildResource = async ({ buildType, srcRoot, lastBuildTimeStamp }: 
   const outDir = path.join(srcRoot, buildDir);
 
   const isWindows = process.platform.startsWith('win');
-  const executableName = isWindows && buildType === BuildType.DEV ? MAIN_BINARY_WIN : MAIN_BINARY;
-  const executablePath = path.join(outDir, executableName);
 
   if (!lastBuildTimeStamp || isBuildStale(srcRoot, lastBuildTimeStamp, outDir)) {
     const srcDir = path.join(srcRoot, SRC);
@@ -86,7 +84,7 @@ export const buildResource = async ({ buildType, srcRoot, lastBuildTimeStamp }: 
       fs.mkdirSync(outDir);
     }
 
-    const envVars: any = {};
+    const envVars: any = { GOPROXY: 'direct' };
 
     if (buildType === BuildType.PROD) {
       envVars.GOOS = 'linux';
@@ -95,12 +93,14 @@ export const buildResource = async ({ buildType, srcRoot, lastBuildTimeStamp }: 
 
     if (isWindows) {
       envVars.CGO_ENABLED = 0;
+      executeCommand(['install', 'github.com/aws/aws-lambda-go/cmd/build-lambda-zip@latest'], true, envVars, srcDir);
     }
 
     // for go@1.16, dependencies must be manually installed
     executeCommand(['mod', 'tidy', '-v'], true, envVars, srcDir);
     // Execute the build command, cwd must be the source file directory (Windows requires it)
-    executeCommand(['build', '-o', executablePath, '.'], true, envVars, srcDir);
+    // Details: https://github.com/aws/aws-lambda-go
+    executeCommand(['build', '-o', '../bin/bootstrap', '.'], true, envVars, srcDir);
 
     rebuilt = true;
   }

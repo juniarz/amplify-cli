@@ -49,7 +49,9 @@ const main = async () => {
   const expectedSourceVersion = process.argv[2];
   const jobsDependedOnFilepathOrId = process.argv[3];
   const codeBuildProjectName = process.argv[4];
-  let accountForFailures: boolean = process.argv.length >= 6 && process.argv[5] === 'requirePrevJobsToSucceed';
+  const codebuildWebhookTrigger = process.argv[5];
+  const accountForFailures: boolean = process.argv.length >= 7 && process.argv[6] === 'requirePrevJobsToSucceed';
+
   let jobsDependedOn: string[];
   if (fs.existsSync(jobsDependedOnFilepathOrId)) {
     const jobsDependedOnRaw = fs.readFileSync(jobsDependedOnFilepathOrId, 'utf8');
@@ -79,9 +81,12 @@ const main = async () => {
   let intersectingIncompleteJobs: string[];
   do {
     await new Promise((resolve) => setTimeout(resolve, 180 * 1000)); // sleep for 180 seconds
+    const failedJobsInBatch = await getFailedJobIdsFromBatchId(cb, batchId);
+    const intersectingFailedJobs = failedJobsInBatch.filter((jobId) => jobsDependedOn.includes(jobId));
+    const batchFailed = failedJobsInBatch.length || intersectingFailedJobs.length;
+    console.log(`Batch triggered by ${codebuildWebhookTrigger} ${batchFailed ? 'failed' : 'succeeded'}.`);
+
     if (accountForFailures) {
-      const failedJobsInBatch = await getFailedJobIdsFromBatchId(cb, batchId);
-      const intersectingFailedJobs = failedJobsInBatch.filter((jobId) => jobsDependedOn.includes(jobId));
       console.log(`failedJobsInBatch: ${JSON.stringify(failedJobsInBatch)}`);
       console.log(`intersectingFailedJobs: ${JSON.stringify(intersectingFailedJobs)}`);
       if (intersectingFailedJobs.length > 0) {

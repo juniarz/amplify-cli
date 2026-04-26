@@ -1,7 +1,7 @@
 {
   "name": "@aws-amplify/amplify-go-function-template-provider",
-  "version": "1.4.7",
-  "description": "Go 1.x templates supplied by the Amplify Team",
+  "version": "1.4.9",
+  "description": "Go templates supplied by the Amplify Team",
   "repository": {
     "type": "git",
     "url": "https://github.com/aws-amplify/amplify-cli.git",
@@ -30,6 +30,6 @@
   "devDependencies": {
     "@types/fs-extra": "^8.0.1",
     "@types/lodash": "^4.14.149",
-    "@types/node": "^12.12.6"
+    "@types/node": "^20.9.0"
   }
 }

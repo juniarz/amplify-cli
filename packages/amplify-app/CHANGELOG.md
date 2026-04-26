@@ -3,6 +3,161 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [5.0.45](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-app@5.0.44...@aws-amplify/amplify-app@5.0.45) (2025-10-31)
+
+**Note:** Version bump only for package @aws-amplify/amplify-app
+
+
+
+
+
+## [5.0.44](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-app@5.0.43...@aws-amplify/amplify-app@5.0.44) (2025-10-08)
+
+**Note:** Version bump only for package @aws-amplify/amplify-app
+
+
+
+
+
+## [5.0.43](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-app@5.0.42...@aws-amplify/amplify-app@5.0.43) (2025-07-01)
+
+
+### Bug Fixes
+
+* upgrade most packages that use `rimraf` and `glob` ([#14153](https://github.com/aws-amplify/amplify-cli/issues/14153)) ([c85ed14](https://github.com/aws-amplify/amplify-cli/commit/c85ed14b2fe61c09a026f7bb7c82857b5227dff2))
+
+
+
+
+
+## [5.0.42](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-app@5.0.41...@aws-amplify/amplify-app@5.0.42) (2025-04-17)
+
+**Note:** Version bump only for package @aws-amplify/amplify-app
+
+
+
+
+
+## [5.0.41](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-app@5.0.40...@aws-amplify/amplify-app@5.0.41) (2025-02-25)
+
+**Note:** Version bump only for package @aws-amplify/amplify-app
+
+
+
+
+
+## [5.0.40](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-app@5.0.39...@aws-amplify/amplify-app@5.0.40) (2025-02-20)
+
+**Note:** Version bump only for package @aws-amplify/amplify-app
+
+
+
+
+
+## [5.0.39](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-app@5.0.38...@aws-amplify/amplify-app@5.0.39) (2025-02-07)
+
+**Note:** Version bump only for package @aws-amplify/amplify-app
+
+
+
+
+
+## [5.0.38](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-app@5.0.37...@aws-amplify/amplify-app@5.0.38) (2025-01-30)
+
+**Note:** Version bump only for package @aws-amplify/amplify-app
+
+
+
+
+
+## [5.0.37](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-app@5.0.36...@aws-amplify/amplify-app@5.0.37) (2025-01-02)
+
+**Note:** Version bump only for package @aws-amplify/amplify-app
+
+
+
+
+
+## [5.0.36](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-app@5.0.35...@aws-amplify/amplify-app@5.0.36) (2024-08-02)
+
+**Note:** Version bump only for package @aws-amplify/amplify-app
+
+
+
+
+
+## [5.0.35](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-app@5.0.34...@aws-amplify/amplify-app@5.0.35) (2024-06-27)
+
+**Note:** Version bump only for package @aws-amplify/amplify-app
+
+
+
+
+
+## [5.0.34](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-app@5.0.33...@aws-amplify/amplify-app@5.0.34) (2024-06-20)
+
+**Note:** Version bump only for package @aws-amplify/amplify-app
+
+
+
+
+
+## [5.0.33](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-app@5.0.32...@aws-amplify/amplify-app@5.0.33) (2024-06-06)
+
+**Note:** Version bump only for package @aws-amplify/amplify-app
+
+
+
+
+
+## [5.0.32](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-app@5.0.31...@aws-amplify/amplify-app@5.0.32) (2024-05-24)
+
+**Note:** Version bump only for package @aws-amplify/amplify-app
+
+
+
+
+
+## [5.0.31](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-app@5.0.30...@aws-amplify/amplify-app@5.0.31) (2024-05-07)
+
+**Note:** Version bump only for package @aws-amplify/amplify-app
+
+
+
+
+
+## [5.0.30](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-app@5.0.29...@aws-amplify/amplify-app@5.0.30) (2024-04-18)
+
+**Note:** Version bump only for package @aws-amplify/amplify-app
+
+
+
+
+
+## [5.0.29](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-app@5.0.28...@aws-amplify/amplify-app@5.0.29) (2024-04-15)
+
+**Note:** Version bump only for package @aws-amplify/amplify-app
+
+
+
+
+
+## [5.0.28](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-app@5.0.27...@aws-amplify/amplify-app@5.0.28) (2024-03-29)
+
+**Note:** Version bump only for package @aws-amplify/amplify-app
+
+
+
+
+
+## [5.0.27](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-app@5.0.26...@aws-amplify/amplify-app@5.0.27) (2024-03-06)
+
+**Note:** Version bump only for package @aws-amplify/amplify-app
+
+
+
+
+
 ## [5.0.26](https://github.com/aws-amplify/amplify-cli/compare/@aws-amplify/amplify-app@5.0.25...@aws-amplify/amplify-app@5.0.26) (2023-12-11)
 
 **Note:** Version bump only for package @aws-amplify/amplify-app

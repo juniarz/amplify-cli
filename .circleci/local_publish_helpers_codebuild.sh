@@ -86,22 +86,22 @@ function generatePkgCli {
   cp package.json ../build/node_modules/package.json
 
   if [[ "$@" =~ 'arm' ]]; then
-    npx pkg --no-bytecode --public-packages "*" --public -t node18-linux-arm64 ../build/node_modules -o ../out/amplify-pkg-linux-arm64
+    npx pkg --no-bytecode --public-packages "*" --public -t node22-linux-arm64 ../build/node_modules -o ../out/amplify-pkg-linux-arm64
     tar -czvf ../out/amplify-pkg-linux-arm64.tgz ../out/amplify-pkg-linux-arm64
   fi
 
   if [[ "$@" =~ 'linux' ]]; then
-    npx pkg -t node18-linux-x64 ../build/node_modules -o ../out/amplify-pkg-linux-x64
+    npx pkg -t node22-linux-x64 ../build/node_modules -o ../out/amplify-pkg-linux-x64
     tar -czvf ../out/amplify-pkg-linux-x64.tgz ../out/amplify-pkg-linux-x64
   fi
 
   if [[ "$@" =~ 'macos' ]]; then
-    npx pkg -t node18-macos-x64 ../build/node_modules -o ../out/amplify-pkg-macos-x64
+    npx pkg -t node22-macos-x64 ../build/node_modules -o ../out/amplify-pkg-macos-x64
     tar -czvf ../out/amplify-pkg-macos-x64.tgz ../out/amplify-pkg-macos-x64
   fi
 
   if [[ "$@" =~ 'win' ]]; then
-    npx pkg -t node18-win-x64 ../build/node_modules -o ../out/amplify-pkg-win-x64.exe
+    npx pkg -t node22-win-x64 ../build/node_modules -o ../out/amplify-pkg-win-x64.exe
     tar -czvf ../out/amplify-pkg-win-x64.tgz ../out/amplify-pkg-win-x64.exe
   fi
 
@@ -139,10 +139,11 @@ function verifyPkgCli {
       fi
     }
 
-    verifySinglePkg "amplify-pkg-linux-x64" "amplify-pkg-linux-x64.tgz" $((750 * 1024 * 1024))
-    verifySinglePkg "amplify-pkg-macos-x64" "amplify-pkg-macos-x64.tgz" $((750 * 1024 * 1024))
-    verifySinglePkg "amplify-pkg-win-x64.exe" "amplify-pkg-win-x64.tgz" $((750 * 1024 * 1024))
-    verifySinglePkg "amplify-pkg-linux-arm64" "amplify-pkg-linux-arm64.tgz" $((660 * 1024 * 1024))
+    # TODO: After V3 migrations are done, decrease 1095 back to 930 and 875 back to 750
+    verifySinglePkg "amplify-pkg-linux-x64" "amplify-pkg-linux-x64.tgz" $((1095 * 1024 * 1024))
+    verifySinglePkg "amplify-pkg-macos-x64" "amplify-pkg-macos-x64.tgz" $((1105 * 1024 * 1024))
+    verifySinglePkg "amplify-pkg-win-x64.exe" "amplify-pkg-win-x64.tgz" $((1095 * 1024 * 1024))
+    verifySinglePkg "amplify-pkg-linux-arm64" "amplify-pkg-linux-arm64.tgz" $((875 * 1024 * 1024))
 }
 
 function unsetNpmRegistryUrl {
@@ -323,7 +324,7 @@ function checkPackageVersionsInLocalNpmRegistry {
 
     if [[ $cli_internal_version != $cli_version ]]; then
         echo "Versions did not match."
-        echo "Manual fix: add a proper conventional commit that touches the amplify-cli-npm package to correct its version bump. For example https://github.com/aws-amplify/amplify-cli/commit/6f14792d1db424aa428ec4836fed7d6dd5cccfd0"
+        echo "Manual fix: add a proper conventional commit that touches the amplify-cli-npm package to correct its version bump. For example https://github.com/aws-amplify/amplify-cli/pull/13759/commits/15dcd96feae925ff26ca51abfb4a0477890af745"
         exit 1
     else
         echo "Versions matched."

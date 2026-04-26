@@ -1,5 +1,7 @@
-const aws = require('./aws.js');
+const { LexModelBuildingServiceClient } = require('@aws-sdk/client-lex-model-building-service');
+const { NodeHttpHandler } = require('@smithy/node-http-handler');
 const configurationManager = require('../configuration-manager');
+const { proxyAgent } = require('./aws-globals');
 
 const serviceRegionMap = {
   'us-east-1': 'us-east-1',
@@ -35,7 +37,14 @@ class Lex {
         // ignore missing config
       }
       this.context = context;
-      this.lex = new aws.LexModelBuildingService({ ...cred, ...options, apiVersion: '2017-04-19' });
+      this.lex = new LexModelBuildingServiceClient({
+        ...cred,
+        ...options,
+        requestHandler: new NodeHttpHandler({
+          httpAgent: proxyAgent(),
+          httpsAgent: proxyAgent(),
+        }),
+      });
       return this;
     })();
   }

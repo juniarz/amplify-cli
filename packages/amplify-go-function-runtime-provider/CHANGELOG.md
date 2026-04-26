@@ -3,6 +3,157 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [2.3.54](https://github.com/aws-amplify/amplify-cli/compare/amplify-go-function-runtime-provider@2.3.53...amplify-go-function-runtime-provider@2.3.54) (2025-10-31)
+
+
+### Reverts
+
+* Revert "refactor: amplify-category-notifications aws sdk v3 migration (#14271)" (#14285) ([510560d](https://github.com/aws-amplify/amplify-cli/commit/510560decb0735a0e8633aadfa6c23fae376dfe1)), closes [#14271](https://github.com/aws-amplify/amplify-cli/issues/14271) [#14285](https://github.com/aws-amplify/amplify-cli/issues/14285)
+
+
+
+
+
+## [2.3.53](https://github.com/aws-amplify/amplify-cli/compare/amplify-go-function-runtime-provider@2.3.52...amplify-go-function-runtime-provider@2.3.53) (2025-10-08)
+
+**Note:** Version bump only for package amplify-go-function-runtime-provider
+
+
+
+
+
+## [2.3.52](https://github.com/aws-amplify/amplify-cli/compare/amplify-go-function-runtime-provider@2.3.51...amplify-go-function-runtime-provider@2.3.52) (2025-07-01)
+
+
+### Bug Fixes
+
+* upgrade most packages that use `rimraf` and `glob` ([#14153](https://github.com/aws-amplify/amplify-cli/issues/14153)) ([c85ed14](https://github.com/aws-amplify/amplify-cli/commit/c85ed14b2fe61c09a026f7bb7c82857b5227dff2))
+
+
+
+
+
+## [2.3.51](https://github.com/aws-amplify/amplify-cli/compare/amplify-go-function-runtime-provider@2.3.50...amplify-go-function-runtime-provider@2.3.51) (2025-04-17)
+
+**Note:** Version bump only for package amplify-go-function-runtime-provider
+
+
+
+
+
+## [2.3.50](https://github.com/aws-amplify/amplify-cli/compare/amplify-go-function-runtime-provider@2.3.49...amplify-go-function-runtime-provider@2.3.50) (2025-02-20)
+
+**Note:** Version bump only for package amplify-go-function-runtime-provider
+
+
+
+
+
+## [2.3.49](https://github.com/aws-amplify/amplify-cli/compare/amplify-go-function-runtime-provider@2.3.48...amplify-go-function-runtime-provider@2.3.49) (2025-02-07)
+
+**Note:** Version bump only for package amplify-go-function-runtime-provider
+
+
+
+
+
+## [2.3.48](https://github.com/aws-amplify/amplify-cli/compare/amplify-go-function-runtime-provider@2.3.47...amplify-go-function-runtime-provider@2.3.48) (2025-01-30)
+
+**Note:** Version bump only for package amplify-go-function-runtime-provider
+
+
+
+
+
+## [2.3.47](https://github.com/aws-amplify/amplify-cli/compare/amplify-go-function-runtime-provider@2.3.46...amplify-go-function-runtime-provider@2.3.47) (2024-08-02)
+
+
+### Bug Fixes
+
+* remove go.exe as argument to go command ([#13789](https://github.com/aws-amplify/amplify-cli/issues/13789)) ([2570d0c](https://github.com/aws-amplify/amplify-cli/commit/2570d0c448b63e6cad419757030fd9f26eb97557))
+
+
+
+
+
+## [2.3.46](https://github.com/aws-amplify/amplify-cli/compare/amplify-go-function-runtime-provider@2.3.45...amplify-go-function-runtime-provider@2.3.46) (2024-06-27)
+
+**Note:** Version bump only for package amplify-go-function-runtime-provider
+
+
+
+
+
+## [2.3.45](https://github.com/aws-amplify/amplify-cli/compare/amplify-go-function-runtime-provider@2.3.44...amplify-go-function-runtime-provider@2.3.45) (2024-06-20)
+
+**Note:** Version bump only for package amplify-go-function-runtime-provider
+
+
+
+
+
+## [2.3.44](https://github.com/aws-amplify/amplify-cli/compare/amplify-go-function-runtime-provider@2.3.43...amplify-go-function-runtime-provider@2.3.44) (2024-06-06)
+
+**Note:** Version bump only for package amplify-go-function-runtime-provider
+
+
+
+
+
+## [2.3.43](https://github.com/aws-amplify/amplify-cli/compare/amplify-go-function-runtime-provider@2.3.42...amplify-go-function-runtime-provider@2.3.43) (2024-05-24)
+
+
+### Bug Fixes
+
+* fix Go project with multiple files ([#13765](https://github.com/aws-amplify/amplify-cli/issues/13765)) ([bd5dc93](https://github.com/aws-amplify/amplify-cli/commit/bd5dc939dccc19520d45e6ff1d2e3870b2c9d679))
+
+
+
+
+
+## [2.3.42](https://github.com/aws-amplify/amplify-cli/compare/amplify-go-function-runtime-provider@2.3.41...amplify-go-function-runtime-provider@2.3.42) (2024-05-07)
+
+**Note:** Version bump only for package amplify-go-function-runtime-provider
+
+
+
+
+
+## [2.3.41](https://github.com/aws-amplify/amplify-cli/compare/amplify-go-function-runtime-provider@2.3.40...amplify-go-function-runtime-provider@2.3.41) (2024-04-18)
+
+**Note:** Version bump only for package amplify-go-function-runtime-provider
+
+
+
+
+
+## [2.3.40](https://github.com/aws-amplify/amplify-cli/compare/amplify-go-function-runtime-provider@2.3.39...amplify-go-function-runtime-provider@2.3.40) (2024-04-15)
+
+
+### Bug Fixes
+
+* upgrade Go runtime and fix e2e ([#13671](https://github.com/aws-amplify/amplify-cli/issues/13671)) ([395f717](https://github.com/aws-amplify/amplify-cli/commit/395f717cf52e7beef76f00ee08d37877138b0c30))
+
+
+
+
+
+## [2.3.39](https://github.com/aws-amplify/amplify-cli/compare/amplify-go-function-runtime-provider@2.3.38...amplify-go-function-runtime-provider@2.3.39) (2024-03-29)
+
+**Note:** Version bump only for package amplify-go-function-runtime-provider
+
+
+
+
+
+## [2.3.38](https://github.com/aws-amplify/amplify-cli/compare/amplify-go-function-runtime-provider@2.3.37...amplify-go-function-runtime-provider@2.3.38) (2024-03-06)
+
+**Note:** Version bump only for package amplify-go-function-runtime-provider
+
+
+
+
+
 ## [2.3.37](https://github.com/aws-amplify/amplify-cli/compare/amplify-go-function-runtime-provider@2.3.36...amplify-go-function-runtime-provider@2.3.37) (2023-12-11)
 
 **Note:** Version bump only for package amplify-go-function-runtime-provider
